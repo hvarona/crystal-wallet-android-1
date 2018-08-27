@@ -55,7 +55,6 @@ import cy.agorise.crystalwallet.viewmodels.CryptoNetBalanceListViewModel;
  * Created by Henry Varona on 7/10/2017.
  *
  */
-
 public class BoardActivity  extends CustomActivity {
 
     @BindView(R.id.tabLayout)
@@ -119,7 +118,7 @@ public class BoardActivity  extends CustomActivity {
         /*
         * Listener tabLayout to resalt text when clicked
         * */
-        final TabLayout tabLayoutFinal = tabLayout;
+        /*final TabLayout tabLayoutFinal = tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
@@ -163,7 +162,7 @@ public class BoardActivity  extends CustomActivity {
 
 
             }
-        });
+        });*/
 
         // Appbar animation
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
