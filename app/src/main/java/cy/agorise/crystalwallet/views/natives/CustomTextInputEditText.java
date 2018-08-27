@@ -8,7 +8,6 @@ import android.view.View;
 import cy.agorise.crystalwallet.models.FieldValidatorModel;
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidator;
 
-
 /*
 * Custom implementation of the native control to get more over control it
 * */
@@ -30,8 +29,6 @@ public class CustomTextInputEditText extends TextInputEditText implements UIVali
     private String lastValue;
 
 
-
-
     public CustomTextInputEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -48,8 +45,6 @@ public class CustomTextInputEditText extends TextInputEditText implements UIVali
             }
         });
     }
-
-
 
     public void setFieldValidatorModel(FieldValidatorModel fieldValidatorModel) {
         this.fieldValidatorModel = fieldValidatorModel;
@@ -72,7 +67,4 @@ public class CustomTextInputEditText extends TextInputEditText implements UIVali
     public void validate() {
         uiValidator.validate();
     }
-
-
-
 }

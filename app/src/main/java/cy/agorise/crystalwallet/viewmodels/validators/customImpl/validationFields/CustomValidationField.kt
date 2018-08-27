@@ -28,9 +28,6 @@ open class CustomValidationField {
     @JvmField protected var activity: Activity
 
 
-
-
-
     constructor(activity:Activity){
 
         /*

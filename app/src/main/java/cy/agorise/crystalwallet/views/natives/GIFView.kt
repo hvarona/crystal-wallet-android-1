@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import cy.agorise.crystalwallet.R
 
-
 /*
 * GIF implementation based on existing imageview class
 * */
@@ -17,8 +16,6 @@ class GIFView : ImageView {
     * Contains aditional options for the gif
     * */
     private var options: RequestOptions? = RequestOptions()
-
-
 
 
     constructor(context:Context,attrs: AttributeSet?) : super(context,attrs) {

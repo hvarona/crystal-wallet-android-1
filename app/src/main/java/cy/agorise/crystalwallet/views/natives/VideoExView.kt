@@ -7,7 +7,6 @@ import android.widget.VideoView
 import cy.agorise.crystalwallet.R
 import kotlinx.android.synthetic.main.empty_activity.*
 
-
 /*
 * Extensión for videoview
 * */
@@ -21,7 +20,6 @@ class VideoExView(context: Context?, attrs: AttributeSet?) : VideoView(context, 
         val uri = Uri.parse(uriPath)
         this.setVideoURI(uri)
     }
-
 
     /*
     * With this method the video play continues

@@ -17,8 +17,6 @@ class Test_VideoActivity : CustomActivity() {
     * cy.agorise.crystalwallet.views.natives.VideoViewEx
     * should be used as view to get the new implementations
     * */
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,7 +31,6 @@ class Test_VideoActivity : CustomActivity() {
         playIndeterminate()
     }
 
-
     /*
     * Just one time play
     * */
@@ -41,7 +38,6 @@ class Test_VideoActivity : CustomActivity() {
         video.setVideoRaw(R.raw.appbar_background)
         video.start()
     }
-
 
     /*
     * Just one time play

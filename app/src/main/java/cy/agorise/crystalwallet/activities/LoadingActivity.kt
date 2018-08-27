@@ -20,9 +20,6 @@ class LoadingActivity : CustomActivity() {
     @BindView(R.id.imageviewLoading)
     lateinit var imageviewLoading:ImageView
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         /*
@@ -154,9 +151,6 @@ class LoadingActivity : CustomActivity() {
         private var loadingIconHeigt:Int = -1
         private var loadinIconChangeSize:Boolean = false
 
-
-
-
         /*
         * Show the loading activity
         * */
@@ -249,7 +243,6 @@ class LoadingActivity : CustomActivity() {
             LoadingActivity.seconds = seconds
         }
     }
-
 
     /*
     * Interface for all the events

@@ -68,7 +68,6 @@ class CreateSeedActivity : CustomActivity() {
                     e.printStackTrace()
                 }
 
-
                 /*
                  * Validate if can continue
                  * */
@@ -121,7 +120,6 @@ class CreateSeedActivity : CustomActivity() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(tilPin, InputMethodManager.SHOW_IMPLICIT)
     }
-
 
     @OnTextChanged(value = R.id.tietPin, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     internal fun afterPinChanged(editable: Editable) {

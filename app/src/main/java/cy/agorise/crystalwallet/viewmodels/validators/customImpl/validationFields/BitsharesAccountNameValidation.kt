@@ -10,7 +10,6 @@ import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIVa
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidatorListener
 import cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
 
-
 /*
 *
 * Validation layer for Account Name
@@ -26,9 +25,6 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
      * Interface to validate when an account exist an take over control it
      * */
     private var onAccountExist: OnAccountExist? = null
-
-
-
 
 
     constructor (   activity: Activity,
@@ -244,7 +240,6 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
         * Passed initial validations, next final validations
         * */
     }
-
 
     /*
     * Setters and getters

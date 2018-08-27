@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import cy.agorise.crystalwallet.util.FieldsValidator
 
-
 /*
 * Custom implementaion of the activity
 * */
@@ -20,9 +19,6 @@ open class CustomActivity : AppCompatActivity() {
     * Contains the global activity
     * */
     protected lateinit var globalActivity: Activity
-
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

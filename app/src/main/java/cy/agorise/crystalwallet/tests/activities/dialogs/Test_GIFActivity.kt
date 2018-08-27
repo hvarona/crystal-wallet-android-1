@@ -6,7 +6,6 @@ import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.activities.CustomActivity
 import kotlinx.android.synthetic.main.empty_activity.*
 
-
 /*
 * Unit test for class GIFView
 * */
@@ -25,7 +24,6 @@ class Test_GIFActivity : CustomActivity() {
         load()
         //loadWithContainer()
     }
-
 
     /*
     * Load normaly the gif

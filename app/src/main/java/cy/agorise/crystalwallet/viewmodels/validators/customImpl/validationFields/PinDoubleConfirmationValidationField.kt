@@ -6,7 +6,6 @@ import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIVa
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidatorListener
 import cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
 
-
 /*
 * Validate PIN and PIN confirmation
 * */
@@ -19,8 +18,6 @@ class PinDoubleConfirmationValidationField : CustomValidationField, UIValidator 
     private val pinConfirmationField: CustomTextInputEditText
 
 
-
-
     constructor(activity: Activity,
                  pinField: CustomTextInputEditText,
                  pinConfirmationField: CustomTextInputEditText,
@@ -30,7 +27,6 @@ class PinDoubleConfirmationValidationField : CustomValidationField, UIValidator 
         this.pinConfirmationField = pinConfirmationField
         this.uiValidatorListener = pinDoubleConfirmationInterface
     }
-
 
     override fun validate() {
 

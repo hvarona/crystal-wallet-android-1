@@ -5,7 +5,6 @@ import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.activities.CustomActivity
 import cy.agorise.crystalwallet.dialogs.material.DialogMaterial
 
-
 /*
 * Class to test DialogMaterial.kt
 * */
@@ -16,15 +15,11 @@ class Test_DialogMaterialActivity : CustomActivity() {
     * */
     lateinit var dialogMaterial: DialogMaterial;
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.empty_activity)
     }
-
 
     /*
     * This class can not be instantiate,

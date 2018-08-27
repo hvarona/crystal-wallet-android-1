@@ -3,7 +3,6 @@ package cy.agorise.crystalwallet.dialogs.material
 import android.app.Activity
 import android.widget.Toast
 
-
 /*
 * This class is an implementation of toast
 * */

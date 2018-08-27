@@ -5,7 +5,6 @@ import android.widget.Toast
 import cy.agorise.crystalwallet.activities.CustomActivity
 import cy.agorise.crystalwallet.activities.LoadingActivity
 
-
 /*
 * Class to test LoadingActivity
 * */
@@ -21,7 +20,6 @@ class Test_LoadingActivity : CustomActivity(){
         //sizeInLoadingIcon()
     }
 
-
     /*
     * Show the simple loading graphic
     * */
@@ -30,7 +28,6 @@ class Test_LoadingActivity : CustomActivity(){
         //LoadingActivity.dismiss() //For testing porpouse
     }
 
-
     /*
     * Loading with timer
     * */
@@ -38,7 +35,6 @@ class Test_LoadingActivity : CustomActivity(){
         LoadingActivity.closeOnTime(3)
         LoadingActivity.show(globalActivity)
     }
-
 
     /*
     * Listener when the loading window is closed
@@ -53,7 +49,6 @@ class Test_LoadingActivity : CustomActivity(){
         })
         LoadingActivity.show(globalActivity)
     }
-
 
     /*
     * Listener when the loading window is resume

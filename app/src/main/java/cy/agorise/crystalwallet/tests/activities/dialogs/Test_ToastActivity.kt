@@ -16,14 +16,12 @@ class Test_ToastActivity : CustomActivity() {
         showLongShort()
     }
 
-
     /*
     * Show simple short toast
     * */
     fun showShort(){
         ToastIt.showShortToast(this,"showShortToast")
     }
-
 
     /*
     * Show simple short toast

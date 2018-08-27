@@ -4,7 +4,6 @@ import android.app.Activity
 import cy.agorise.crystalwallet.R
 import kotlinx.android.synthetic.main.account_seed_list.view.*
 
-
 /*
 * Dialog material that shows loading gif and and explicit message
 * */

@@ -32,8 +32,6 @@ open abstract class DialogMaterial{
     var negativeResponse:NegativeResponse? = null
 
 
-
-
     constructor(activity: Activity) {
 
         /*
@@ -46,7 +44,6 @@ open abstract class DialogMaterial{
         * */
         builder = MaterialDialog.Builder(activity)
     }
-
 
     /*
     * Show the dialog
@@ -128,7 +125,6 @@ open abstract class DialogMaterial{
     open fun build() {
         this.materialDialog = this.builder.build()
     }
-
 
     /*
     * Set indeterminate progress
