@@ -1,14 +1,18 @@
 package cy.agorise.crystalwallet.network;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketListener;
 
 import java.io.IOException;
 import java.util.HashMap;
+
+import cy.agorise.crystalwallet.activities.LoadingActivity;
+import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 
 /**
  * Created by henry on 8/10/2017.
@@ -33,6 +37,34 @@ public class WebSocketThread extends Thread {
     // If the parameters of this class can be change
     private boolean canChange = true;
 
+    /*
+     *
+     * Interface to catch only errors in connection with sockets
+     * */
+    private GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker;
+
+    /*
+     *
+     * Interface to catch errors and success responses in connection with sockets
+     * */
+    private GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket;
+
+
+    /*
+    * To catch websocket errors
+    * */
+    private Activity activity;
+
+    /*
+    * To show normal error message or not
+    * */
+    private boolean showNormalMessage = true;
+
+
+    /*
+    * Object needed for socket connection
+    * */
+    private WebSocketFactory factory;
 
     /**
      * Basic constructor,
@@ -43,16 +75,27 @@ public class WebSocketThread extends Thread {
      * @param url The url to connect
      */
     public WebSocketThread(WebSocketListener webSocketListener, String url) {
-        try {
-            WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(5000);
-            this.mUrl = url;
-            this.mWebSocketListener = webSocketListener;
-            this.mWebSocket = factory.createSocket(this.mUrl);
-            this.mWebSocket.addListener(this.mWebSocketListener);
-        } catch (IOException e) {
-            Log.e(TAG, "IOException. Msg: "+e.getMessage());
-        } catch(NullPointerException e){
-            Log.e(TAG, "NullPointerException at WebsocketWorkerThreas. Msg: "+e.getMessage());
+
+        /*
+        * The listener always can be setted
+        * */
+        this.mWebSocketListener = webSocketListener;
+
+        /*
+        *
+        * If at this point the url is not defined, this will be set after
+        * */
+        if(url!=null){
+            try {
+                factory = new WebSocketFactory().setConnectionTimeout(5000);
+                this.mUrl = url;
+                this.mWebSocket = factory.createSocket(this.mUrl);
+                this.mWebSocket.addListener(this.mWebSocketListener);
+            } catch (IOException e) {
+                Log.e(TAG, "IOException. Msg: "+e.getMessage());
+            } catch(NullPointerException e){
+                Log.e(TAG, "NullPointerException at WebsocketWorkerThreas. Msg: "+e.getMessage());
+            }
         }
     }
 
@@ -110,21 +153,88 @@ public class WebSocketThread extends Thread {
 
     @Override
     public void run() {
+
         canChange = false;
+
         // Moves the current Thread into the background
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
         try {
+
+            /*
+            * If the initialization of the socket comes after
+            * */
+            if(factory==null){
+                factory = new WebSocketFactory().setConnectionTimeout(5000);
+                this.mWebSocket = factory.createSocket(this.mUrl);
+                this.mWebSocket.addListener(this.mWebSocketListener);
+            }
+
             WebSocketThread.currentThreads.put(this.getId(),this);
             mWebSocket.connect();
-        } catch (WebSocketException e) {
+
+            /*
+            *
+            * Websocket success response
+            * */
+            if(onResponsesWebSocket!=null){
+                onResponsesWebSocket.onSuccess();
+            }
+
+        } catch (final Exception e) {
             Log.e(TAG, "WebSocketException. Msg: "+e.getMessage());
-        } catch(NullPointerException e){
-            Log.e(TAG, "NullPointerException. Msg: "+e.getMessage());
+
+            //Deliver error to user
+            if(activity!=null){
+
+                /*
+                 * Show error to user if aplies
+                 * */
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(showNormalMessage){
+                            Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+                /*Deliver response in the listeners*/
+                if(onErrorWebSocker!=null){
+                    onErrorWebSocker.onError(e);
+                }
+                else if(onResponsesWebSocket!=null){
+                    onResponsesWebSocket.onError(e);
+                }
+            }
+
         }
         WebSocketThread.currentThreads.remove(this.getId());
     }
 
     public boolean isConnected(){
         return mWebSocket.isOpen();
+    }
+
+
+    public void setOnErrorWebSocker(GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker) {
+        this.onErrorWebSocker = onErrorWebSocker;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    public void setShowNormalMessage(boolean showNormalMessage) {
+        this.showNormalMessage = showNormalMessage;
+    }
+
+    public void setmUrl(String mUrl) {
+        this.mUrl = mUrl;
+    }
+
+    public void setOnResponsesWebSocket(GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket) {
+        this.onResponsesWebSocket = onResponsesWebSocket;
     }
 }

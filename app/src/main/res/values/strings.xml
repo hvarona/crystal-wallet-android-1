@@ -33,6 +33,17 @@
     <string name="account_label">Choose File</string>
     <string name="loading_msg">Please wait until Balances are loading</string>
 
+    <string name="window_create_seed_DialogTittle"></string>
+    <string name="window_create_seed_DialogMessage">Creating New Account ...</string>
+    <string name="window_create_seed_Server_validation">Validating With Server ...</string>
+
+    <string name="window_create_seed_Info">You will use your PIN yo make transactions between accounts</string>
+
+    <string name="window_seed_backup">Backup brainkey</string>
+    <string name="window_seed_toast_clipboard">Brainkey copied to clipboard!</string>
+    <string name="window_seed_copy">Copy</string>
+    <string name="window_seed_leyend_backup">IMPORTANT: Print this out, or write it down. Anyone with access to your recovery key will have access to funds within this wallet</string>
+
     <string name="seed_words">Seed</string>
     <string name="txt_6_digits_pin">PIN (6+ digits)</string>
     <string name="txt_6_digits_pin_confirm">PIN confirm</string>
@@ -119,7 +130,7 @@
     <string name="txt_validating_account">Validating account...</string>
     <string name="validating_account">Validating Account...</string>
     <string name="account_name_should_be_longer">Account name should be longer</string>
-    <string name="account_name_already_exist">Account Name %s already exist</string>
+    <string name="account_name_already_exist">Account Name already exist</string>
     <string name="account_name_not_exist">Account Name %s does not exist</string>
     <string name="account_already_exist">Account already exist</string>
     <string name="add_contact">Add</string>
