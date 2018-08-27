@@ -112,8 +112,8 @@ public class BoardActivity  extends CustomActivity {
         /*
         *  Set the bubbles animation
         * */
-        imagevieGIF.centerCrop();
-        imagevieGIF.load(R.raw.burbujas);
+        //imagevieGIF.centerCrop();
+        //imagevieGIF.load(R.raw.burbujas);
 
         /*
         * Listener tabLayout to resalt text when clicked
