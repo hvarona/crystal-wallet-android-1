@@ -9,6 +9,9 @@ import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountReq
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidator
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidatorListener
 import cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener
+
+
 
 /*
 *
@@ -166,64 +169,41 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
             creatingAccountMaterialDialog.build()
             creatingAccountMaterialDialog.show()
 
-
             val request = ValidateExistBitsharesAccountRequest(newValue)
             request.setListener {
+
                 /*
-    * Dismiss the dialog of loading
-    * */
+                * Dismiss the dialog of loading
+                * */
                 creatingAccountMaterialDialog.dismiss()
 
-                if (request.accountExists) {
+                if (!request.accountExists) {
 
                     /*
-         *   The account exists and is not valid
-         * */
+                     *   The account exists and is not valid
+                     * */
                     accountNameField.fieldValidatorModel.setInvalid()
                     accountNameField.fieldValidatorModel.message = accountNameField.resources.getString(R.string.account_name_already_exist)
-
-                    /*
-         *   Deliver the response
-         * */
-                    if (uiValidatorListener != null) {
-                        uiValidatorListener.onValidationFailed(globalCustomValidationField)
-                    }
-
-                    /*
-        * Deliver response to local callback
-        * */
-                    if (onAccountExist != null) {
-                        onAccountExist!!.onAccountExists()
-                    }
 
                 } else {
 
                     /*
-        * Passed all validations
-        * */
+                    * Passed all validations
+                    * */
                     accountNameField.fieldValidatorModel.setValid()
 
                     /*
-         *   Deliver the response
-         * */
+                     *   Deliver the response
+                     * */
                     if (uiValidatorListener != null) {
                         uiValidatorListener.onValidationSucceeded(globalCustomValidationField)
                     }
                 }
             }
+            CryptoNetInfoRequests.getInstance().addRequest(request)
 
-            /*GrapheneApiGenerator.setActivity(activity); //Set the activity to catch errors
-            val onErrorWebSocker = object : GrapheneApiGenerator.OnErrorWebSocket {
-                override fun onError(exception: java.lang.Exception?) {
-
-                    creatingAccountMaterialDialog.dismiss();
-
-                }
-
-            }
-            GrapheneApiGenerator.setOnErrorWebSocket(onErrorWebSocker); //Set the activity to catch errors
-            CryptoNetInfoRequests.getInstance().addRequest(request)*/
-        }/*
+        }
+        /*
         * Passed initial validations, next final validations
         * */
     }
