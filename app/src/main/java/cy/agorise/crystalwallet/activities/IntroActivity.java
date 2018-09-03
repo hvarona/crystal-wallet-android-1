@@ -63,11 +63,6 @@ public class IntroActivity extends CustomActivity {
 
         ButterKnife.bind(this);
 
-        /*
-        * Test connection with server
-        * */
-        NetworkUtility.testServerConnnection(this);
-
         // Appbar animation
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -151,55 +146,12 @@ public class IntroActivity extends CustomActivity {
     @OnClick(R.id.btnCreateAccount)
     public void createAccount() {
 
-        /*
-         * Test connection with server, if no conection user can not continue
-         *
-         * */
-        final GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket = new GrapheneApiGenerator.OnResponsesWebSocket() {
-            @Override
-            public void onSuccess() {
 
-                /*
-                 * Open the window to create seed and account
-                 * */
-                Intent intent = new Intent(globalActivity, CreateSeedActivity.class);
-                startActivity(intent);
-            }
-            @Override
-            public void onError(Exception exception) {
-                //Nothing to implement, internally the user will see a toast
-            }
-        };
-        NetworkUtility.testServerConnnectionNormalError(this,onResponsesWebSocket);
     }
 
     @OnClick(R.id.btnImportAccount)
     public void importAccount() {
 
-        /*
-         * Test connection with server, if no conection user can not continue
-         *
-         * */
-        final GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket = new GrapheneApiGenerator.OnResponsesWebSocket() {
-            @Override
-            public void onSuccess() {
 
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                Fragment prev = getSupportFragmentManager().findFragmentByTag("importAccountOptions");
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
-
-                // Create and show the dialog.
-                ImportAccountOptionsFragment newFragment = ImportAccountOptionsFragment.newInstance();
-                newFragment.show(ft, "importAccountOptions");
-            }
-            @Override
-            public void onError(Exception exception) {
-                //Nothing to implement, internally the user will see a toast
-            }
-        };
-        NetworkUtility.testServerConnnectionNormalError(this,onResponsesWebSocket);
     }
 }
