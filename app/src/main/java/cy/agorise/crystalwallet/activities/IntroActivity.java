@@ -144,13 +144,21 @@ public class IntroActivity extends CustomActivity {
 
     @OnClick(R.id.btnCreateAccount)
     public void createAccount() {
-
-
+        Intent intent = new Intent(this, CreateSeedActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.btnImportAccount)
     public void importAccount() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("importAccountOptions");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
 
-
+        // Create and show the dialog.
+        ImportAccountOptionsFragment newFragment = ImportAccountOptionsFragment.newInstance();
+        newFragment.show(ft, "importAccountOptions");
     }
 }
