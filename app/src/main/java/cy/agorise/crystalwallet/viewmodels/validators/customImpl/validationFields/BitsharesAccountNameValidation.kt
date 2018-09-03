@@ -212,30 +212,17 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                 }
             }
 
-            /*
-                * Listener for websocket error
-                * */
-            GrapheneApiGenerator.setActivity(activity); //Set the activity to catch errors
+            /*GrapheneApiGenerator.setActivity(activity); //Set the activity to catch errors
             val onErrorWebSocker = object : GrapheneApiGenerator.OnErrorWebSocket {
                 override fun onError(exception: java.lang.Exception?) {
 
-                    /*
-                    *
-                    * Hide loading dialog
-                    *
-                    * */
                     creatingAccountMaterialDialog.dismiss();
 
                 }
 
             }
             GrapheneApiGenerator.setOnErrorWebSocket(onErrorWebSocker); //Set the activity to catch errors
-
-
-            /*
-            *
-            * Run thread*/
-            CryptoNetInfoRequests.getInstance().addRequest(request)
+            CryptoNetInfoRequests.getInstance().addRequest(request)*/
         }/*
         * Passed initial validations, next final validations
         * */

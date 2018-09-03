@@ -37,7 +37,6 @@ import cy.agorise.crystalwallet.randomdatagenerators.RandomCryptoNetAccountGener
 import cy.agorise.crystalwallet.randomdatagenerators.RandomSeedGenerator;
 import cy.agorise.crystalwallet.randomdatagenerators.RandomTransactionsGenerator;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
-import cy.agorise.crystalwallet.util.NetworkUtility;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
 import cy.agorise.crystalwallet.viewmodels.TransactionListViewModel;
 import cy.agorise.crystalwallet.views.TransactionListView;
