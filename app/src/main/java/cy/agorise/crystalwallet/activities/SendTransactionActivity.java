@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.jaredrummler.materialspinner.MaterialSpinner;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +37,8 @@ public class SendTransactionActivity extends AppCompatActivity implements UIVali
 
     SendTransactionValidator sendTransactionValidator;
 
-    /*@BindView(R.id.etFrom)
-    EditText etFrom;*/
+    @BindView(R.id.spFrom)
+    MaterialSpinner spFrom;
     @BindView(R.id.tvFromError)
     TextView tvFromError;
     @BindView(R.id.etTo)
@@ -102,7 +104,7 @@ public class SendTransactionActivity extends AppCompatActivity implements UIVali
                 }
             });
 
-            //sendTransactionValidator = new SendTransactionValidator(this.getApplicationContext(), this.cryptoNetAccount, etFrom, etTo, spAsset, etAmount, etMemo);
+            sendTransactionValidator = new SendTransactionValidator(this.getApplicationContext(), this.cryptoNetAccount, spFrom, etTo, spAsset, etAmount, etMemo);
             sendTransactionValidator.setListener(this);
         } else {
             this.finish();

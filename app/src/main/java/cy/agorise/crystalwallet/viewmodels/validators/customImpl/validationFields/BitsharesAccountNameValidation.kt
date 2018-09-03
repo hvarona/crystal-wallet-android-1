@@ -177,7 +177,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                 * */
                 creatingAccountMaterialDialog.dismiss()
 
-                if (!request.accountExists) {
+                if (request.accountExists) {
 
                     /*
                      *   The account exists and is not valid

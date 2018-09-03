@@ -153,8 +153,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             * this is only for graphene accounts.
             *
             **/
-            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
-            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
+            //this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
+            //this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
 
             final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
             balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
@@ -185,7 +185,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             * Custom material spinner implementation
             * */
             spFrom.setItems(cryptoNetAccounts);
-            spFrom.setSelectedIndex(0);
+            //spFrom.setSelectedIndex(0);
             spFrom.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<CryptoNetAccount>() {
                 @Override
                 public void onItemSelected(MaterialSpinner view, int position, long id, CryptoNetAccount item) {

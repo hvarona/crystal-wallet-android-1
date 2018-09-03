@@ -118,7 +118,7 @@ public class BoardActivity  extends CustomActivity {
         /*
         * Listener tabLayout to resalt text when clicked
         * */
-        /*final TabLayout tabLayoutFinal = tabLayout;
+        final TabLayout tabLayoutFinal = tabLayout;
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
@@ -162,7 +162,7 @@ public class BoardActivity  extends CustomActivity {
 
 
             }
-        });*/
+        });
 
         // Appbar animation
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
