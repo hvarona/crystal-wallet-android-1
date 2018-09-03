@@ -103,7 +103,9 @@ class CreateSeedActivity : CustomActivity() {
         val bitsharesAccountNameValidation = BitsharesAccountNameValidation(this, tietAccountName, uiValidatorListener)
         val onAccountExist = object : OnAccountExist {
             override fun onAccountExists() {
-                runOnUiThread { Toast.makeText(globalActivity, resources.getString(R.string.account_name_already_exist), Toast.LENGTH_LONG).show() }
+                runOnUiThread {
+                    Toast.makeText(globalActivity, resources.getString(R.string.account_name_already_exist), Toast.LENGTH_LONG).show()
+                }
             }
 
         }
@@ -170,8 +172,10 @@ class CreateSeedActivity : CustomActivity() {
         //Makes dialog to tell the user that the account is been created
         val creatingAccountMaterialDialog = CrystalDialog(this)
         creatingAccountMaterialDialog.setText(this.resources.getString(R.string.window_create_seed_DialogMessage))
-        creatingAccountMaterialDialog.build()
-        this@CreateSeedActivity.runOnUiThread { creatingAccountMaterialDialog.show() }
+        creatingAccountMaterialDialog.progress()
+        this@CreateSeedActivity.runOnUiThread {
+            creatingAccountMaterialDialog.show()
+        }
         request.setListener {
             creatingAccountMaterialDialog.dismiss()
             if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED) {
@@ -184,7 +188,7 @@ class CreateSeedActivity : CustomActivity() {
             }
         }
 
-        val thread = object : Thread() {
+        (object : Thread() {
             override fun run() {
 
                 /*
@@ -192,9 +196,7 @@ class CreateSeedActivity : CustomActivity() {
                 * Run thread*/
                 CryptoNetInfoRequests.getInstance().addRequest(request)
             }
-        }
-
-        thread.start()
+        }).start()
     }
 
     /*
