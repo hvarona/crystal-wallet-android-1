@@ -1,6 +1,5 @@
 package cy.agorise.crystalwallet.network;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -8,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 
 /**
@@ -63,50 +61,17 @@ public abstract class CryptoNetManager {
 
 
     /*
-    * Add url with listener on error only for sockets
-    * */
-    public static void addCryptoNetURL(CryptoNet crypto,
-                                       String[] urls,
-                                       final Activity activity,
-                                       final GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker,
-                                       final boolean showNormalError){
-        addCryptoNetURL(crypto,urls,activity,onErrorWebSocker,null,showNormalError);
-    }
-
-
-    /*
-     * Add url with listener on error and response for sockets
-     * */
-    public static void addCryptoNetURL(CryptoNet crypto,
-                                       String[] urls,
-                                       final Activity activity,
-                                       final GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket,
-                                       final boolean showNormalError){
-        addCryptoNetURL(crypto,urls,activity,null,onResponsesWebSocket,showNormalError);
-    }
-
-
-    /*
     * Utility for above methods
     *
     * */
     public static void addCryptoNetURL(CryptoNet crypto,
-                                               String[] urls,
-                                               final Activity activity,
-                                               final GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker,
-                                               final GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket,
-                                               final boolean showNormalError) {
+                                               String[] urls) {
 
         if (!CryptoNetURLs.containsKey(crypto)) {
             CryptoNetURLs.put(crypto, new HashSet<String>());
         }
 
         CryptoNetVerifier verifier = CryptoNetVerifier.getNetworkVerify(crypto);
-        verifier.getThread().setActivity(activity); //Logical connection to ui
-        verifier.getThread().setOnErrorWebSocker(onErrorWebSocker); //Connect response web socket error to ui response
-        verifier.getThread().setOnResponsesWebSocket(onResponsesWebSocket); //Connect response and error web socket error to ui response
-        verifier.getThread().setShowNormalMessage(showNormalError); //Not show native message error, we handle it
-
         for (String url : urls) {
             CryptoNetURLs.get(crypto).add(url);
             if (verifier != null) {

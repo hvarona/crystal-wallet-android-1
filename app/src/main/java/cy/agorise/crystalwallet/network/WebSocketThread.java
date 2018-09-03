@@ -1,8 +1,6 @@
 package cy.agorise.crystalwallet.network;
 
-import android.app.Activity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -10,9 +8,6 @@ import com.neovisionaries.ws.client.WebSocketListener;
 
 import java.io.IOException;
 import java.util.HashMap;
-
-import cy.agorise.crystalwallet.activities.LoadingActivity;
-import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 
 /**
  * Created by henry on 8/10/2017.
@@ -36,29 +31,6 @@ public class WebSocketThread extends Thread {
     private String mUrl;
     // If the parameters of this class can be change
     private boolean canChange = true;
-
-    /*
-     *
-     * Interface to catch only errors in connection with sockets
-     * */
-    private GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker;
-
-    /*
-     *
-     * Interface to catch errors and success responses in connection with sockets
-     * */
-    private GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket;
-
-
-    /*
-    * To catch websocket errors
-    * */
-    private Activity activity;
-
-    /*
-    * To show normal error message or not
-    * */
-    private boolean showNormalMessage = true;
 
 
     /*
@@ -173,42 +145,8 @@ public class WebSocketThread extends Thread {
             WebSocketThread.currentThreads.put(this.getId(),this);
             mWebSocket.connect();
 
-            /*
-            *
-            * Websocket success response
-            * */
-            if(onResponsesWebSocket!=null){
-                onResponsesWebSocket.onSuccess();
-            }
-
         } catch (final Exception e) {
             Log.e(TAG, "WebSocketException. Msg: "+e.getMessage());
-
-            //Deliver error to user
-            if(activity!=null){
-
-                /*
-                 * Show error to user if aplies
-                 * */
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if(showNormalMessage){
-                            Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-
-                /*Deliver response in the listeners*/
-                if(onErrorWebSocker!=null){
-                    onErrorWebSocker.onError(e);
-                }
-                else if(onResponsesWebSocket!=null){
-                    onResponsesWebSocket.onError(e);
-                }
-            }
-
         }
         WebSocketThread.currentThreads.remove(this.getId());
     }
@@ -218,23 +156,7 @@ public class WebSocketThread extends Thread {
     }
 
 
-    public void setOnErrorWebSocker(GrapheneApiGenerator.OnErrorWebSocket onErrorWebSocker) {
-        this.onErrorWebSocker = onErrorWebSocker;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public void setShowNormalMessage(boolean showNormalMessage) {
-        this.showNormalMessage = showNormalMessage;
-    }
-
     public void setmUrl(String mUrl) {
         this.mUrl = mUrl;
-    }
-
-    public void setOnResponsesWebSocket(GrapheneApiGenerator.OnResponsesWebSocket onResponsesWebSocket) {
-        this.onResponsesWebSocket = onResponsesWebSocket;
     }
 }

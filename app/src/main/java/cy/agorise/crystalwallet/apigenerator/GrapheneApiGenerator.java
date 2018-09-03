@@ -1,6 +1,5 @@
 package cy.agorise.crystalwallet.apigenerator;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.io.Serializable;
@@ -9,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.BitsharesAssetDao;
 import cy.agorise.crystalwallet.dao.CryptoCoinBalanceDao;
 import cy.agorise.crystalwallet.dao.CryptoCurrencyDao;
@@ -81,28 +79,6 @@ public abstract class GrapheneApiGenerator {
      * This is used for manager each listener in the subscription thread
      */
     private static HashMap<Long, SubscriptionListener> currentBitsharesListener = new HashMap<>();
-
-    /*
-    *
-    *  To present erros to user
-    * */
-    private static Activity activity;
-
-
-    /*
-     *
-     * Interface to catch only errors in connection with sockets
-     * */
-    private static OnErrorWebSocket onErrorWebSocket;
-
-    /*
-     *
-     * Interface to catch both errors and success in connection with sockets
-     * */
-    private static OnResponsesWebSocket onResponsesWebSocker;
-
-
-
 
 
 
@@ -246,8 +222,6 @@ public abstract class GrapheneApiGenerator {
                         request.getListener().fail(request.getId());
                     }
                 }), CryptoNetManager.getURL(CryptoNet.BITSHARES));
-        thread.setActivity(activity); //To catch websocket errors to user interface
-        thread.setOnErrorWebSocker(onErrorWebSocket); //To deliver websocket errors to user interface
         thread.start();
     }
 
@@ -729,36 +703,4 @@ public abstract class GrapheneApiGenerator {
 
         }
     }
-
-
-    public static void setActivity(Activity activity) {
-        GrapheneApiGenerator.activity = activity;
-    }
-
-
-    public static void setOnResponsesWebSocker(OnResponsesWebSocket onResponsesWebSocker) {
-        GrapheneApiGenerator.onResponsesWebSocker = onResponsesWebSocker;
-    }
-
-    public static void setOnErrorWebSocket(OnErrorWebSocket onErrorWebSocket) {
-        GrapheneApiGenerator.onErrorWebSocket = onErrorWebSocket;
-    }
-
-    /*
-     *
-     * Interface to catch errors in connection with sockets
-     * */
-    public interface OnErrorWebSocket {
-        void onError(Exception exception);
-    }
-
-    /*
-     *
-     * Interface to catch succesfully connection with sockets
-     * */
-    public interface OnResponsesWebSocket {
-        void onSuccess();
-        void onError(Exception exception);
-    }
-
 }
