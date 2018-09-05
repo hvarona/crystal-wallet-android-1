@@ -18,7 +18,7 @@
         android:configChanges="locale"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.LicenseActivity"
+            android:name=".activities.BoardActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,8 +30,7 @@
 
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".activities.BoardActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+        <activity android:name=".activities.LicenseActivity">
         </activity>
         <activity android:name=".activities.CreateSeedActivity" >
         </activity>
