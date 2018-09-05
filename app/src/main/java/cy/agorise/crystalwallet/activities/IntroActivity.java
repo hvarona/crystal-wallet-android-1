@@ -43,9 +43,6 @@ import cy.agorise.crystalwallet.views.TransactionListView;
 
 public class IntroActivity extends CustomActivity {
 
-    TransactionListViewModel transactionListViewModel;
-    TransactionListView transactionListView;
-
     @BindView(R.id.surface_view)
     public SurfaceView mSurfaceView;
 
@@ -104,6 +101,7 @@ public class IntroActivity extends CustomActivity {
                 Intent intent = new Intent(this, BoardActivity.class);
                 //Intent intent = new Intent(this, PocketRequestActivity.class);
                 startActivity(intent);
+                finish();
             }
 
         /*CrystalDatabase db = CrystalDatabase.getAppDatabase(getApplicationContext());
