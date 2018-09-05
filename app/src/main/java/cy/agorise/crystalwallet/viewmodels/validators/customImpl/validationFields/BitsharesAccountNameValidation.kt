@@ -69,6 +69,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
             * Remove error
             * */
             accountNameField.error = null
+            accountNameField.fieldValidatorModel.setValid()
 
             /*
                 Validate at least min length
@@ -87,6 +88,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                  * Remove error
                  * */
                 accountNameField.error = null
+                accountNameField.fieldValidatorModel.setValid()
 
                 /*
                     Validate at least one character
@@ -105,6 +107,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                      * Remove error
                      * */
                     accountNameField.error = null
+                    accountNameField.fieldValidatorModel.setValid()
 
                     /*
                         Validate at least one number for the account string
@@ -117,12 +120,14 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                         result = false
                         accountNameField.fieldValidatorModel.setInvalid()
                         accountNameField.fieldValidatorModel.message = this.accountNameField.resources.getString(R.string.create_account_window_err_at_least_one_number)
+
                     } else {
 
                         /*
                          * Remove error
                          * */
                         accountNameField.error = null
+                        accountNameField.fieldValidatorModel.setValid()
 
 
                         /*
@@ -136,12 +141,14 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                             result = false
                             accountNameField.fieldValidatorModel.setInvalid()
                             accountNameField.fieldValidatorModel.message = this.accountNameField.resources.getString(R.string.create_account_window_err_at_least_one_script)
+
                         } else {
 
                             /*
                              * Remove error
                              * */
                             accountNameField.error = null
+                            accountNameField.fieldValidatorModel.setValid()
                         }
                     }
                 }
@@ -162,46 +169,11 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
         } else {
 
             /*
-             * Show the dialog for connection with the server
+             * Deliver result
              * */
-            val creatingAccountMaterialDialog = CrystalDialog(activity)
-            creatingAccountMaterialDialog.setText(activity.resources.getString(R.string.window_create_seed_Server_validation))
-            creatingAccountMaterialDialog.progress()
-            creatingAccountMaterialDialog.show()
-
-            val request = ValidateExistBitsharesAccountRequest(newValue)
-            request.setListener {
-
-                /*
-                * Dismiss the dialog of loading
-                * */
-                creatingAccountMaterialDialog.dismiss()
-
-                if (request.accountExists) {
-
-                    /*
-                     *   The account exists and is not valid
-                     * */
-                    accountNameField.fieldValidatorModel.setInvalid()
-                    accountNameField.fieldValidatorModel.message = accountNameField.resources.getString(R.string.account_name_already_exist)
-
-                } else {
-
-                    /*
-                    * Passed all validations
-                    * */
-                    accountNameField.fieldValidatorModel.setValid()
-
-                    /*
-                     *   Deliver the response
-                     * */
-                    if (uiValidatorListener != null) {
-                        uiValidatorListener.onValidationSucceeded(globalCustomValidationField)
-                    }
-                }
+            if (uiValidatorListener != null) {
+                uiValidatorListener.onValidationSucceeded(this)
             }
-            CryptoNetInfoRequests.getInstance().addRequest(request)
-
         }
         /*
         * Passed initial validations, next final validations

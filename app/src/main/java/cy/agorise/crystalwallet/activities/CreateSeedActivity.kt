@@ -13,6 +13,7 @@ import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests
 import cy.agorise.crystalwallet.requestmanagers.ValidateCreateBitsharesAccountRequest
+import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountRequest
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidatorListener
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.validationFields.BitsharesAccountNameValidation
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.validationFields.BitsharesAccountNameValidation.OnAccountExist
@@ -62,16 +63,12 @@ class CreateSeedActivity : CustomActivity() {
                     runOnUiThread {
                         val customTextInputEditText = customValidationField.currentView as CustomTextInputEditText
                         customTextInputEditText.error = null
+                        customTextInputEditText.fieldValidatorModel.setValid()
                     }
 
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-
-                /*
-                 * Validate if can continue
-                 * */
-                validateFieldsToContinue()
             }
 
             override fun onValidationFailed(customValidationField: CustomValidationField) {
@@ -82,6 +79,7 @@ class CreateSeedActivity : CustomActivity() {
                 runOnUiThread {
                     val customTextInputEditText = customValidationField.currentView as CustomTextInputEditText
                     customTextInputEditText.error = customTextInputEditText.fieldValidatorModel.message
+                    customTextInputEditText.fieldValidatorModel.setInvalid()
                 }
             }
         }
@@ -131,6 +129,8 @@ class CreateSeedActivity : CustomActivity() {
          * Validate continue to create account
          * */
         validateFieldsToContinue()
+
+
     }
 
     @OnTextChanged(value = R.id.tietPinConfirmation, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
@@ -148,9 +148,9 @@ class CreateSeedActivity : CustomActivity() {
         this.fieldsValidator.validate()
 
         /*
-         * Always disable till the server response comes
+         * Validate continue to create account
          * */
-        disableCreate()
+        validateFieldsToContinue()
     }
 
     @OnClick(R.id.btnCancel)
@@ -221,8 +221,59 @@ class CreateSeedActivity : CustomActivity() {
         * If the result is true so the user can continue to the creation of the account
         * */
         if (result) {
-            enableCreate()
+
+            /*
+             * Show the dialog for connection with the server
+             * */
+            val creatingAccountMaterialDialog = CrystalDialog(globalActivity)
+            creatingAccountMaterialDialog.setText(globalActivity.resources.getString(R.string.window_create_seed_Server_validation))
+            creatingAccountMaterialDialog.progress()
+            creatingAccountMaterialDialog.show()
+
+            /*
+            * Validate the account does not exists
+            * */
+            val request = ValidateExistBitsharesAccountRequest(tietAccountName?.text.toString())
+            request.setListener {
+
+                /*
+                * Dismiss the dialog of loading
+                * */
+                creatingAccountMaterialDialog.dismiss()
+
+                if (request.accountExists) {
+
+                    /*
+                     *   The account exists and is not valid
+                     * */
+                    tietAccountName.fieldValidatorModel.setInvalid()
+                    tietAccountName.fieldValidatorModel.message = tietAccountName.resources.getString(R.string.account_name_already_exist)
+
+                    /*
+                   * Disaible button create
+                   * */
+                    disableCreate()
+
+                } else {
+
+                    /*
+                    * Passed all validations
+                    * */
+                    tietAccountName.fieldValidatorModel.setValid()
+
+                    /*
+                    * Enable button create
+                    * */
+                    enableCreate()
+                }
+            }
+            CryptoNetInfoRequests.getInstance().addRequest(request)
+
         } else {
+
+            /*
+            * Disaible button create
+            * */
             disableCreate()
         }
     }
