@@ -166,7 +166,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
              * */
             val creatingAccountMaterialDialog = CrystalDialog(activity)
             creatingAccountMaterialDialog.setText(activity.resources.getString(R.string.window_create_seed_Server_validation))
-            creatingAccountMaterialDialog.build()
+            creatingAccountMaterialDialog.progress()
             creatingAccountMaterialDialog.show()
 
             val request = ValidateExistBitsharesAccountRequest(newValue)
