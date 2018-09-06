@@ -43,6 +43,8 @@ public class AccountActivityWatcher {
      */
     private final Context mContext;
 
+    private final String mServerUrl;
+
     /**
      * Handles the address/transaction notification.
      * Then calls the GetTransactionData to get the info of the new transaction
@@ -53,7 +55,7 @@ public class AccountActivityWatcher {
             try {
                 System.out.println("Receive accountActivtyWatcher " + os[0].toString() );
                 String txid = ((JSONObject) os[0]).getString(InsightApiConstants.sTxTag);
-                new GetTransactionData(txid, mAccount, mContext).start();
+                new GetTransactionData(txid, mAccount, mServerUrl, mContext).start();
             } catch (JSONException ex) {
                 Logger.getLogger(AccountActivityWatcher.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -107,6 +109,7 @@ public class AccountActivityWatcher {
      * @param mContext This app mContext
      */
     public AccountActivityWatcher(String serverUrl, GeneralCoinAccount mAccount, Context mContext) {
+        this.mServerUrl = serverUrl;
         this.mAccount = mAccount;
         this.mContext = mContext;
         try {
