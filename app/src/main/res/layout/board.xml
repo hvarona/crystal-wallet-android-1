@@ -98,7 +98,7 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <android.support.design.widget.TabLayout
+            <com.sjaramillo10.animatedtablayout.AnimatedTabLayout
                 android:id="@+id/tabLayout"
                 android:layout_gravity="bottom"
                 android:background="@color/transparent"
