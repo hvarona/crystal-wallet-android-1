@@ -48,8 +48,7 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
      * @param account The account to be query
      * @param context This app context
      */
-    public GetTransactionByAddress(GeneralCoinAccount account, Context context) {
-        String serverUrl = InsightApiConstants.sProtocol + "://" + InsightApiConstants.getAddress(account.getCryptoCoin()) +"/";
+    public GetTransactionByAddress(GeneralCoinAccount account, String serverUrl, Context context) {
         this.mAccount = account;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
         this.mContext = context;

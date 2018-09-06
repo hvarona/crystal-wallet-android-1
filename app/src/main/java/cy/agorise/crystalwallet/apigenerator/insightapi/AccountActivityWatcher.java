@@ -106,15 +106,10 @@ public class AccountActivityWatcher {
      * @param mAccount The mAccount to be monitor
      * @param mContext This app mContext
      */
-    public AccountActivityWatcher(GeneralCoinAccount mAccount, Context mContext) {
-        //String serverUrl = InsightApiConstants.protocol + "://" + InsightApiConstants.getAddress(mAccount.getCoin()) + ":" + InsightApiConstants.getPort(mAccount.getCoin()) + "/"+InsightApiConstants.getRawPath(mAccount.getCoin())+"/mSocket.io/";
-        String serverUrl = InsightApiConstants.sProtocolSocketIO + "://" + InsightApiConstants.getAddress(mAccount.getCryptoCoin()) + ":" + InsightApiConstants.getPort(mAccount.getCryptoCoin()) + "/";
+    public AccountActivityWatcher(String serverUrl, GeneralCoinAccount mAccount, Context mContext) {
         this.mAccount = mAccount;
         this.mContext = mContext;
-        System.out.println("accountActivityWatcher " + serverUrl);
         try {
-            IO.Options opts = new IO.Options();
-            System.out.println("accountActivityWatcher default path " + opts.path);
             this.mSocket = IO.socket(serverUrl);
             this.mSocket.on(Socket.EVENT_CONNECT, onConnect);
             this.mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);

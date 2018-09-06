@@ -36,6 +36,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
      * This app context, used to save on the DB
      */
     private Context mContext;
+
+    private String mServerUrl;
     /**
      * If has to wait for another confirmation
      */
@@ -47,8 +49,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
      * @param account The account to be query
      * @param context This app Context
      */
-    public GetTransactionData(String txid, GeneralCoinAccount account, Context context) {
-        this(txid, account, context, false);
+    public GetTransactionData(String txid, GeneralCoinAccount account,String serverUrl, Context context) {
+        this(txid, account, serverUrl, context, false);
     }
 
     /**
@@ -58,8 +60,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
      * @param context This app Context
      * @param mustWait If there is less confirmation that needed
      */
-    public GetTransactionData(String txid, GeneralCoinAccount account, Context context, boolean mustWait) {
-        String serverUrl = InsightApiConstants.sProtocol + "://" + InsightApiConstants.getAddress(account.getCryptoCoin()) +"/";
+    public GetTransactionData(String txid, GeneralCoinAccount account,String serverUrl, Context context, boolean mustWait) {
+        this.mServerUrl = serverUrl;
         this.mAccount = account;
         this.mTxId= txid;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
@@ -179,7 +181,7 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
 
             if (transaction.getConfirm() < this.mAccount.getCryptoNet().getConfirmationsNeeded()) {
                 //If transaction weren't confirmed, add the transaction to watch for change on the confirmations
-                new GetTransactionData(this.mTxId, this.mAccount, this.mContext, true).start();
+                new GetTransactionData(this.mTxId, this.mAccount, this.mServerUrl, this.mContext, true).start();
             }
         }
     }

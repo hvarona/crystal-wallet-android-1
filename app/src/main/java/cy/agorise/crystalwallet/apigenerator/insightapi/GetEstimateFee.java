@@ -20,55 +20,31 @@ import retrofit2.Response;
 
 public abstract class GetEstimateFee {
 
-    //TODO add a funciton to get the rate of a specific port
-
     /**
      * The funciton to get the rate for the transaction be included in the next 2 blocks
      * @param coin The coin to get the rate
-     * @return The rate number (coin/kbytes)
-     * @throws IOException If the server answer null, or the rate couldn't be calculated
      */
-    public static long getEstimateFee(final CryptoCoin coin) throws IOException {
-        String serverUrl = InsightApiConstants.sProtocol + "://"
-                + InsightApiConstants.getAddress(coin) + "/";
+    public static void getEstimateFee(final CryptoCoin coin, String serverUrl, final estimateFeeListener listener) {
         InsightApiServiceGenerator serviceGenerator = new InsightApiServiceGenerator(serverUrl);
         InsightApiService service = serviceGenerator.getService(InsightApiService.class);
         Call<JsonObject> call = service.estimateFee(InsightApiConstants.getPath(coin));
-        final Object SYNC = new Object();
         final JsonObject answer = new JsonObject();
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                synchronized (SYNC) {
-                    answer.addProperty("answer",
-                            (long) (response.body().get("2").getAsDouble()* Math.pow(10, coin.getPrecision())));
-                    SYNC.notifyAll();
-                }
+                listener.estimateFee((long) (answer.get("answer").getAsDouble()));
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                synchronized (SYNC) {
-                    SYNC.notifyAll();
-                }
+                listener.estimateFee(-1);
             }
         });
-        synchronized (SYNC){
-            for(int i = 0; i < 6; i++) {
-                try {
-                    SYNC.wait(5000);
-                } catch (InterruptedException e) {
-                    // this interruption never rises
-                }
-                if(answer.get("answer")!=null){
-                    break;
-                }
-            }
-        }
-        if(answer.get("answer")==null){
-            throw new IOException("");
-        }
-        return (long) (answer.get("answer").getAsDouble());
+    }
+
+    public static interface estimateFeeListener{
+        public void estimateFee(long value);
     }
 
 }
