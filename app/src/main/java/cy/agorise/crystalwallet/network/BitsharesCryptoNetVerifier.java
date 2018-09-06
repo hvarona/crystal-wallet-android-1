@@ -1,6 +1,5 @@
 package cy.agorise.crystalwallet.network;
 
-import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.graphenej.interfaces.WitnessResponseListener;
 import cy.agorise.graphenej.models.BaseResponse;
@@ -24,21 +23,15 @@ public class BitsharesCryptoNetVerifier extends CryptoNetVerifier {
     private final String CHAIN_ID = "9cf6f255a208100d2bb275a3c52f4b1589b7ec9c9bfc2cb2a5fe6411295106d8";//testnet
     //private final String CHAIN_ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8";//mainnet
 
-
-
-
-
-
-    public BitsharesCryptoNetVerifier(){
-
-        /**/
+    @Override
+    public void checkURL(final String url) {
         final long startTime = System.currentTimeMillis();
-        thread = new WebSocketThread(new GetChainId(new WitnessResponseListener() {
+        WebSocketThread thread = new WebSocketThread(new GetChainId(new WitnessResponseListener() {
             @Override
             public void onSuccess(WitnessResponse response) {
                 if(response.result instanceof String) {
                     if(response.result.equals(CHAIN_ID)) {
-                        CryptoNetManager.verifiedCryptoNetURL(cryptoNet, null, System.currentTimeMillis() - startTime);
+                        CryptoNetManager.verifiedCryptoNetURL(cryptoNet, url, System.currentTimeMillis() - startTime);
                     }else{
                         System.out.println(" BitsharesCryptoNetVerifier Error we are not in the net current chain id " + response.result + " excepted " + CHAIN_ID);
                         //TODO handle error bad chain
@@ -50,15 +43,8 @@ public class BitsharesCryptoNetVerifier extends CryptoNetVerifier {
             public void onError(BaseResponse.Error error) {
                 //TODO handle error
             }
-        }),null);
-
-    }
-
-
-    @Override
-    public void checkURL(final String url) {
-        thread.setmUrl(url); //Set the url
-        thread.start(); //Run the thread connection
+        }),url);
+        thread.start();
     }
 
     @Override
