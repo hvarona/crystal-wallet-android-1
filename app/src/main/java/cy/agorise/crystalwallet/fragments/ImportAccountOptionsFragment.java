@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.activities.ImportSeedActivity;
 import cy.agorise.crystalwallet.activities.IntroActivity;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
@@ -95,6 +96,12 @@ public class ImportAccountOptionsFragment extends DialogFragment {
         startActivityForResult(fileIntent, FILE_CONTENT_REQUEST_CODE);
 
 
+    }
+
+    @OnClick (R.id.btnImportSeed)
+    public void importSeed(){
+        Intent intent = new Intent(this.getActivity(), ImportSeedActivity.class);
+        startActivity(intent);
     }
 
     @Override

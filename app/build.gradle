@@ -108,4 +108,6 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
+    kapt "android.arch.lifecycle:compiler:1.1.1"
+    kapt "android.arch.persistence.room:compiler:1.1.0"
 }

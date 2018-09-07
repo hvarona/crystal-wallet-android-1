@@ -6,15 +6,14 @@ import android.arch.lifecycle.LiveData
 import cy.agorise.crystalwallet.dao.CrystalDatabase
 import cy.agorise.crystalwallet.models.AccountSeed
 
-class AccountSeedViewModel : AndroidViewModel {
+class AccountSeedViewModel(application: Application) : AndroidViewModel(application) {
 
     private var accountSeed: LiveData<AccountSeed>? = null
     private val db: CrystalDatabase
-    private val app: Application
+    private val app: Application = application
 
-    constructor(application: Application,db:CrystalDatabase): super(application) {
-        this.app = application;
-        this.db = db;
+    init{
+        this.db = CrystalDatabase.getAppDatabase(this.app.getApplicationContext());
     }
 
     fun loadSeed(seedId: Long) {
