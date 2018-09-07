@@ -28,6 +28,8 @@ import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
 import cy.agorise.crystalwallet.requestmanagers.ImportBackupRequest;
 import cy.agorise.crystalwallet.util.UriTranslator;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by xd on 1/25/18.
  * Shows a dialog where the user can select how to import his/her existing account
@@ -99,7 +101,7 @@ public class ImportAccountOptionsFragment extends DialogFragment {
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FILE_CONTENT_REQUEST_CODE){
+        if ((requestCode == FILE_CONTENT_REQUEST_CODE) && (resultCode == RESULT_OK)){
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View passwordDialogView = inflater.inflate(R.layout.dialog_password_input, null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
