@@ -42,6 +42,8 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
      */
     private Context mContext;
 
+    private String serverUrl;
+
 
     /**
      * Basic consturcotr
@@ -49,6 +51,7 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
      * @param context This app context
      */
     public GetTransactionByAddress(GeneralCoinAccount account, String serverUrl, Context context) {
+        this.serverUrl = serverUrl;
         this.mAccount = account;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
         this.mContext = context;
@@ -162,7 +165,7 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
                 }*/
 
                 if (tempAccount != null && transaction.getConfirm() < this.mAccount.getCryptoNet().getConfirmationsNeeded()) {
-                    new GetTransactionData(transaction.getTxid(), tempAccount, this.mContext, true).start();
+                    new GetTransactionData(transaction.getTxid(), tempAccount, this.serverUrl, this.mContext, true).start();
                 }
                 for (GeneralCoinAddress address : this.mAddresses) {
                     if (address.updateTransaction(transaction)) {

@@ -31,6 +31,8 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
      */
     private GeneralCoinAccount mAccount;
 
+    private String serverUrl;
+
     /**
      * Basic Consturctor
      * @param RawTx The RawTX in Hex String
@@ -38,6 +40,7 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
      * @param context This app context
      */
     public BroadcastTransaction(String RawTx, GeneralCoinAccount account, String serverUrl, Context context){
+        this.serverUrl = serverUrl;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
         this.mContext = context;
         this.mRawTx = RawTx;
@@ -53,7 +56,7 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
         if (response.isSuccessful()) {
             //TODO invalidated send
             //TODO call getTransactionData
-            GetTransactionData trData = new GetTransactionData(response.body().txid,this.mAccount,this.mContext);
+            GetTransactionData trData = new GetTransactionData(response.body().txid,this.mAccount, this.serverUrl, this.mContext);
             trData.start();
         } else {
             System.out.println("SENDTEST: not succesful " + response.message());
