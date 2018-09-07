@@ -56,7 +56,10 @@ public class SecuritySettingsFragment extends Fragment {
         return fragment;
     }
 
-    private NfcAdapter mNfcAdapter;
+    /*
+    * Functionality not needed for now
+    * */
+    //private NfcAdapter mNfcAdapter;
     private PendingIntent pendingIntent;
     private IntentFilter ndef;
     IntentFilter[] intentFiltersArray;
@@ -100,7 +103,11 @@ public class SecuritySettingsFragment extends Fragment {
         mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mPager));
 
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this.getActivity());
+        /*
+         * Functionality not needed for now
+         * */
+        //mNfcAdapter = NfcAdapter.getDefaultAdapter(this.getActivity());
+
         this.configureForegroundDispatch();
 
         return v;
@@ -149,32 +156,37 @@ public class SecuritySettingsFragment extends Fragment {
     }
 
     public void configureForegroundDispatch(){
-        if (mNfcAdapter != null) {
-            pendingIntent = PendingIntent.getActivity(
-                    this.getActivity(), 0, new Intent(this.getActivity(), getActivity().getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-            ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-            try {
-                ndef.addDataType("*/*");    /* Handles all MIME based dispatches.
-                                       You should specify only the ones that you need. */
-            } catch (IntentFilter.MalformedMimeTypeException e) {
-                throw new RuntimeException("fail", e);
-            }
-            intentFiltersArray = new IntentFilter[]{ndef,};
-            techList = new String[][]{ new String[] {IsoDep.class.getName(), NfcA.class.getName(), MifareClassic.class.getName(), NdefFormatable.class.getName()} };
+        /*
+         * Functionality not needed for now
+         * */
+        //if (mNfcAdapter != null) {
+            //pendingIntent = PendingIntent.getActivity(
+              //      this.getActivity(), 0, new Intent(this.getActivity(), getActivity().getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-        } else {
-            Toast.makeText(this.getContext(), "This device doesn't support NFC.", Toast.LENGTH_LONG).show();
-        }
+            //ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+            //try {
+                //ndef.addDataType("*/*");
+                // Handles all MIME based dispatches.
+                //You should specify only the ones that you need.
+            //} catch (IntentFilter.MalformedMimeTypeException e) {
+                //throw new RuntimeException("fail", e);
+            //}
+            //intentFiltersArray = new IntentFilter[]{ndef,};
+            //techList = new String[][]{ new String[] {IsoDep.class.getName(), NfcA.class.getName(), MifareClassic.class.getName(), NdefFormatable.class.getName()} };
+
+        //} else {
+            //Toast.makeText(this.getContext(), "This device doesn't support NFC.", Toast.LENGTH_LONG).show();
+        //}
     }
 
     public void enableNfc(){
-        mNfcAdapter.enableForegroundDispatch(this.getActivity(), pendingIntent, intentFiltersArray, techList);
+        //mNfcAdapter.enableForegroundDispatch(this.getActivity(), pendingIntent, intentFiltersArray, techList);
         Toast.makeText(this.getContext(), "Tap with your yubikey", Toast.LENGTH_LONG).show();
     }
 
     public void disableNfc(){
-        mNfcAdapter.disableForegroundDispatch(this.getActivity());
+        //mNfcAdapter.disableForegroundDispatch(this.getActivity());
     }
 
     public void onPause() {
@@ -184,9 +196,9 @@ public class SecuritySettingsFragment extends Fragment {
 
     public void onResume() {
         super.onResume();
-        if (mNfcAdapter != null) {
+        /*if (mNfcAdapter != null) {
             enableNfc();
-        }
+        }*/
     }
 
     public void onNewIntent(Intent intent) {
