@@ -5,8 +5,12 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +20,16 @@ import butterknife.ButterKnife;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.models.Contact;
 import cy.agorise.crystalwallet.viewmodels.ContactListViewModel;
-import cy.agorise.crystalwallet.views.ContactListView;
+import cy.agorise.crystalwallet.views.ContactListAdapter;
 
 public class ContactsFragment extends Fragment {
 
-    @BindView(R.id.vContactListView)
-    ContactListView contactListView;
+    @BindView(R.id.rvContacts)
+    RecyclerView rvContacts;
+
+    ContactListAdapter adapter;
+
+    FloatingActionButton fabAddContact;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -40,23 +48,47 @@ public class ContactsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_contacts, container, false);
-        ButterKnife.bind(this, v);
+        View view = inflater.inflate(R.layout.fragment_contacts, container, false);
+        ButterKnife.bind(this, view);
 
-        ContactListViewModel contactListViewModel = ViewModelProviders.of(this).get(ContactListViewModel.class);
-        contactListViewModel.init();
+        // Configure RecyclerView and its adapter
+        rvContacts.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new ContactListAdapter();
+        rvContacts.setAdapter(adapter);
+
+        fabAddContact = getActivity().findViewById(R.id.fabAddContact);
+
+        // Hides the fab when scrolling down
+        rvContacts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // Scroll down
+                if(dy > 0 && fabAddContact.isShown())
+                    fabAddContact.hide();
+
+                // Scroll up
+                if(dy < 0 && !fabAddContact.isShown())
+                    fabAddContact.show();
+            }
+        });
+
+        // Gets contacts LiveData instance from ContactsViewModel
+        ContactListViewModel contactListViewModel =
+                ViewModelProviders.of(this).get(ContactListViewModel.class);
         LiveData<PagedList<Contact>> contactsLiveData = contactListViewModel.getContactList();
 
         contactsLiveData.observe(this, new Observer<PagedList<Contact>>() {
             @Override
             public void onChanged(@Nullable PagedList<Contact> contacts) {
-                contactListView.setData(contacts);
+                adapter.submitList(contacts);
             }
         });
 
-        return v;
+        return view;
     }
 }

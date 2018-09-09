@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.BitsharesAssetDao;
 import cy.agorise.crystalwallet.dao.CryptoCoinBalanceDao;
 import cy.agorise.crystalwallet.dao.CryptoCurrencyDao;
@@ -80,6 +79,8 @@ public abstract class GrapheneApiGenerator {
      * This is used for manager each listener in the subscription thread
      */
     private static HashMap<Long, SubscriptionListener> currentBitsharesListener = new HashMap<>();
+
+
 
     /**
      * Retrieves the data of an account searching by it's id
@@ -702,5 +703,4 @@ public abstract class GrapheneApiGenerator {
 
         }
     }
-
 }

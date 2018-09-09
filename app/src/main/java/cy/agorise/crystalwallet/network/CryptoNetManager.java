@@ -1,11 +1,9 @@
 package cy.agorise.crystalwallet.network;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -61,19 +59,29 @@ public abstract class CryptoNetManager {
         }
     }
 
-    public static void addCryptoNetURL(CryptoNet crypto, String[] urls){
-        if(!CryptoNetURLs.containsKey(crypto)){
-            CryptoNetURLs.put(crypto,new HashSet<String>());
-        }
-        CryptoNetVerifier verifier = CryptoNetVerifier.getNetworkVerify(crypto);
 
-        for(String url : urls) {
+    /*
+    * Utility for above methods
+    *
+    * */
+    public static void addCryptoNetURL(CryptoNet crypto,
+                                               String[] urls) {
+
+        if (!CryptoNetURLs.containsKey(crypto)) {
+            CryptoNetURLs.put(crypto, new HashSet<String>());
+        }
+
+        CryptoNetVerifier verifier = CryptoNetVerifier.getNetworkVerify(crypto);
+        for (String url : urls) {
             CryptoNetURLs.get(crypto).add(url);
-            if(verifier != null) {
+            if (verifier != null) {
                 verifier.checkURL(url);
             }
         }
+
     }
+
+
 
     public static void removeCryptoNetURL(CryptoNet crypto, String url){
         if(CryptoNetURLs.containsKey(crypto)){
@@ -145,5 +153,4 @@ public abstract class CryptoNetManager {
             return (int) (this.getTime() - testedURL.getTime());
         }
     }
-
 }

@@ -22,11 +22,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.activities.ImportSeedActivity;
 import cy.agorise.crystalwallet.activities.IntroActivity;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
 import cy.agorise.crystalwallet.requestmanagers.ImportBackupRequest;
 import cy.agorise.crystalwallet.util.UriTranslator;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by xd on 1/25/18.
@@ -95,11 +98,17 @@ public class ImportAccountOptionsFragment extends DialogFragment {
 
     }
 
+    @OnClick (R.id.btnImportSeed)
+    public void importSeed(){
+        Intent intent = new Intent(this.getActivity(), ImportSeedActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FILE_CONTENT_REQUEST_CODE){
+        if ((requestCode == FILE_CONTENT_REQUEST_CODE) && (resultCode == RESULT_OK)){
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View passwordDialogView = inflater.inflate(R.layout.dialog_password_input, null);
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());

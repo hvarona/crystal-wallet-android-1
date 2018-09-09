@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -19,13 +20,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
+import cy.agorise.crystalwallet.application.CrystalApplication;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
+import cy.agorise.crystalwallet.dialogs.material.ToastIt;
+import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.fragments.ImportAccountOptionsFragment;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.CryptoCoinBalance;
 import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.models.GeneralSetting;
+import cy.agorise.crystalwallet.network.CryptoNetManager;
 import cy.agorise.crystalwallet.randomdatagenerators.RandomCryptoCoinBalanceGenerator;
 import cy.agorise.crystalwallet.randomdatagenerators.RandomCryptoNetAccountGenerator;
 import cy.agorise.crystalwallet.randomdatagenerators.RandomSeedGenerator;
@@ -35,10 +41,7 @@ import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
 import cy.agorise.crystalwallet.viewmodels.TransactionListViewModel;
 import cy.agorise.crystalwallet.views.TransactionListView;
 
-public class IntroActivity extends AppCompatActivity {
-
-    TransactionListViewModel transactionListViewModel;
-    TransactionListView transactionListView;
+public class IntroActivity extends CustomActivity {
 
     @BindView(R.id.surface_view)
     public SurfaceView mSurfaceView;
@@ -53,6 +56,7 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
+
         ButterKnife.bind(this);
 
         // Appbar animation
@@ -97,6 +101,7 @@ public class IntroActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, BoardActivity.class);
                 //Intent intent = new Intent(this, PocketRequestActivity.class);
                 startActivity(intent);
+                finish();
             }
 
         /*CrystalDatabase db = CrystalDatabase.getAppDatabase(getApplicationContext());
