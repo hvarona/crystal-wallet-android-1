@@ -44,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Spinner
+        <com.jaredrummler.materialspinner.MaterialSpinner
             android:id="@+id/spFrom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,6 +74,7 @@
             android:inputType="text"
             android:textSize="20sp"
             android:hint="@string/to_capital"
+            android:maxLength="255"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gravatar" />

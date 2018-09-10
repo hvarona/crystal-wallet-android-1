@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:configChanges="locale"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.LicenseActivity">
+        <activity
+            android:name=".activities.LicenseActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,12 +33,14 @@
         <activity android:name=".activities.BoardActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity android:name=".activities.CreateSeedActivity" >
+        </activity>
+        <activity android:name=".activities.LoadingActivity"
+            android:theme="@style/ActivityDialog">
+        </activity>
         <activity android:name=".activities.AccountSeedsManagementActivity" >
         </activity>
         <activity android:name=".activities.ImportSeedActivity" >
-        </activity>
-        <activity android:name=".activities.CreateSeedActivity"
-            android:noHistory="true">
         </activity>
         <activity android:name=".activities.SendTransactionActivity" >
         </activity>
@@ -100,6 +104,7 @@
 
         <activity android:name=".activities.CreateContactActivity">
         </activity>
+
     </application>
 
 </manifest>

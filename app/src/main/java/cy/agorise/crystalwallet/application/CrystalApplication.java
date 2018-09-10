@@ -1,5 +1,6 @@
 package cy.agorise.crystalwallet.application;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,6 +12,7 @@ import com.idescout.sql.SqlScoutServer;
 import java.util.Locale;
 
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.models.BitsharesAsset;
@@ -91,7 +93,9 @@ public class CrystalApplication extends Application {
         CryptoNetEvents.getInstance().addListener(crystalWalletNotifier);
 
         //Next line is for use the bitshares main net
-        CryptoNetManager.addCryptoNetURL(CryptoNet.BITSHARES,BITSHARES_URL);
+        // TODO fix, the following line accepts one string not an array it needs to accept an arrey
+        // TODO and hoop over the urls if no connection can be established
+        CryptoNetManager.addCryptoNetURL(CryptoNet.BITSHARES,BITSHARES_URL[2]);
 
         GeneralSetting generalSettingPreferredLanguage = db.generalSettingDao().getSettingByName(GeneralSetting.SETTING_NAME_PREFERRED_LANGUAGE);
 

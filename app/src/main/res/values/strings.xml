@@ -33,6 +33,17 @@
     <string name="account_label">Choose File</string>
     <string name="loading_msg">Please wait until Balances are loading</string>
 
+    <string name="window_create_seed_DialogTittle"></string>
+    <string name="window_create_seed_DialogMessage">Creating New Account ...</string>
+    <string name="window_create_seed_Server_validation">Validating With Server ...</string>
+
+    <string name="window_create_seed_Info">You will use your PIN yo make transactions between accounts</string>
+
+    <string name="window_seed_backup">Backup brainkey</string>
+    <string name="window_seed_toast_clipboard">Brainkey copied to clipboard!</string>
+    <string name="window_seed_copy">Copy</string>
+    <string name="window_seed_leyend_backup">IMPORTANT: Print this out, or write it down. Anyone with access to your recovery key will have access to funds within this wallet</string>
+
     <string name="seed_words">Seed</string>
     <string name="txt_6_digits_pin">PIN (6+ digits)</string>
     <string name="txt_6_digits_pin_confirm">PIN confirm</string>
@@ -119,7 +130,7 @@
     <string name="txt_validating_account">Validating account...</string>
     <string name="validating_account">Validating Account...</string>
     <string name="account_name_should_be_longer">Account name should be longer</string>
-    <string name="account_name_already_exist">Account Name %s already exist</string>
+    <string name="account_name_already_exist">Account Name already exist</string>
     <string name="account_name_not_exist">Account Name %s does not exist</string>
     <string name="account_already_exist">Account already exist</string>
     <string name="add_contact">Add</string>
@@ -486,7 +497,7 @@
     <string name="remove">Remove</string>
     <string name="user_name_password_placeholder">user_name Password</string>
     <string name="version_placeholder">v1.0</string>
-    <string name="block_number_placeholder">block# 14966596</string>
+    <string name="block_number_placeholder">block# -----</string>
     <string name="current_pin">Current PIN</string>
     <string name="new_pin">New PIN</string>
     <string name="confirm_pin">Confirm PIN</string>
@@ -506,4 +517,6 @@
     <string name="import_account_backup">Import Account Backup</string>
     <string name="disagree">Disagree</string>
     <string name="agree">Agree</string>
+    <string name="add">Add</string>
+    <string name="modify">Modify</string>
 </resources>
