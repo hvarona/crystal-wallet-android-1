@@ -1,5 +1,7 @@
 package cy.agorise.crystalwallet.requestmanagers;
 
+import android.content.Context;
+
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.SeedType;
 
@@ -37,6 +39,11 @@ public class ValidateImportBitsharesAccountRequest extends CryptoNetInfoRequest 
     private final String mnemonic;
 
     /**
+     * True - the account must be added if the accountName and mnemonic are correct
+     */
+    private boolean addAccountIfValid = false;
+
+    /**
      * If this seed is BIP39 or Brainkey
      */
     private SeedType seedType;
@@ -46,10 +53,21 @@ public class ValidateImportBitsharesAccountRequest extends CryptoNetInfoRequest 
      */
     private StatusCode status = StatusCode.NOT_STARTED;
 
-    public ValidateImportBitsharesAccountRequest(String accountName, String mnemonic){
+    private Context context;
+
+    public ValidateImportBitsharesAccountRequest(String accountName, String mnemonic, Context context){
         super(CryptoCoin.BITSHARES);
         this.accountName = accountName;
         this.mnemonic = mnemonic;
+        this.context = context;
+    }
+
+    public ValidateImportBitsharesAccountRequest(String accountName, String mnemonic, Context context, boolean addAccountIfValid){
+        super(CryptoCoin.BITSHARES);
+        this.accountName = accountName;
+        this.mnemonic = mnemonic;
+        this.addAccountIfValid = addAccountIfValid;
+        this.context = context;
     }
 
     public void validate(){
@@ -68,6 +86,14 @@ public class ValidateImportBitsharesAccountRequest extends CryptoNetInfoRequest 
 
     public SeedType getSeedType() {
         return seedType;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public boolean addAccountIfValid(){
+        return this.addAccountIfValid;
     }
 
     public void setSeedType(SeedType seedType) {

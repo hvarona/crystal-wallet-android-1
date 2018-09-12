@@ -114,7 +114,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         if (this.importSeedValidator.isValid()) {
 
             final ValidateImportBitsharesAccountRequest validatorRequest =
-                    new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString());
+                    new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
 
             validatorRequest.setListener(new CryptoNetInfoRequestListener() {
                 @Override
