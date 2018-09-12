@@ -2,6 +2,7 @@ package cy.agorise.crystalwallet.fragments;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -24,6 +25,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.activities.BackupSeedActivity;
+import cy.agorise.crystalwallet.activities.IntroActivity;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.requestmanagers.CreateBackupRequest;
@@ -46,6 +49,9 @@ public class BackupsSettingsFragment extends Fragment{
         fragment.setArguments(args);
         return fragment;
     }
+
+    @BindView(R.id.btnBrainkey)
+    public Button btnBrainkey;
 
     @BindView(R.id.tvBinFile)
     public TextView tvBinFile;
@@ -80,6 +86,15 @@ public class BackupsSettingsFragment extends Fragment{
 
         return ssb;
     }
+
+
+    @OnClick(R.id.btnBrainkey)
+    public void btnBrainOnClick(){
+
+        Intent intent = new Intent(getContext(), BackupSeedActivity.class);
+        startActivity(intent);
+    }
+
 
     @OnClick(R.id.btnBinFile)
     public void makeBackupFile(){

@@ -43,6 +43,7 @@ open abstract class DialogMaterial{
         *   Init the builder
         * */
         builder = MaterialDialog.Builder(activity)
+        builder.cancelable(false)
     }
 
     /*
