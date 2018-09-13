@@ -141,7 +141,8 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
                         Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
                     } else {
-                        Intent intent = new Intent(thisActivity, IntroActivity.class);
+                        Intent intent = new Intent(thisActivity, BoardActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     }
                 }
@@ -170,6 +171,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             grapheneAccountInfoViewModel.addGrapheneAccountInfo(grapheneAccountInfo);
 
             this.finish();*/
+            CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
         }
     }
 
