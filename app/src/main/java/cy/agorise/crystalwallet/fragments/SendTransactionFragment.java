@@ -145,6 +145,11 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
 
+        /*
+         *   Add style to the spinner android
+         * */
+        spFrom.setBackground(getContext().getDrawable(R.drawable.square_color));
+
         if (this.cryptoNetAccountId != -1) {
             db = CrystalDatabase.getAppDatabase(this.getContext());
             this.cryptoNetAccount = db.cryptoNetAccountDao().getById(this.cryptoNetAccountId);
@@ -153,8 +158,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             * this is only for graphene accounts.
             *
             **/
-            //this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
-            //this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
+            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
+            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
 
             final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
             balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
@@ -178,7 +183,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             List<CryptoNetAccount> cryptoNetAccounts = cryptoNetAccountListViewModel.getCryptoNetAccountList();
             CryptoNetAccountAdapter fromSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
 
-            //spFrom.setAdapter(fromSpinnerAdapter);
+            spFrom.setAdapter(fromSpinnerAdapter);
             //spFrom.setSelection(0);
 
             /*
