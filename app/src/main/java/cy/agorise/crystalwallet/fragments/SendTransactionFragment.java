@@ -24,15 +24,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.zxing.Result;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.vincent.filepicker.ToastUtil;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -79,12 +82,16 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     TextView tvFromError;
     @BindView(R.id.etTo)
     EditText etTo;
+    @BindView(R.id.viewSend)
+    View viewSend;
     @BindView(R.id.tvToError)
     TextView tvToError;
     @BindView(R.id.spAsset)
     Spinner spAsset;
     @BindView(R.id.tvAssetError)
     TextView tvAssetError;
+    @BindView(R.id.scrollMain)
+    ScrollView scrollMain;
     @BindView(R.id.etAmount)
     EditText etAmount;
     @BindView(R.id.tvAmountError)
@@ -136,12 +143,57 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         fabSend.hide();
 
         //AlertDialog.Builder
-        builder = new AlertDialog.Builder(getActivity(), R.style.SendTransactionTheme);
+        builder = new AlertDialog.Builder(getActivity(), R.style.dialog_theme_full);
         //builder.setTitle("Send");
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.send_transaction, null);
         ButterKnife.bind(this, view);
+
+
+        /*
+         * Detet scroll changes
+         * */
+        scrollMain.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+
+                View view = scrollMain.getChildAt(scrollMain.getChildCount() - 1);
+
+                int diff = (view.getBottom() - (scrollMain.getHeight() + scrollMain.getScrollY()));
+
+                float traslationY = btnSend.getTranslationY();
+
+                if(diff<=266 && diff>128){
+                    //btnSend.setTranslationY(0);
+                    //viewSend.setTranslationY(0);
+
+                    btnSend.animate().y(880);
+                    viewSend.animate().y(800);
+                }
+                else if(diff<=128 && diff>10){
+                    //btnSend.setTranslationY(-130);
+                    //viewSend.setTranslationY(-130);
+
+                    btnSend.animate().y(880);
+                    viewSend.animate().y(800);
+                }
+                else if(diff<=10 && diff>0){
+                    //btnSend.setTranslationY(-170);
+                    //viewSend.setTranslationY(-170);
+
+                    btnSend.animate().y(680);
+                    viewSend.animate().y(600);
+                }
+                else if(diff==0){
+                    //btnSend.setTranslationY(-190);
+                    //viewSend.setTranslationY(-190);
+
+                    btnSend.animate().y(680);
+                    viewSend.animate().y(600);
+                }
+            }
+        });
 
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
 
