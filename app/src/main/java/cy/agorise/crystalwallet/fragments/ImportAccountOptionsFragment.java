@@ -1,12 +1,15 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +25,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.activities.BoardActivity;
 import cy.agorise.crystalwallet.activities.ImportSeedActivity;
 import cy.agorise.crystalwallet.activities.IntroActivity;
+import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
+import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
 import cy.agorise.crystalwallet.requestmanagers.ImportBackupRequest;
 import cy.agorise.crystalwallet.util.UriTranslator;
+import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,6 +51,21 @@ public class ImportAccountOptionsFragment extends DialogFragment {
     Button btnClose;
     @BindView(R.id.btnImportBackup)
     Button btnImportBackup;
+
+
+    /*
+        Dialog for loading
+    */
+    private CrystalDialog crystalDialog;
+
+    /*
+    * Contains the activity to close in case import succed
+    * */
+    private Activity introActivity;
+
+
+
+
 
     public ImportAccountOptionsFragment() {
         // Required empty public constructor
@@ -141,14 +163,30 @@ public class ImportAccountOptionsFragment extends DialogFragment {
                                                 @Override
                                                 public void run() {
                                                     if (importBackupRequest.getStatus() == ImportBackupRequest.StatusCode.SUCCEEDED) {
-                                                        Toast toast = Toast.makeText(
-                                                                getContext(), "Backup restored!", Toast.LENGTH_LONG);
-                                                        toast.show();
 
-                                                        Intent intent = new Intent(getContext(), IntroActivity.class);
-                                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        //Checks if the user has any seed created
+                                                        AccountSeedListViewModel accountSeedListViewModel = ViewModelProviders.of((FragmentActivity) getContext()).get(AccountSeedListViewModel.class);
+
+                                                        if(introActivity!=null){
+                                                            introActivity.finish();
+                                                        }
+
+                                                        Intent intent = new Intent(getContext(), BoardActivity.class);
                                                         startActivity(intent);
+                                                        dismiss();
+
+                                                        /*
+                                                         * Hide the loading dialog
+                                                         * */
+                                                        crystalDialog.dismiss();
+
                                                     } else if (importBackupRequest.getStatus() == ImportBackupRequest.StatusCode.FAILED) {
+
+                                                        /*
+                                                         * Hide the loading dialog
+                                                         * */
+                                                        crystalDialog.dismiss();
+
                                                         Toast toast = Toast.makeText(
                                                                 getContext(), "An error ocurred while restoring the backup!", Toast.LENGTH_LONG);
                                                         toast.show();
@@ -159,6 +197,14 @@ public class ImportAccountOptionsFragment extends DialogFragment {
                                     });
 
                                     FileServiceRequests.getInstance().addRequest(importBackupRequest);
+
+                                    /*
+                                    * Show loading dialog
+                                    * */
+                                    crystalDialog = new CrystalDialog((Activity) getContext());
+                                    crystalDialog.setText(getContext().getString(R.string.Creating_backup_from_file));
+                                    crystalDialog.progress();
+                                    crystalDialog.show();
                                 }
                             })
                     .setNegativeButton("Cancel",
@@ -172,5 +218,10 @@ public class ImportAccountOptionsFragment extends DialogFragment {
             passwordDialog.show();
 
         }
+    }
+
+
+    public void setIntroActivity(Activity introActivity) {
+        this.introActivity = introActivity;
     }
 }
