@@ -30,7 +30,18 @@ public class AmountValidationField extends ValidationField {
         try {
             final float newAmountValue = Float.parseFloat(amountField.getText().toString());
             final CryptoCurrency cryptoCurrency = (CryptoCurrency)assetSpinner.getSelectedItem();
-            final String mixedValues = newAmountValue+"_"+cryptoCurrency.getId();
+
+            /*
+            * Validation for the money
+            * */
+            if(cryptoCurrency==null){
+                setMessageForValue("",amountField.getContext().getString(R.string.send_assets_error_invalid_cypto_coin_selected));
+                setValidForValue("", false);
+                return;
+            }
+
+            final String idCurrency = cryptoCurrency==null?"null ":Long.toString(cryptoCurrency.getId());
+            final String mixedValues = newAmountValue + "_" + idCurrency;
             this.setLastValue(mixedValues);
             this.startValidating();
             final ValidationField field = this;

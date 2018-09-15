@@ -234,14 +234,14 @@ public class FileBackupManager implements FileServiceRequestsListener {
             final AccountSeedDao accountSeedDao = db.accountSeedDao();
             for(BitsharesSeedName seedName : seedNames) {
                 final ValidateImportBitsharesAccountRequest validatorRequest =
-                        new ValidateImportBitsharesAccountRequest(seedName.accountName, seedName.accountSeed);
+                        new ValidateImportBitsharesAccountRequest(seedName.accountName, seedName.accountSeed, request.getContext(), true);
                 validatorRequest.setListener(new CryptoNetInfoRequestListener() {
                     @Override
                     public void onCarryOut() {
                         if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
                             request.setStatus(ImportBackupRequest.StatusCode.FAILED); // TODO reason bad seed
                         } else {
-                            AccountSeed seed = new AccountSeed();
+                            /*AccountSeed seed = new AccountSeed();
                             seed.setName(validatorRequest.getAccountName());
                             seed.setType(validatorRequest.getSeedType());
                             seed.setMasterSeed(validatorRequest.getMnemonic());
@@ -257,7 +257,8 @@ public class FileBackupManager implements FileServiceRequestsListener {
                                 request.setStatus(ImportBackupRequest.StatusCode.SUCCEEDED);
                             }else{
                                 request.setStatus(ImportBackupRequest.StatusCode.FAILED); //TODO reason couldn't insert seed
-                            }
+                            }*/
+                            request.setStatus(ImportBackupRequest.StatusCode.SUCCEEDED);
                         }
                     }
                 });

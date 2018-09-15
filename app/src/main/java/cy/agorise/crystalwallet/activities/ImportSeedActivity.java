@@ -1,22 +1,31 @@
 package cy.agorise.crystalwallet.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.enums.SeedType;
+import cy.agorise.crystalwallet.manager.BitsharesAccountManager;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
+import cy.agorise.crystalwallet.models.GrapheneAccount;
 import cy.agorise.crystalwallet.models.GrapheneAccountInfo;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
+import cy.agorise.crystalwallet.requestmanagers.ImportBackupRequest;
+import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedViewModel;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetAccountViewModel;
 import cy.agorise.crystalwallet.viewmodels.GrapheneAccountInfoViewModel;
@@ -100,7 +109,46 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
     @OnClick(R.id.btnImport)
     public void importSeed(){
+        final ImportSeedActivity thisActivity = this;
+
         if (this.importSeedValidator.isValid()) {
+
+            final ValidateImportBitsharesAccountRequest validatorRequest =
+                    new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
+
+            validatorRequest.setListener(new CryptoNetInfoRequestListener() {
+                @Override
+                public void onCarryOut() {
+                    if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
+                        String errorText = "An error ocurred attempting to import the account";
+
+                        switch (validatorRequest.getStatus()){
+                            case PETITION_FAILED:
+                            case NO_INTERNET:
+                            case NO_SERVER_CONNECTION:
+                                errorText = "There was an error with the connection. Try again later";
+                                break;
+                            case ACCOUNT_DOESNT_EXIST:
+                                errorText = "The account doesn't exists";
+                                break;
+                            case BAD_SEED:
+                                errorText = "The seed is not valid";
+                                break;
+                            case NO_ACCOUNT_DATA:
+                                errorText = "The account doesn't have any data";
+                                break;
+                        }
+
+                        Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
+                    } else {
+                        Intent intent = new Intent(thisActivity, BoardActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+                }
+            });
+            /*CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
+
             AccountSeed seed = new AccountSeed();
 
             //TODO verify if words are already in the db
@@ -122,7 +170,8 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             grapheneAccountInfo.setName(etAccountName.getText().toString());
             grapheneAccountInfoViewModel.addGrapheneAccountInfo(grapheneAccountInfo);
 
-            this.finish();
+            this.finish();*/
+            CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
         }
     }
 

@@ -11,5 +11,7 @@
 
     <string name="network_err_no_server_connection" translatable="false">No server connection</string>
 
+    <string name="send_assets_error_invalid_cypto_coin_selected" translatable="false">Invalid crypto coin selected</string>
+
 
 </resources>

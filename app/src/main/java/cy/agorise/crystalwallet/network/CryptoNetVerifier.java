@@ -1,8 +1,5 @@
 package cy.agorise.crystalwallet.network;
 
-import android.app.Activity;
-
-import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 
 /**
@@ -15,14 +12,6 @@ import cy.agorise.crystalwallet.enums.CryptoNet;
 
 public abstract class CryptoNetVerifier {
 
-    /*
-    * Contains the worker connection thread
-    */
-    protected WebSocketThread thread;
-
-
-
-
     static CryptoNetVerifier getNetworkVerify(CryptoNet cryptoNet){
         if(cryptoNet.getLabel().equals(CryptoNet.BITSHARES.getLabel())){
             return new BitsharesCryptoNetVerifier();
@@ -33,9 +22,4 @@ public abstract class CryptoNetVerifier {
     public abstract void checkURL(final String url);
 
     public abstract String getChainId();
-
-
-    public WebSocketThread getThread() {
-        return thread;
-    }
 }

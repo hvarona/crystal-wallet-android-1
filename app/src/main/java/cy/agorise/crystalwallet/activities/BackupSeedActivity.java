@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.fragments.BackupsSettingsFragment;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedViewModel;
 
@@ -28,7 +29,7 @@ public class BackupSeedActivity extends AppCompatActivity {
 
     @BindView(R.id.tvBrainKey)
     TextView textfieldBrainkey;
-    @BindView(R.id.btnOk)
+    @BindView(R.id.btnCancel)
     Button btnOk;
     @BindView(R.id.btnCopy)
     Button btnCopy;
@@ -60,14 +61,14 @@ public class BackupSeedActivity extends AppCompatActivity {
             accountSeedViewModel.loadSeed(seedId);
 
         } else {
+
             finish();
         }
     }
 
-    @OnClick(R.id.btnOk)
+    @OnClick(R.id.btnCancel)
     public void btnOkClick(){
-        Intent intent = new Intent(this, IntroActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     /*

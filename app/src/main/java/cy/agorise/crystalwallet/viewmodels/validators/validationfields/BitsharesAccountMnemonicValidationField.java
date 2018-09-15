@@ -31,7 +31,7 @@ public class BitsharesAccountMnemonicValidationField extends ValidationField {
         this.startValidating();
         final ValidationField field = this;
 
-        final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(newAccountNameValue,newMnemonicValue);
+        final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(newAccountNameValue,newMnemonicValue,accountNameField.getContext());
         request.setListener(new CryptoNetInfoRequestListener() {
             @Override
             public void onCarryOut() {

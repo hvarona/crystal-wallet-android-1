@@ -158,5 +158,6 @@ public class IntroActivity extends CustomActivity {
         // Create and show the dialog.
         ImportAccountOptionsFragment newFragment = ImportAccountOptionsFragment.newInstance();
         newFragment.show(ft, "importAccountOptions");
+        newFragment.setIntroActivity(globalActivity); //This activity should close when import succeds
     }
 }
