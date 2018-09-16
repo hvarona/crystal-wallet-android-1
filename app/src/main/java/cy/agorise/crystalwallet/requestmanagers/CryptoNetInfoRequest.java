@@ -37,7 +37,9 @@ public abstract class CryptoNetInfoRequest {
     }
 
     protected void _fireOnCarryOutEvent(){
-        listener.onCarryOut();
+        if (listener != null) {
+            listener.onCarryOut();
+        }
         CryptoNetInfoRequests.getInstance().removeRequest(this);
     }
 

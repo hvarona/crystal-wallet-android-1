@@ -196,15 +196,15 @@ public class ImportAccountOptionsFragment extends DialogFragment {
                                         }
                                     });
 
-                                    FileServiceRequests.getInstance().addRequest(importBackupRequest);
-
                                     /*
-                                    * Show loading dialog
-                                    * */
+                                     * Show loading dialog
+                                     * */
                                     crystalDialog = new CrystalDialog((Activity) getContext());
                                     crystalDialog.setText(getContext().getString(R.string.Creating_backup_from_file));
                                     crystalDialog.progress();
                                     crystalDialog.show();
+
+                                    FileServiceRequests.getInstance().addRequest(importBackupRequest);
                                 }
                             })
                     .setNegativeButton("Cancel",
