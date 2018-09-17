@@ -22,29 +22,36 @@ public abstract class GetEstimateFee {
 
     /**
      * The funciton to get the rate for the transaction be included in the next 2 blocks
-     * @param coin The coin to get the rate
+     * @param serverUrl The url of the insight server
+     * @param listener the listener to this answer
      */
-    public static void getEstimateFee(final CryptoCoin coin, String serverUrl, final estimateFeeListener listener) {
-        InsightApiServiceGenerator serviceGenerator = new InsightApiServiceGenerator(serverUrl);
-        InsightApiService service = serviceGenerator.getService(InsightApiService.class);
-        Call<JsonObject> call = service.estimateFee(InsightApiConstants.getPath(coin));
-        final JsonObject answer = new JsonObject();
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                listener.estimateFee((long) (answer.get("answer").getAsDouble()));
+    public static void getEstimateFee(String serverUrl, final estimateFeeListener listener) {
+        try {
+            InsightApiServiceGenerator serviceGenerator = new InsightApiServiceGenerator(serverUrl);
+            InsightApiService service = serviceGenerator.getService(InsightApiService.class);
+            Call<JsonObject> call = service.estimateFee(serverUrl);
+            final JsonObject answer = new JsonObject();
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    listener.estimateFee((long) (answer.get("answer").getAsDouble()));
 
-            }
+                }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                listener.estimateFee(-1);
-            }
-        });
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    listener.fail();
+                    listener.estimateFee(-1);
+                }
+            });
+        }catch(Exception e){
+            listener.fail();
+        }
     }
 
     public static interface estimateFeeListener{
         public void estimateFee(long value);
+        public void fail();
     }
 
 }
