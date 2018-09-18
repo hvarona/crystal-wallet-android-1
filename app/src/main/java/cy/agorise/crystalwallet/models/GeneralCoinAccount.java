@@ -323,6 +323,14 @@ public abstract class GeneralCoinAccount extends CryptoNetAccount {
 
     public abstract List<CryptoNetBalance> getBalance();
 
+    public DeterministicKey getChangeKey() {
+        return mChangeKey;
+    }
+
+    public DeterministicKey getExternalKey() {
+        return mExternalKey;
+    }
+
     /**
      * Compare the transaction, to order it for the list of transaction
      */
