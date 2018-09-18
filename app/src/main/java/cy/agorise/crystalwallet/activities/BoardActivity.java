@@ -44,6 +44,7 @@ import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.fragments.BalanceFragment;
 import cy.agorise.crystalwallet.fragments.ContactsFragment;
+import cy.agorise.crystalwallet.fragments.MerchantsFragment;
 import cy.agorise.crystalwallet.fragments.ReceiveTransactionFragment;
 import cy.agorise.crystalwallet.fragments.SendTransactionFragment;
 import cy.agorise.crystalwallet.fragments.TransactionsFragment;
@@ -356,7 +357,7 @@ public class BoardActivity  extends CustomActivity {
         }
 
         // Titles of the tabs
-        int[] tabTitles = {R.string.balances, R.string.transactions, R.string.contacts};
+        int[] tabTitles = {R.string.balances, R.string.transactions, R.string.contacts,R.string.Merchants};
 
         @Override
         public Fragment getItem(int position) {
@@ -367,6 +368,8 @@ public class BoardActivity  extends CustomActivity {
                     return new TransactionsFragment();
                 case 2:
                     return new ContactsFragment();
+                case 3:
+                    return new MerchantsFragment();
             }
 
 
@@ -380,7 +383,7 @@ public class BoardActivity  extends CustomActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     }
 }
