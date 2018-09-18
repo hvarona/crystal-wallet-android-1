@@ -518,7 +518,7 @@
     <string name="import_account">Import Account</string>
     <string name="import_account_options_description">Select one option to import your existing account</string>
     <string name="import_account_seed">Import Account Seed</string>
-    <string name="import_account_backup">Import Account Backup</string>
+    <string name="import_account_backup">Import .bin File</string>
     <string name="disagree">Disagree</string>
     <string name="agree">Agree</string>
     <string name="add">Add</string>
