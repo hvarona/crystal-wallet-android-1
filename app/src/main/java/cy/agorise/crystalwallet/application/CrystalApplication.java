@@ -43,11 +43,6 @@ public class CrystalApplication extends Application {
                     "ws://185.208.208.147:8090"                   // Custom node
             };
 
-    public static String BITSHARES_TESTNET_URL[] =
-            {
-                    "http://185.208.208.147:11012",      // Openledger node
-            };
-
     //This is for testing the equivalent values on the testnet TODO remove
     public static BitsharesAsset bitUSDAsset = new BitsharesAsset("USD",4,"1.3.121",BitsharesAsset.Type.SMART_COIN);
     //This is for testing the equivalent values on the testnet TODO remove

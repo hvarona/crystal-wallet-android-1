@@ -11,17 +11,8 @@ import cy.agorise.graphenej.models.WitnessResponse;
  */
 
 public class BitsharesCryptoNetVerifier extends CryptoNetVerifier {
-
-
-    /**
-     * TODO We need to change this to a type of subCryptoNet
-     */
     private final CryptoNet cryptoNet = CryptoNet.BITSHARES;
-    /**
-     * Todo info need to be on the SubCryptoNet
-     */
-    private final String CHAIN_ID = "9cf6f255a208100d2bb275a3c52f4b1589b7ec9c9bfc2cb2a5fe6411295106d8";//testnet
-    //private final String CHAIN_ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8";//mainnet
+    private final String CHAIN_ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8";//mainnet
 
     @Override
     public void checkURL(final String url) {
