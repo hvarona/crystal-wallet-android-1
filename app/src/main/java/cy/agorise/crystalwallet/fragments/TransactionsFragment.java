@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,9 +113,9 @@ public class TransactionsFragment extends Fragment {
         TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem orderSelected =
                 (TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem)(spTransactionsOrder.getSelectedItem());
 
-        if (transactionsLiveData != null){
-            transactionsLiveData.removeObservers(this);
-        }
+        //if (transactionsLiveData != null){
+            //transactionsLiveData.removeObservers(this);
+        //}
         transactionListViewModel.initTransactionList(orderSelected.getField(),etTransactionSearch.getText().toString());
         transactionsLiveData = transactionListViewModel.getTransactionList();
 
@@ -122,6 +123,7 @@ public class TransactionsFragment extends Fragment {
         transactionsLiveData.observe(this, new Observer<PagedList<CryptoCoinTransactionExtended>>() {
             @Override
             public void onChanged(@Nullable PagedList<CryptoCoinTransactionExtended> cryptoCoinTransactions) {
+                Log.i("Transactions","Transactions have change! Count:"+cryptoCoinTransactions.size());
                 transactionListView.setData(cryptoCoinTransactions, fragment);
             }
         });
