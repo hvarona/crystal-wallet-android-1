@@ -27,9 +27,7 @@ import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.activities.BoardActivity;
 import cy.agorise.crystalwallet.activities.ImportSeedActivity;
-import cy.agorise.crystalwallet.activities.IntroActivity;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
-import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
 import cy.agorise.crystalwallet.requestmanagers.ImportBackupRequest;
@@ -202,7 +200,7 @@ public class ImportAccountOptionsFragment extends DialogFragment {
                                     * Show loading dialog
                                     * */
                                     crystalDialog = new CrystalDialog((Activity) getContext());
-                                    crystalDialog.setText(getContext().getString(R.string.Creating_backup_from_file));
+                                    crystalDialog.setText(getContext().getString(R.string.Restoring_backup_from_file));
                                     crystalDialog.progress();
                                     crystalDialog.show();
                                 }
