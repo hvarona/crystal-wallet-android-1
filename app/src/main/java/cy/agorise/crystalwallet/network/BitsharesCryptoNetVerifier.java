@@ -33,6 +33,7 @@ public class BitsharesCryptoNetVerifier extends CryptoNetVerifier {
             @Override
             public void onError(BaseResponse.Error error) {
                 //TODO handle error
+                System.out.println("Bad server response " + url);
             }
         }),url);
         thread.start();

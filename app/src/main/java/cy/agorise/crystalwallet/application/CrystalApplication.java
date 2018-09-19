@@ -91,7 +91,7 @@ public class CrystalApplication extends Application {
         //Next line is for use the bitshares main net
         // TODO fix, the following line accepts one string not an array it needs to accept an arrey
         // TODO and hoop over the urls if no connection can be established
-        CryptoNetManager.addCryptoNetURL(CryptoNet.BITSHARES,BITSHARES_URL[2]);
+        CryptoNetManager.addCryptoNetURL(CryptoNet.BITSHARES,BITSHARES_URL);
 
         GeneralSetting generalSettingPreferredLanguage = db.generalSettingDao().getSettingByName(GeneralSetting.SETTING_NAME_PREFERRED_LANGUAGE);
 

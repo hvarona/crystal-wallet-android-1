@@ -47,6 +47,14 @@ public abstract class CryptoNetManager {
         return 0;
     }
 
+    public static void addCryptoNetUrls(CryptoNet crypto, String[] urls){
+        for(String url: urls){
+            addCryptoNetURL(crypto,url);
+        }
+    }
+
+
+
     public static void addCryptoNetURL(CryptoNet crypto, String url){
         if(!CryptoNetURLs.containsKey(crypto)){
             CryptoNetURLs.put(crypto,new HashSet<String>());
