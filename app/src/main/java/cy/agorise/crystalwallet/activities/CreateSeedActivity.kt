@@ -181,6 +181,7 @@ class CreateSeedActivity : CustomActivity() {
             if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED) {
                 val accountSeed = request.account
                 val intent = Intent(applicationContext, BackupSeedActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 intent.putExtra("SEED_ID", accountSeed.id)
                 startActivity(intent)
             } else {

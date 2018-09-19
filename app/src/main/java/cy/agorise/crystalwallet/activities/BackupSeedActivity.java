@@ -68,7 +68,10 @@ public class BackupSeedActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnCancel)
     public void btnOkClick(){
-        finish();
+        Intent intent = new Intent(this, BoardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        //finish();
     }
 
     /*

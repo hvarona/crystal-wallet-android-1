@@ -44,8 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:text="0.003€" />
+                android:layout_centerVertical="true" />
 
             <Button
                 android:id="@+id/btnSendFromThisAccount"
