@@ -106,6 +106,7 @@
                 app:tabSelectedTextColor="@color/white"
                 app:layout_collapseMode="pin"
                 app:tabIndicatorHeight="0dp"
+                app:tabMode="scrollable"
                 app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
                 app:tabTextColor="@color/lightGrayClear"
                 android:animateLayoutChanges="true" />

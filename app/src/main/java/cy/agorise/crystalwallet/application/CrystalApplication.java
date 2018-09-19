@@ -37,15 +37,8 @@ public class CrystalApplication extends Application {
             {
                     "wss://de.palmpay.io/ws",                   // Custom node
                     "wss://bitshares.nu/ws",
-                    "wss://dexnode.net/ws",                    // Dallas, USA
                     "wss://bitshares.crypto.fans/ws",          // Munich, Germany
                     "wss://bitshares.openledger.info/ws",      // Openledger node
-                    "ws://185.208.208.147:8090"                   // Custom node
-            };
-
-    public static String BITSHARES_TESTNET_URL[] =
-            {
-                    "http://185.208.208.147:11012",      // Openledger node
             };
 
     //This is for testing the equivalent values on the testnet TODO remove
