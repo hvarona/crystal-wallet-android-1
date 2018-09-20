@@ -47,6 +47,7 @@
     <string name="seed_words">Seed</string>
     <string name="txt_6_digits_pin">PIN (6+ digits)</string>
     <string name="txt_6_digits_pin_confirm">PIN confirm</string>
+    <string name="Seed">Seed</string>
     <string name="create">CREATE</string>
     <string name="or">OR</string>
     <string name="existing_account">Existing Account</string>

@@ -1,47 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activities.ImportSeedActivity">
-    <!--
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/tilPin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/tietPin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </android.support.design.widget.TextInputLayout>
-    -->
-    <TextView
-        android:id="@+id/tvPin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/txt_6_digits_pin"
-        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etPin"
+        android:layout_below="@+id/statusBar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edittext_bg"
         android:inputType="number"
         android:maxLines="1"
+        android:hint="@string/txt_6_digits_pin"
         android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvPinError"
+        android:layout_below="@+id/etPin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -50,25 +32,17 @@
         android:textColor="@color/red"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/tvPinConfirmation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/txt_6_digits_pin_confirm"
-        android:textStyle="bold" />
-
     <EditText
         android:id="@+id/etPinConfirmation"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:layout_below="@+id/tvPinError"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:background="@drawable/edittext_bg"
         android:inputType="number"
         android:maxLines="1"
+        android:hint="@string/txt_6_digits_pin_confirm"
         android:singleLine="true"
         android:textColor="@color/black" />
 
@@ -81,61 +55,50 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="10dp"
         android:textColor="@color/red"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/seed_words"
+        android:layout_below="@+id/etPinConfirmation"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etSeedWords"
+        android:layout_below="@+id/tvPinConfirmationError"
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:background="@drawable/edittext_bg"
         android:gravity="top"
+        android:hint="@string/Seed"
         android:inputType="textMultiLine"
         android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvSeedWordsError"
+        android:layout_below="@+id/etSeedWords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="10dp"
         android:textColor="@color/red"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/txt_account_name"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etAccountName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSeedWordsError"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:background="@drawable/edittext_bg"
         android:gravity="top"
+        android:hint="@string/txt_account_name"
         android:inputType="textMultiLine"
         android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvAccountNameError"
         android:layout_width="match_parent"
+        android:layout_below="@+id/etAccountName"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -144,8 +107,10 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/txtLeyend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tvAccountNameError"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="10dp"
@@ -156,6 +121,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/txtLeyend"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="10dp"
@@ -164,11 +130,11 @@
 
         <Button
             android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:background="@color/pink"
+            android:background="@color/redColor"
             android:text="@string/cancel"
             android:textColor="@color/white" />
 
@@ -178,7 +144,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:background="@color/green"
+            android:background="@color/colorPrimary"
             android:padding="10dp"
             android:text="@string/create_wallet"
             android:textColor="@color/white" />
@@ -188,6 +154,7 @@
     <cy.agorise.crystalwallet.util.BottomStatusBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:id="@+id/statusBar"/>
 
-</LinearLayout>
+</RelativeLayout>
