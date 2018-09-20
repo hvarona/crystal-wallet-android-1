@@ -23,6 +23,8 @@ import cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
 import kotlinx.android.synthetic.main.create_seed.*
 
 
+
+
 /*
 * This activity creates a new account with some security concerns
 * */
@@ -283,15 +285,19 @@ class CreateSeedActivity : CustomActivity() {
     * Enable create button
     * */
     private fun enableCreate() {
-        btnCreate?.setEnabled(true)
-        btnCreate?.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+        runOnUiThread(Runnable {
+            btnCreate?.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+            btnCreate?.setEnabled(true)
+        })
     }
 
     /*
      * Disable create button
      * */
     private fun disableCreate() {
-        btnCreate?.setEnabled(false)
-        btnCreate?.setBackground(resources.getDrawable(R.drawable.disable_style))
+        runOnUiThread(Runnable {
+            btnCreate?.setEnabled(false)
+            btnCreate?.setBackground(resources.getDrawable(R.drawable.disable_style))
+        })
     }
 }
