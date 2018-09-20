@@ -3,6 +3,7 @@ package cy.agorise.crystalwallet.network;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +32,10 @@ public abstract class CryptoNetManager {
 
     public static String getURL(CryptoNet crypto, int index){
         if(TestedURLs.containsKey(crypto) && TestedURLs.get(crypto).size()>index){
+            System.out.println("Servers url list " + Arrays.toString(TestedURLs.get(crypto).toArray()));
             return TestedURLs.get(crypto).get(index).getUrl();
         }
+        System.out.println("Servers " + crypto.getLabel()+" dioesn't have testedurl");
 
         if(CryptoNetURLs.containsKey(crypto) && !CryptoNetURLs.get(crypto).isEmpty()){
             return CryptoNetURLs.get(crypto).iterator().next();
