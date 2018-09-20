@@ -280,6 +280,8 @@
     <string name="head_block_number">head_block_number</string>
     <string name="e_receipt">e_receipt</string>
 
+    <string name="continue_question">Are you sure to continue?</string>
+
     <string name="Restoring_backup_from_file">Restoring backup from file</string>
 
     <string name="folder_name">SmartcoinsWallet</string>

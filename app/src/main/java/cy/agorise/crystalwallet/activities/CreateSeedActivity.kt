@@ -10,7 +10,7 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
 import cy.agorise.crystalwallet.R
-import cy.agorise.crystalwallet.dialogs.material.CrystalDialog
+import cy.agorise.crystalwallet.dialogs.material.*
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests
 import cy.agorise.crystalwallet.requestmanagers.ValidateCreateBitsharesAccountRequest
 import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountRequest
@@ -167,39 +167,55 @@ class CreateSeedActivity : CustomActivity() {
     @OnClick(R.id.btnCreate)
     fun createSeed() {
 
-        // Make request to create a bitshare account
-        val request = ValidateCreateBitsharesAccountRequest(tietAccountName?.getText().toString(), applicationContext)
-
-        //DTVV: Friday 27 July 2018
-        //Makes dialog to tell the user that the account is been created
-        val creatingAccountMaterialDialog = CrystalDialog(this)
-        creatingAccountMaterialDialog.setText(this.resources.getString(R.string.window_create_seed_DialogMessage))
-        creatingAccountMaterialDialog.progress()
-        this@CreateSeedActivity.runOnUiThread {
-            creatingAccountMaterialDialog.show()
-        }
-        request.setListener {
-            creatingAccountMaterialDialog.dismiss()
-            if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED) {
-                val accountSeed = request.account
-                val intent = Intent(applicationContext, BackupSeedActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                intent.putExtra("SEED_ID", accountSeed.id)
-                startActivity(intent)
-            } else {
-                fieldsValidator.validate()
+        /*
+        * Question if continue or not
+        * */
+        var questionDialog:QuestionDialog = QuestionDialog(globalActivity)
+        questionDialog.setText(getString(R.string.continue_question))
+        questionDialog.setOnNegative(object : NegativeResponse{
+            override fun onNegative(dialogMaterial: DialogMaterial) {
+                dialogMaterial.dismiss()
             }
-        }
+        })
+        questionDialog.setOnPositive(object : PositiveResponse{
+            override fun onPositive() {
 
-        (object : Thread() {
-            override fun run() {
+                // Make request to create a bitshare account
+                val request = ValidateCreateBitsharesAccountRequest(tietAccountName?.getText().toString(), applicationContext)
 
-                /*
-                *
-                * Run thread*/
-                CryptoNetInfoRequests.getInstance().addRequest(request)
+                //DTVV: Friday 27 July 2018
+                //Makes dialog to tell the user that the account is been created
+                val creatingAccountMaterialDialog = CrystalDialog(globalActivity)
+                creatingAccountMaterialDialog.setText(globalActivity.resources.getString(R.string.window_create_seed_DialogMessage))
+                creatingAccountMaterialDialog.progress()
+                this@CreateSeedActivity.runOnUiThread {
+                    creatingAccountMaterialDialog.show()
+                }
+                request.setListener {
+                    creatingAccountMaterialDialog.dismiss()
+                    if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED) {
+                        val accountSeed = request.account
+                        val intent = Intent(applicationContext, BackupSeedActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        intent.putExtra("SEED_ID", accountSeed.id)
+                        startActivity(intent)
+                    } else {
+                        fieldsValidator.validate()
+                    }
+                }
+
+                (object : Thread() {
+                    override fun run() {
+
+                        /*
+                        *
+                        * Run thread*/
+                        CryptoNetInfoRequests.getInstance().addRequest(request)
+                    }
+                }).start()
             }
-        }).start()
+        })
+        questionDialog.show()
     }
 
     /*
