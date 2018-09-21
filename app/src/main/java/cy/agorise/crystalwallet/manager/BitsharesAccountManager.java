@@ -333,23 +333,21 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         GrapheneAccount account = new GrapheneAccount();
         account.setName(createRequest.getAccountName());
         account.setSeedId(idSeed);
-            account.setAccountIndex(0);
-            account.setCryptoNet(CryptoNet.BITSHARES);
-            this.createAccountFromSeed(account, new ManagerRequest() {
+        account.setAccountIndex(0);
+        account.setCryptoNet(CryptoNet.BITSHARES);
+        this.createAccountFromSeed(account, new ManagerRequest() {
 
-                @Override
-                public void success(Object answer) {
-                    createRequest.setAccount((GrapheneAccount) answer);
-                    createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED);
-                }
+            @Override
+            public void success(Object answer) {
+                createRequest.setAccount((GrapheneAccount) answer);
+                createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED);
+            }
 
-                @Override
-                public void fail() {
-                    createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.ACCOUNT_EXIST);
-                }
-            }, context);
-
-
+            @Override
+            public void fail() {
+                createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.ACCOUNT_EXIST);
+            }
+        }, context);
     }
 
     /**
@@ -681,10 +679,20 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         public void success(Object answer, int idPetition) {
                             ArrayList<BitsharesAsset> assets = (ArrayList<BitsharesAsset>) answer;
                             for(BitsharesAsset asset : assets){
-                                long idCryptoCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(asset)[0];
+                                long currencyId = -1;
+                                CryptoCurrency cryptoCurrencyDb = db.cryptoCurrencyDao().getByNameAndCryptoNet(asset.getName(),asset.getCryptoNet().name());
+
+                                if (cryptoCurrencyDb != null){
+                                    currencyId = cryptoCurrencyDb.getId();
+                                } else {
+                                    long idCryptoCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(asset)[0];
+                                    currencyId = idCryptoCurrency;
+                                }
+
+
                                 BitsharesAssetInfo info = new BitsharesAssetInfo(asset);
-                                info.setCryptoCurrencyId(idCryptoCurrency);
-                                asset.setId((int)idCryptoCurrency);
+                                info.setCryptoCurrencyId(currencyId);
+                                asset.setId((int)currencyId);
                                 db.bitsharesAssetDao().insertBitsharesAssetInfo(info);
                                 saveTransaction(transaction,info,transfer);
                             }

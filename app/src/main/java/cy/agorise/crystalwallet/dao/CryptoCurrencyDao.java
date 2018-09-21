@@ -35,7 +35,7 @@ public interface CryptoCurrencyDao {
     @Query("SELECT * FROM crypto_currency WHERE name = :name")
     CryptoCurrency getByName(String name);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertCryptoCurrency(CryptoCurrency... currencies);
 
 }

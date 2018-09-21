@@ -28,6 +28,6 @@ public interface BitsharesAssetDao {
     @Query("SELECT * FROM bitshares_asset WHERE bitshares_id = :bitsharesId")
     BitsharesAssetInfo getBitsharesAssetInfoById(String bitsharesId);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertBitsharesAssetInfo(BitsharesAssetInfo... accounts);
 }

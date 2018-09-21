@@ -1,6 +1,7 @@
 package cy.agorise.crystalwallet.apigenerator;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -380,10 +381,20 @@ public abstract class GrapheneApiGenerator {
                                                     public void success(Object answer, int idPetition) {
                                                         ArrayList<BitsharesAsset> assets = (ArrayList<BitsharesAsset>) answer;
                                                         for(BitsharesAsset asset : assets){
-                                                            long idCryptoCurrency = cryptoCurrencyDao.insertCryptoCurrency(asset)[0];
+
+                                                            long currencyId = -1;
+                                                            CryptoCurrency cryptoCurrencyDb = cryptoCurrencyDao.getByNameAndCryptoNet(((BitsharesAsset) answer).getName(),((BitsharesAsset) answer).getCryptoNet().name());
+
+                                                            if (cryptoCurrencyDb != null){
+                                                                currencyId = cryptoCurrencyDb.getId();
+                                                            } else {
+                                                                long idCryptoCurrency = cryptoCurrencyDao.insertCryptoCurrency(asset)[0];
+                                                                currencyId = idCryptoCurrency;
+                                                            }
+
                                                             BitsharesAssetInfo info = new BitsharesAssetInfo(asset);
-                                                            info.setCryptoCurrencyId(idCryptoCurrency);
-                                                            asset.setId((int)idCryptoCurrency);
+                                                            info.setCryptoCurrencyId(currencyId);
+                                                            asset.setId((int)currencyId);
                                                             bitsharesAssetDao.insertBitsharesAssetInfo(info);
                                                             saveTransaction(transaction,cryptoCurrencyDao.getById(info.getCryptoCurrencyId()),accountBitsharesId,tOperation,context);
                                                         }
@@ -484,10 +495,19 @@ public abstract class GrapheneApiGenerator {
                                 List<BitsharesAsset> assets = (List<BitsharesAsset>) answer;
                                 for(BitsharesAsset asset : assets) {
                                     BitsharesAssetInfo info = new BitsharesAssetInfo(asset);
-                                    long[] cryptoCurrencyId = cryptoCurrencyDao.insertCryptoCurrency((CryptoCurrency) asset);
-                                    info.setCryptoCurrencyId(cryptoCurrencyId[0]);
+
+                                    long currencyId = -1;
+                                    CryptoCurrency cryptoCurrencyDb = cryptoCurrencyDao.getByNameAndCryptoNet(asset.getName(),asset.getCryptoNet().name());
+
+                                    if (cryptoCurrencyDb != null){
+                                        currencyId = cryptoCurrencyDb.getId();
+                                    } else {
+                                        long[] cryptoCurrencyId = cryptoCurrencyDao.insertCryptoCurrency((CryptoCurrency) asset);
+                                        currencyId = cryptoCurrencyId[0];
+                                    }
+                                    info.setCryptoCurrencyId(currencyId);
                                     bitsharesAssetDao.insertBitsharesAssetInfo(info);
-                                    ccBalance.setCryptoCurrencyId(cryptoCurrencyId[0]);
+                                    ccBalance.setCryptoCurrencyId(currencyId);
                                     balanceDao.insertCryptoCoinBalance(ccBalance);
                                 }
                             }
@@ -616,8 +636,18 @@ public abstract class GrapheneApiGenerator {
                 public void success(Object answer, int idPetition) {
                     if(answer instanceof  BitsharesAsset){
                         BitsharesAssetInfo info = new BitsharesAssetInfo((BitsharesAsset) answer);
-                        long cryptoCurrencyId = cryptoCurrencyDao.insertCryptoCurrency((CryptoCurrency)answer )[0];
-                        info.setCryptoCurrencyId(cryptoCurrencyId);
+
+                        long currencyId = -1;
+                        CryptoCurrency cryptoCurrencyDb = cryptoCurrencyDao.getByNameAndCryptoNet(((BitsharesAsset) answer).getName(),((BitsharesAsset) answer).getCryptoNet().name());
+
+                        if (cryptoCurrencyDb != null){
+                            currencyId = cryptoCurrencyDb.getId();
+                        } else {
+                            long cryptoCurrencyId = cryptoCurrencyDao.insertCryptoCurrency((CryptoCurrency)answer )[0];
+                            currencyId = cryptoCurrencyId;
+                        }
+
+                        info.setCryptoCurrencyId(currencyId);
                         bitsharesAssetDao.insertBitsharesAssetInfo(info);
                         GrapheneApiGenerator.getEquivalentValue((BitsharesAsset) answer, quoteAssets, context);
                     }
