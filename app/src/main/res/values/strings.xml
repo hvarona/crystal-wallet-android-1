@@ -280,6 +280,8 @@
     <string name="head_block_number">head_block_number</string>
     <string name="e_receipt">e_receipt</string>
 
+    <string name="continue_question">Are you sure to continue?</string>
+
     <string name="Restoring_backup_from_file">Restoring backup from file</string>
 
     <string name="folder_name">SmartcoinsWallet</string>
@@ -512,6 +514,7 @@
     <string name="pattern">Pattern</string>
     <string name="new_user">New user?</string>
     <string name="existing_user">Existing user?</string>
+    <string name="Account_already_exists">Account already exists</string>
     <string name="connection_status">Connection status</string>
     <string name="people_icon">People icon</string>
     <string name="camera_feed_to_scan_qr">Camera feed to scan QR</string>

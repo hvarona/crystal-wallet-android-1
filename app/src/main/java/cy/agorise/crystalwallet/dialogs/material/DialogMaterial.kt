@@ -20,16 +20,20 @@ open abstract class DialogMaterial{
     * */
     protected var activity:Activity;
 
+    /*
+    * Contains pointer to myself
+    * */
+    protected var dialogMaterial:DialogMaterial;
 
     /*
     * Contains the response for positive button click
     * */
-    var positiveResponse:PositiveResponse? = null
+    protected var positiveResponse:PositiveResponse? = null
 
     /*
     * Contains the response for negative button click
     * */
-    var negativeResponse:NegativeResponse? = null
+    protected var negativeResponse:NegativeResponse? = null
 
 
     constructor(activity: Activity) {
@@ -38,6 +42,8 @@ open abstract class DialogMaterial{
         * Save the activity
         * */
         this.activity = activity
+
+        dialogMaterial = this;
 
         /*
         *   Init the builder
@@ -80,7 +86,7 @@ open abstract class DialogMaterial{
                 * If response is not null deliver response
                 * */
                 if(negativeResponse != null){
-                    negativeResponse!!.onNegative()
+                    negativeResponse!!.onNegative(dialogMaterial)
                 }
             }
         }
@@ -140,6 +146,14 @@ open abstract class DialogMaterial{
     * */
     fun setText(message: String) {
         this.builder.content(message)
+    }
+
+    fun setOnPositive(onPositive:PositiveResponse){
+        this.positiveResponse = onPositive
+    }
+
+    fun setOnNegative(onNegative:NegativeResponse){
+        this.negativeResponse = onNegative
     }
 
     fun setTitle(title: String) {

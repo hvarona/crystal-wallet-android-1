@@ -1,8 +1,6 @@
 package cy.agorise.crystalwallet.dialogs.material
 
 import android.app.Activity
-import cy.agorise.crystalwallet.R
-import kotlinx.android.synthetic.main.account_seed_list.view.*
 
 /*
 * Dialog material that shows loading gif and and explicit message
@@ -26,5 +24,5 @@ interface PositiveResponse{
     fun onPositive()
 }
 interface NegativeResponse{
-    fun onNegative()
+    fun onNegative(dialogMaterial:DialogMaterial)
 }
