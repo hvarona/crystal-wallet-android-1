@@ -194,7 +194,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvMemoError" />
 
-            <ImageView
+            <me.dm7.barcodescanner.zxing.ZXingScannerView
                 android:id="@+id/ivCamera"
                 android:layout_width="180dp"
                 android:layout_height="180dp"

@@ -37,6 +37,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.vincent.filepicker.ToastUtil;
@@ -76,6 +77,8 @@ import cy.agorise.graphenej.Invoice;
 import cy.agorise.graphenej.LineItem;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+import static butterknife.internal.Utils.listOf;
+
 public class SendTransactionFragment extends DialogFragment implements UIValidatorListener, ZXingScannerView.ResultHandler {
 
     SendTransactionValidator sendTransactionValidator;
@@ -112,8 +115,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     ImageView ivPeople;
 
     @BindView(R.id.ivCamera)
-    ImageView ivCamera;
-
     ZXingScannerView mScannerView;
 
     CryptoCurrencyAdapter assetAdapter;
@@ -450,7 +451,11 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     }
 
     public void beginScanQrCode(){
-        mScannerView = new ZXingScannerView(getContext());
+        //mScannerView = new ZXingScannerView(getContext());
+        mScannerView.setFormats(listOf(BarcodeFormat.QR_CODE));
+        mScannerView.setAutoFocus(true);
+        mScannerView.setLaserColor(R.color.colorAccent);
+        mScannerView.setMaskColor(R.color.colorAccent);
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
     }
@@ -529,6 +534,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @Override
     public void handleResult(Result result) {
         try {
+            System.out.println("CAMERA result " + result.getText() );
             Invoice invoice = Invoice.fromQrCode(result.getText());
 
             etTo.setText(invoice.getTo());
