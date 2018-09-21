@@ -39,11 +39,6 @@ public class BackupSeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.backup_seed);
 
-        //Note: Test porpouses
-        /*final TextView textView = findViewById(R.id.tvBrainKey);
-            textView.setText("sakk902909321o p3k21kldsa0'dsa90'e930eidakdñsakdñlsakdi90i03 2i90idopsasakk902909321op3k21 kldsa0'dsa90'e930eid akdñsakdñlsakdi90i032i90idopsa");
-        */
-
         ButterKnife.bind(this);
 
         long seedId = getIntent().getLongExtra("SEED_ID",-1);
@@ -61,17 +56,22 @@ public class BackupSeedActivity extends AppCompatActivity {
             accountSeedViewModel.loadSeed(seedId);
 
         } else {
-
             finish();
         }
     }
 
     @OnClick(R.id.btnCancel)
+    public void btnCancelClick(){
+        Intent intent = new Intent(this, BoardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @OnClick(R.id.btnOK)
     public void btnOkClick(){
         Intent intent = new Intent(this, BoardActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        //finish();
+        finish();
     }
 
     /*
