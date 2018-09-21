@@ -9,6 +9,7 @@ import android.widget.Toast
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
+import com.vincent.filepicker.ToastUtil
 import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.dialogs.material.*
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests
@@ -181,7 +182,8 @@ class CreateSeedActivity : CustomActivity() {
             override fun onPositive() {
 
                 // Make request to create a bitshare account
-                val request = ValidateCreateBitsharesAccountRequest(tietAccountName?.getText().toString(), applicationContext)
+                var accountName:String = tietAccountName?.getText().toString().trim()
+                val request = ValidateCreateBitsharesAccountRequest(accountName, applicationContext)
 
                 //DTVV: Friday 27 July 2018
                 //Makes dialog to tell the user that the account is been created
@@ -199,7 +201,12 @@ class CreateSeedActivity : CustomActivity() {
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         intent.putExtra("SEED_ID", accountSeed.id)
                         startActivity(intent)
-                    } else {
+                    }
+                    else if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.ACCOUNT_EXIST) {
+                        ToastUtil.getInstance(globalActivity).showToast(globalActivity.getString(R.string.Account_already_exists))
+                        disableCreate()
+                    }
+                    else {
                         fieldsValidator.validate()
                     }
                 }
