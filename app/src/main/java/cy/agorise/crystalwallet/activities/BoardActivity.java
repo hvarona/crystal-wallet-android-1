@@ -120,50 +120,50 @@ public class BoardActivity  extends CustomActivity {
         * Listener tabLayout to resalt text when clicked
         * */
         final TabLayout tabLayoutFinal = tabLayout;
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(final TabLayout.Tab tab) {
-
-                globalActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        LinearLayout tabLayout = (LinearLayout)((ViewGroup) tabLayoutFinal.getChildAt(0)).getChildAt(tab.getPosition());
-                        tabLayout.setBackgroundColor(Color.TRANSPARENT);
-                        TextView tabTextView = (TextView) tabLayout.getChildAt(1);
-                        //tabTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP ,50);
-                        Spannable WordtoSpan = new SpannableString(tabTextView.getText());
-                        WordtoSpan.setSpan(new ForegroundColorSpan(Color.WHITE), 0, tabTextView.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        tabTextView.setText(WordtoSpan);
-                        tabTextView.setTypeface(tabTextView.getTypeface(), Typeface.BOLD);
-                    }
-                });
-            }
-
-            @Override
-            public void onTabUnselected(final TabLayout.Tab tab) {
-
-                globalActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        LinearLayout tabLayout = (LinearLayout)((ViewGroup) tabLayoutFinal.getChildAt(0)).getChildAt(tab.getPosition());
-                        TextView tabTextView = (TextView) tabLayout.getChildAt(1);
-                        //tabTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP ,50);
-                        Spannable WordtoSpan = new SpannableString(tabTextView.getText());
-                        WordtoSpan.setSpan(new ForegroundColorSpan(globalActivity.getResources().getColor(R.color.lightGrayClear)), 0, tabTextView.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        tabTextView.setText(WordtoSpan);
-                        tabTextView.setTypeface(tabTextView.getTypeface(), Typeface.NORMAL);
-                    }
-                });
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-
-            }
-        });
+//        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+//            @Override
+//            public void onTabSelected(final TabLayout.Tab tab) {
+//
+//                globalActivity.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        LinearLayout tabLayout = (LinearLayout)((ViewGroup) tabLayoutFinal.getChildAt(0)).getChildAt(tab.getPosition());
+//                        tabLayout.setBackgroundColor(Color.TRANSPARENT);
+//                        TextView tabTextView = (TextView) tabLayout.getChildAt(1);
+//                        //tabTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP ,50);
+//                        Spannable WordtoSpan = new SpannableString(tabTextView.getText());
+//                        WordtoSpan.setSpan(new ForegroundColorSpan(Color.WHITE), 0, tabTextView.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                        tabTextView.setText(WordtoSpan);
+//                        tabTextView.setTypeface(tabTextView.getTypeface(), Typeface.BOLD);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onTabUnselected(final TabLayout.Tab tab) {
+//
+//                globalActivity.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        LinearLayout tabLayout = (LinearLayout)((ViewGroup) tabLayoutFinal.getChildAt(0)).getChildAt(tab.getPosition());
+//                        TextView tabTextView = (TextView) tabLayout.getChildAt(1);
+//                        //tabTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP ,50);
+//                        Spannable WordtoSpan = new SpannableString(tabTextView.getText());
+//                        WordtoSpan.setSpan(new ForegroundColorSpan(globalActivity.getResources().getColor(R.color.lightGrayClear)), 0, tabTextView.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                        tabTextView.setText(WordtoSpan);
+//                        tabTextView.setTypeface(tabTextView.getTypeface(), Typeface.NORMAL);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onTabReselected(TabLayout.Tab tab) {
+//
+//
+//            }
+//        });
 
         // Appbar animation
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -234,10 +234,17 @@ public class BoardActivity  extends CustomActivity {
                                 .setInterpolator(new LinearInterpolator()).start();
                         break;
 
-                    default:
+                    case 2:
                         fabReceive.hide();
                         fabSend.hide();
                         fabAddContact.animate().translationY(0)
+                                .setInterpolator(new LinearInterpolator()).start();
+                        break;
+
+                    default:
+                        fabReceive.hide();
+                        fabSend.hide();
+                        fabAddContact.animate().translationY(fabDistanceToHide)
                                 .setInterpolator(new LinearInterpolator()).start();
                         break;
                 }
