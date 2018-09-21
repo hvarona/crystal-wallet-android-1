@@ -1,5 +1,7 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
@@ -8,6 +10,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -106,6 +110,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     TextView btnCancel;
     @BindView(R.id.ivPeople)
     ImageView ivPeople;
+
+    @BindView(R.id.ivCamera)
+    ImageView ivCamera;
+
+    ZXingScannerView mScannerView;
+
     CryptoCurrencyAdapter assetAdapter;
 
     @BindView(R.id.gravatar)
@@ -119,6 +129,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     private CrystalDatabase db;
     private FloatingActionButton fabSend;
     private AlertDialog.Builder builder;
+
+
 
     public static SendTransactionFragment newInstance(long cryptoNetAccountId) {
         SendTransactionFragment f = new SendTransactionFragment();
@@ -260,18 +272,25 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
 
         loadUserImage();
+        try {
+            verifyCameraPermissions(getActivity());
+            beginScanQrCode();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
         return builder.setView(view).create();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        builder.setNeutralButton("Scan QR Code", new DialogInterface.OnClickListener() {
+        /*builder.setNeutralButton("Scan QR Code", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 beginScanQrCode();
             }
-        });
+        });*/
 
         // Force dialog fragment to use the full width of the screen
         Window dialogWindow = getDialog().getWindow();
@@ -290,6 +309,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 fabSend.show();
             }
         }, 400);
+        mScannerView.stopCamera();
     }
 
     public void loadUserImage(){
@@ -430,9 +450,30 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     }
 
     public void beginScanQrCode(){
-        ZXingScannerView mScannerView = new ZXingScannerView(getContext());
+        mScannerView = new ZXingScannerView(getContext());
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
+    }
+
+    // Camera Permissions
+    private static final int REQUEST_CAMERA_PERMISSION = 1;
+    private static String[] PERMISSIONS_CAMERA = {
+            Manifest.permission.CAMERA
+    };
+
+
+    public static void verifyCameraPermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_CAMERA,
+                    REQUEST_CAMERA_PERMISSION
+            );
+        }
     }
 
     @Override
@@ -487,27 +528,31 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
     @Override
     public void handleResult(Result result) {
-        Invoice invoice = Invoice.fromQrCode(result.getText());
+        try {
+            Invoice invoice = Invoice.fromQrCode(result.getText());
 
-        etTo.setText(invoice.getTo());
+            etTo.setText(invoice.getTo());
 
-        for (int i=0;i<assetAdapter.getCount();i++) {
-            if (assetAdapter.getItem(i).getName().equals(invoice.getCurrency())) {
-                spAsset.setSelection(i);
-                break;
+            for (int i = 0; i < assetAdapter.getCount(); i++) {
+                if (assetAdapter.getItem(i).getName().equals(invoice.getCurrency())) {
+                    spAsset.setSelection(i);
+                    break;
+                }
             }
-        }
-        etMemo.setText(invoice.getMemo());
+            etMemo.setText(invoice.getMemo());
 
 
-        double amount = 0.0;
-        for (LineItem nextItem : invoice.getLineItems()) {
-            amount += nextItem.getQuantity() * nextItem.getPrice();
+            double amount = 0.0;
+            for (LineItem nextItem : invoice.getLineItems()) {
+                amount += nextItem.getQuantity() * nextItem.getPrice();
+            }
+            DecimalFormat df = new DecimalFormat("####.####");
+            df.setRoundingMode(RoundingMode.CEILING);
+            df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+            etAmount.setText(df.format(amount));
+            Log.i("SendFragment", result.getText());
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        DecimalFormat df = new DecimalFormat("####.####");
-        df.setRoundingMode(RoundingMode.CEILING);
-        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-        etAmount.setText(df.format(amount));
-        Log.i("SendFragment",result.getText());
     }
 }
