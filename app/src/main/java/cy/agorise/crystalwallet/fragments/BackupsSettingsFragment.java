@@ -1,14 +1,20 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.Manifest;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +45,11 @@ import cy.agorise.crystalwallet.requestmanagers.FileServiceRequests;
  */
 
 public class BackupsSettingsFragment extends Fragment{
+
+    private static final int PERMISSION_REQUEST_CODE = 1;
+
+
+
     public BackupsSettingsFragment() {
         // Required empty public constructor
     }
@@ -92,12 +103,13 @@ public class BackupsSettingsFragment extends Fragment{
     public void btnBrainOnClick(){
 
         Intent intent = new Intent(getContext(), BackupSeedActivity.class);
+        intent.putExtra("SEED_ID","");
         startActivity(intent);
     }
 
-
     @OnClick(R.id.btnBinFile)
     public void makeBackupFile(){
+
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 
             LiveData<GeneralSetting> generalSettingLD = CrystalDatabase.getAppDatabase(getContext()).generalSettingDao().getByName(GeneralSetting.SETTING_PASSWORD);
@@ -105,13 +117,13 @@ public class BackupsSettingsFragment extends Fragment{
             generalSettingLD.observe(this, new Observer<GeneralSetting>() {
                 @Override
                 public void onChanged(@Nullable GeneralSetting generalSetting) {
+
                     String password = "";
                     if (generalSetting != null) {
                         password = generalSetting.getValue();
                     }
 
                     final CreateBackupRequest backupFileRequest = new CreateBackupRequest(getContext(), password);
-
                     backupFileRequest.setListener(new FileServiceRequestListener() {
                         @Override
                         public void onCarryOut() {

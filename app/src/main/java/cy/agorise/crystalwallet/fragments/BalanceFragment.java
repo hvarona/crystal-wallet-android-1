@@ -6,10 +6,12 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -26,6 +28,13 @@ public class BalanceFragment extends Fragment {
 
     @BindView(R.id.vCryptoNetBalanceListView)
     CryptoNetBalanceListView vCryptoNetBalanceListView;
+
+    @BindView(R.id.tvNobalances)
+    public TextView tvNobalances;
+
+
+
+
 
     public BalanceFragment() {
         // Required empty public constructor
@@ -60,6 +69,14 @@ public class BalanceFragment extends Fragment {
             @Override
             public void onChanged(List<CryptoNetBalance> cryptoNetBalances) {
                 vCryptoNetBalanceListView.setData(cryptoNetBalances, fragment);
+
+                final int size = cryptoNetBalances.size();
+                if(size==1){
+                    tvNobalances.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvNobalances.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
