@@ -79,6 +79,8 @@
     <string name="save">SAVE</string>
     <string name="next">NEXT</string>
 
+    <string name="ASK_PERMISSION">A permission need to be granted before to continue</string>
+
     <string name="please_enter_brainkey">Please enter brainkey</string>
     <string name="please_enter_correct_brainkey">Please enter correct brainkey</string>
     <string name="balances">Balances</string>
