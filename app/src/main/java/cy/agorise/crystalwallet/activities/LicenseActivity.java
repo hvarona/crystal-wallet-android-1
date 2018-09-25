@@ -29,11 +29,6 @@ public class LicenseActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        // TODO check if license has been agreed
-
-        String html = getString(R.string.licence_html);
-        wvEULA.loadData(html, "text/html", "UTF-8");
-
         db = CrystalDatabase.getAppDatabase(this.getApplicationContext());
         int licenseVersion = getResources().getInteger(R.integer.license_version);
         GeneralSetting generalSettingLastLicenseRead = db.generalSettingDao().getSettingByName(GeneralSetting.SETTING_LAST_LICENSE_READ);
@@ -42,6 +37,14 @@ public class LicenseActivity extends AppCompatActivity {
             Intent intent = new Intent(this, IntroActivity.class);
             startActivity(intent);
             finish();
+        }
+        else{
+
+            /*
+            * Load the licence only if it is necesarry
+            * */
+            String html = getString(R.string.licence_html);
+            wvEULA.loadData(html, "text/html", "UTF-8");
         }
     }
 
