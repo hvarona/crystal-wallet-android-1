@@ -56,6 +56,14 @@ public class BackupSeedActivity extends AppCompatActivity {
             accountSeedViewModel.loadSeed(seedId);
 
         } else {
+
+            /*
+            *
+            * The first time you create the account, the "seed" is showed propertly in this window,
+            * but when you want to check it again the "seed" does not exist anymore and
+            * for this cause the program gets into this point and finish the window
+            *
+            * */
             finish();
         }
     }

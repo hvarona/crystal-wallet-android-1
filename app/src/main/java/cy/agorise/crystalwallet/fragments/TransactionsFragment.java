@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,9 @@ public class TransactionsFragment extends Fragment {
 
     @BindView(R.id.etTransactionSearch)
     EditText etTransactionSearch;
+
+    @BindView(R.id.tvNobalances)
+    public TextView tvNobalances;
 
     RecyclerView balanceRecyclerView;
     FloatingActionButton fabSend;
@@ -125,6 +129,14 @@ public class TransactionsFragment extends Fragment {
             public void onChanged(@Nullable PagedList<CryptoCoinTransactionExtended> cryptoCoinTransactions) {
                 Log.i("Transactions","Transactions have change! Count:"+cryptoCoinTransactions.size());
                 transactionListView.setData(cryptoCoinTransactions, fragment);
+
+                final int size = cryptoCoinTransactions.size();
+                if(size==0){
+                    tvNobalances.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvNobalances.setVisibility(View.INVISIBLE);
+                }
             }
         });
     }
