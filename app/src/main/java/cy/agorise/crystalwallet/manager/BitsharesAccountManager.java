@@ -64,8 +64,6 @@ import cy.agorise.graphenej.operations.TransferOperationBuilder;
  */
 public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
 
-    //private final static String BITSHARES_TESTNET_CHAIN_ID= "9cf6f255a208100d2bb275a3c52f4b1589b7ec9c9bfc2cb2a5fe6411295106d8";
-
     private final static String SIMPLE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private final static String DEFAULT_TIME_ZONE = "GMT";
 

@@ -84,7 +84,7 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
         }
 
         InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
-        Call<Txi> txiCall = service.getTransaction(InsightApiConstants.getPath(this.mAccount.getCryptoCoin()),this.mTxId);
+        Call<Txi> txiCall = service.getTransaction(this.mServerUrl,this.mTxId);
         txiCall.enqueue(this);
     }
 
