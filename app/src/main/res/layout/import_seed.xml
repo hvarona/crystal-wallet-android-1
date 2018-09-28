@@ -1,160 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activities.ImportSeedActivity">
+    tools:context=".activities.CreateSeedActivity">
 
-    <EditText
-        android:id="@+id/etPin"
-        android:layout_below="@+id/statusBar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/edittext_bg"
-        android:inputType="number"
-        android:maxLines="1"
-        android:hint="@string/txt_6_digits_pin"
-        android:textColor="@color/black" />
-
-    <TextView
-        android:id="@+id/tvPinError"
-        android:layout_below="@+id/etPin"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/red"
-        android:textStyle="bold" />
+        android:layout_centerInParent="true">
 
-    <EditText
-        android:id="@+id/etPinConfirmation"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/tvPinError"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:background="@drawable/edittext_bg"
-        android:inputType="number"
-        android:maxLines="1"
-        android:hint="@string/txt_6_digits_pin_confirm"
-        android:singleLine="true"
-        android:textColor="@color/black" />
-
-
-    <TextView
-        android:id="@+id/tvPinConfirmationError"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/red"
-        android:layout_below="@+id/etPinConfirmation"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/etSeedWords"
-        android:layout_below="@+id/tvPinConfirmationError"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:background="@drawable/edittext_bg"
-        android:gravity="top"
-        android:hint="@string/Seed"
-        android:inputType="textMultiLine"
-        android:textColor="@color/black" />
-
-    <TextView
-        android:id="@+id/tvSeedWordsError"
-        android:layout_below="@+id/etSeedWords"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/red"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/etAccountName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvSeedWordsError"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:background="@drawable/edittext_bg"
-        android:gravity="top"
-        android:hint="@string/txt_account_name"
-        android:inputType="textMultiLine"
-        android:textColor="@color/black" />
-
-    <TextView
-        android:id="@+id/tvAccountNameError"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/etAccountName"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/red"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtLeyend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvAccountNameError"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/txt_brain_key_info"
-        android:textSize="15dp"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtLeyend"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="140dp"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tilPin"
+            android:layout_width="290dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:background="@color/redColor"
-            android:text="@string/cancel"
-            android:textColor="@color/white" />
+            android:layout_centerHorizontal="true">
 
-        <Button
-            android:id="@+id/btnImport"
+            <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
+                android:id="@+id/etPin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/txt_6_digits_pin"
+                android:inputType="number"
+                android:maxLength="32"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tilPinConfirmation"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tilPin"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true">
+
+            <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
+                android:id="@+id/etPinConfirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/txt_6_digits_pin_confirm"
+                android:inputType="number"
+                android:maxLength="32"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/etSeedWordsLayout"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tilPinConfirmation"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true">
+
+            <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
+                android:id="@+id/etSeedWords"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:hint="@string/Seed"
+                android:inputType="textMultiLine" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tilAccountName"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etSeedWordsLayout"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true">
+
+            <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
+                android:id="@+id/etAccountName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyz1234567890 -"
+                android:hint="@string/txt_account_name"
+                android:inputType="textMultiLine"
+                android:maxLength="255"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <LinearLayout
+            android:id="@+id/linearlayoutButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:background="@color/colorPrimary"
-            android:padding="10dp"
-            android:text="@string/create_wallet"
-            android:textColor="@color/white" />
+            android:layout_below="@+id/tilAccountName"
+            android:layout_marginTop="20dp">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:background="@color/redColor"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnImport"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@color/colorPrimary"
+                android:text="@string/create_wallet"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <cy.agorise.crystalwallet.util.BottomStatusBar
+        android:id="@+id/bottomStatusBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:id="@+id/statusBar"/>
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

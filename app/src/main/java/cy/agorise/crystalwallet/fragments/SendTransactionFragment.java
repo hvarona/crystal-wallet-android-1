@@ -97,8 +97,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     Spinner spAsset;
     @BindView(R.id.tvAssetError)
     TextView tvAssetError;
-    @BindView(R.id.scrollMain)
-    ScrollView scrollMain;
+    //@BindView(R.id.scrollMain)
+    //ScrollView scrollMain;
     @BindView(R.id.etAmount)
     EditText etAmount;
     @BindView(R.id.tvAmountError)
@@ -167,7 +167,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         /*
          * Detet scroll changes
          * */
-        scrollMain.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+        /*scrollMain.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
 
@@ -206,7 +206,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                     viewSend.animate().y(600);
                 }
             }
-        });
+        });*/
 
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
 

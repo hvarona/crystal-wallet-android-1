@@ -14,6 +14,10 @@
     <string name="error_wif">Error creating WIF key</string>
     <string name="error_brainkey_wif_export">WIF imported account doesn\'t support brainkey backup</string>
 
+    <string name="You_dont_have_balances">You dont have balances</string>
+    <string name="You_dont_have_transactions">You dont have transactions</string>
+    <string name="You_dont_have_contacts">You dont have contacts</string>
+
     <string name="account_create_register_or_import">ACCOUNT CREATE/REGISTER OR IMPORT</string>
     <string name="txt_account_name">Account Name</string>
     <string name="time_stamp">Time stamp</string>
@@ -74,6 +78,8 @@
     <string name="create_wallet">CREATE WALLET</string>
     <string name="save">SAVE</string>
     <string name="next">NEXT</string>
+
+    <string name="ASK_PERMISSION">A permission need to be granted before to continue</string>
 
     <string name="please_enter_brainkey">Please enter brainkey</string>
     <string name="please_enter_correct_brainkey">Please enter correct brainkey</string>

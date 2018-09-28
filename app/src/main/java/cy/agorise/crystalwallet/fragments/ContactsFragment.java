@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +27,9 @@ public class ContactsFragment extends Fragment {
 
     @BindView(R.id.rvContacts)
     RecyclerView rvContacts;
+
+    @BindView(R.id.tvNobalances)
+    public TextView tvNobalances;
 
     ContactListAdapter adapter;
 
@@ -86,6 +90,14 @@ public class ContactsFragment extends Fragment {
             @Override
             public void onChanged(@Nullable PagedList<Contact> contacts) {
                 adapter.submitList(contacts);
+
+                final int size = contacts.size();
+                if(size==0){
+                    tvNobalances.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvNobalances.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
