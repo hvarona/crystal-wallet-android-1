@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -56,6 +57,7 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -131,7 +133,10 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     private FloatingActionButton fabSend;
     private AlertDialog.Builder builder;
 
-
+    /*
+        Dialog for loading
+    */
+    private CrystalDialog crystalDialog;
 
     public static SendTransactionFragment newInstance(long cryptoNetAccountId) {
         SendTransactionFragment f = new SendTransactionFragment();
@@ -408,6 +413,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
     @OnClick(R.id.btnSend)
     public void sendTransaction(){
+        final SendTransactionFragment thisFragment = this;
+
         if (this.sendTransactionValidator.isValid()) {
             CryptoNetAccount fromAccountSelected = (CryptoNetAccount) spFrom.getItems().get(spFrom.getSelectedIndex());
 
@@ -439,13 +446,26 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 public void onCarryOut() {
                     if (sendRequest.getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)){
                         try {
-                            this.finalize();
+                            crystalDialog.dismiss();
+                            thisFragment.dismiss();
+                            //thisFragment.finalize();
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
+                    } else {
+                        Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                     }
                 }
             });
+
+            /*
+             * Show loading dialog
+             * */
+            crystalDialog = new CrystalDialog((Activity) getContext());
+            crystalDialog.setText("Sending");
+            crystalDialog.progress();
+            crystalDialog.show();
+
             CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
         }
     }
