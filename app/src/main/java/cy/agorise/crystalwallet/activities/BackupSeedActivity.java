@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,12 +35,22 @@ public class BackupSeedActivity extends AppCompatActivity {
     @BindView(R.id.btnCopy)
     Button btnCopy;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.backup_seed);
 
         ButterKnife.bind(this);
+
+        /*
+        *   If comes from new account creation hide the cancel button
+        * */
+        Bundle b = getIntent().getExtras();
+        boolean newAccount = b.getBoolean("newAccount");
+        if(newAccount ){
+            btnOk.setVisibility(View.INVISIBLE);
+        }
 
         long seedId = getIntent().getLongExtra("SEED_ID",-1);
 
