@@ -18,6 +18,8 @@
     <string name="You_dont_have_transactions">You dont have transactions</string>
     <string name="You_dont_have_contacts">You dont have contacts</string>
 
+    <string name="Permission_Denied_WRITE_EXTERNAL_STORAGE">Permission Denied, You cannot use local drive.</string>
+
     <string name="account_create_register_or_import">ACCOUNT CREATE/REGISTER OR IMPORT</string>
     <string name="txt_account_name">Account Name</string>
     <string name="time_stamp">Time stamp</string>
