@@ -43,6 +43,14 @@ public class AccountSettingsActivity extends AppCompatActivity{
     @BindView(R.id.tvBuildVersion)
     public TextView tvBuildVersion;
 
+    /*
+     * For the window animation
+     * */
+    private MediaPlayer mediaPlayer;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +65,7 @@ public class AccountSettingsActivity extends AppCompatActivity{
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceCreated");
-                MediaPlayer mediaPlayer = MediaPlayer.create(AccountSettingsActivity.this, R.raw.appbar_background);
+                mediaPlayer = MediaPlayer.create(AccountSettingsActivity.this, R.raw.appbar_background);
                 mediaPlayer.setDisplay(mSurfaceView.getHolder());
                 mediaPlayer.setLooping(true);
                 mediaPlayer.start();
@@ -82,6 +90,19 @@ public class AccountSettingsActivity extends AppCompatActivity{
         mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mPager));
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Release the media player
+        if(mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
 
     private class SettingsPagerAdapter extends FragmentStatePagerAdapter {
         SettingsPagerAdapter(FragmentManager fm) {
