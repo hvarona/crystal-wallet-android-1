@@ -98,6 +98,14 @@ public class BoardActivity  extends CustomActivity {
 
     File photoDirectory;
 
+    /*
+    * For the window animation
+    * */
+    private MediaPlayer mediaPlayer;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,7 +178,7 @@ public class BoardActivity  extends CustomActivity {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceCreated");
-                MediaPlayer mediaPlayer = MediaPlayer.create(BoardActivity.this, R.raw.appbar_background);
+                mediaPlayer = MediaPlayer.create(BoardActivity.this, R.raw.appbar_background);
                 mediaPlayer.setDisplay(mSurfaceView.getHolder());
                 mediaPlayer.setLooping(true);
                 mediaPlayer.start();
@@ -269,6 +277,15 @@ public class BoardActivity  extends CustomActivity {
         super.onResume();
 
         loadUserImage();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Release the media player
+        mediaPlayer.release();
+        mediaPlayer = null;
     }
 
     public void loadUserImage(){
