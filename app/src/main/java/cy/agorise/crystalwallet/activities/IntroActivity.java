@@ -161,8 +161,10 @@ public class IntroActivity extends CustomActivity {
         super.onDestroy();
 
         //Release the media player
-        mediaPlayer.release();
-        mediaPlayer = null;
+        if(mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     @OnClick(R.id.btnImportAccount)

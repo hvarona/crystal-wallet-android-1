@@ -284,8 +284,10 @@ public class BoardActivity  extends CustomActivity {
         super.onDestroy();
 
         //Release the media player
-        mediaPlayer.release();
-        mediaPlayer = null;
+        if(mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     public void loadUserImage(){
