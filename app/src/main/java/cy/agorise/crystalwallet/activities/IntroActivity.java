@@ -2,9 +2,11 @@ package cy.agorise.crystalwallet.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +54,14 @@ public class IntroActivity extends CustomActivity {
     @BindView(R.id.btnImportAccount)
     public Button btnImportAccount;
 
+    /*
+     * For the window animation
+     * */
+    private MediaPlayer mediaPlayer;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +74,7 @@ public class IntroActivity extends CustomActivity {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceCreated");
-                MediaPlayer mediaPlayer = MediaPlayer.create(IntroActivity.this, R.raw.appbar_background);
+                mediaPlayer = MediaPlayer.create(IntroActivity.this, R.raw.appbar_background);
                 mediaPlayer.setDisplay(mSurfaceView.getHolder());
                 mediaPlayer.setLooping(true);
                 mediaPlayer.start();
@@ -144,6 +154,17 @@ public class IntroActivity extends CustomActivity {
     public void createAccount() {
         Intent intent = new Intent(this, CreateSeedActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Release the media player
+        if(mediaPlayer!=null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     @OnClick(R.id.btnImportAccount)

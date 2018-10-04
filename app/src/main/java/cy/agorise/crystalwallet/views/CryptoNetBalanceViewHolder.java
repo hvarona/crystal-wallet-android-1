@@ -125,7 +125,9 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
         preferedCurrencySetting.observe((LifecycleOwner)this.itemView.getContext(), new Observer<GeneralSetting>() {
             @Override
             public void onChanged(@Nullable GeneralSetting generalSetting) {
-                preferredCurrency = generalSetting.getValue();
+                if(generalSetting != null){
+                    preferredCurrency = generalSetting.getValue();
+                }
             }
         });
 
