@@ -62,6 +62,7 @@
                 android:layout_width="330dp"
                 android:layout_height="120dp"
                 android:hint="@string/Seed"
+                android:maxLength="255"
                 android:inputType="textMultiLine" />
 
         </android.support.design.widget.TextInputLayout>
