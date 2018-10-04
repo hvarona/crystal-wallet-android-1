@@ -1,5 +1,6 @@
 package cy.agorise.crystalwallet.activities;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.dialogs.material.CrystalLoading;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
@@ -53,6 +55,8 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
     @BindView(R.id.btnCancel)
     Button btnCancel;
+
+    final Activity activity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,12 +231,25 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
         if (this.importSeedValidator.isValid()) {
 
+
+            /*
+            * Loading dialog
+            * */
+            final CrystalLoading crystalLoading = new CrystalLoading(activity);
+            crystalLoading.show();
+
             final ValidateImportBitsharesAccountRequest validatorRequest =
                     new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
 
             validatorRequest.setListener(new CryptoNetInfoRequestListener() {
                 @Override
                 public void onCarryOut() {
+
+                    /*
+                    * Hide the loading dialog
+                    * */
+                    crystalLoading.dismiss();
+
                     if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
                         String errorText = "An error ocurred attempting to import the account";
 
