@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -60,10 +61,134 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
         ButterKnife.bind(this);
 
-        btnImport.setEnabled(false);
+        /*
+        * Initially the button CREATE WALLET should be disabled
+        * */
+        disableCreate();
+
+        /*
+        * When a text change in any of the fields
+        * */
+        etPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                /*
+                 * If all is ready to continue enable the button, contrarie case disable it
+                 * */
+                if(allFieldsAreFill()){
+                    enableCreate();
+                }
+                else{
+                    disableCreate();
+                }
+            }
+        });
+        etPinConfirmation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                /*
+                 * If all is ready to continue enable the button, contrarie case disable it
+                 * */
+                if(allFieldsAreFill()){
+                    enableCreate();
+                }
+                else{
+                    disableCreate();
+                }
+            }
+        });
+        etSeedWords.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                /*
+                 * If all is ready to continue enable the button, contrarie case disable it
+                 * */
+                if(allFieldsAreFill()){
+                    enableCreate();
+                }
+                else{
+                    disableCreate();
+                }
+            }
+        });
+        etAccountName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                /*
+                 * If all is ready to continue enable the button, contrarie case disable it
+                 * */
+                if(allFieldsAreFill()){
+                    enableCreate();
+                }
+                else{
+                    disableCreate();
+                }
+            }
+        });
+
         accountSeedViewModel = ViewModelProviders.of(this).get(AccountSeedViewModel.class);
         importSeedValidator = new ImportSeedValidator(this.getApplicationContext(),etPin,etPinConfirmation,etAccountName,etSeedWords);
         importSeedValidator.setListener(this);
+    }
+
+
+    /*
+    *   Method to validate if all the fields are fill
+    * */
+    private boolean allFieldsAreFill(){
+
+        boolean complete = false;
+        if( etPin.getText().toString().trim().compareTo("")!=0 &&
+            etPinConfirmation.getText().toString().trim().compareTo("")!=0 &&
+                etSeedWords.getText().toString().trim().compareTo("")!=0 &&
+                etAccountName.getText().toString().trim().compareTo("")!=0){
+            complete = true;
+        }
+        return complete;
     }
 
     @OnTextChanged(value = R.id.etPin,
@@ -182,9 +307,9 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 }
 
                 if (activity.importSeedValidator.isValid()){
-                    btnImport.setEnabled(true);
+                    enableCreate();
                 } else {
-                    btnImport.setEnabled(false);
+                    disableCreate();
                 }
 
             }
@@ -202,5 +327,32 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         } else if (field.getView() == etSeedWords){
             //tvSeedWordsError.setText(field.getMessage());
         }
+    }
+
+
+    /*
+     * Enable create button
+     * */
+    private void enableCreate() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                btnImport.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                btnImport.setEnabled(true);
+            }
+        });
+    }
+
+    /*
+     * Disable create button
+     * */
+    private void disableCreate() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                btnImport.setEnabled(false);
+                btnImport.setBackground(getDrawable(R.drawable.disable_style));
+            }
+        });
     }
 }
