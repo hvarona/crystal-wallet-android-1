@@ -12,7 +12,9 @@ import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.script.Script;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import cy.agorise.crystalwallet.apigenerator.ApiRequest;
@@ -23,7 +25,9 @@ import cy.agorise.crystalwallet.apigenerator.insightapi.GetTransactionData;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Txi;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vin;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vout;
+import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
+import cy.agorise.crystalwallet.models.BitcoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.models.GTxIO;
 import cy.agorise.crystalwallet.models.GeneralCoinAccount;
@@ -36,7 +40,27 @@ import cy.agorise.graphenej.Util;
 
 public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
 
-    CryptoCoin cryptoCoin;
+    static HashMap<CryptoCoin, GeneralAccountManager> generalAccountManagers = new HashMap();
+
+    private static CryptoCoin[] SUPPORTED_COINS = new CryptoCoin[]{
+            CryptoCoin.BITCOIN,
+            CryptoCoin.BITCOIN_TEST,
+            CryptoCoin.DASH,
+            CryptoCoin.LITECOIN
+    } ;
+
+    final CryptoCoin cryptoCoin;
+    final Context context;
+
+    public static GeneralAccountManager getAccountManager(CryptoCoin coin){
+        return generalAccountManagers.get(coin);
+    }
+
+    public GeneralAccountManager(CryptoCoin cryptoCoin, Context context) {
+        this.cryptoCoin = cryptoCoin;
+        this.context = context;
+        generalAccountManagers.put(cryptoCoin,this);
+    }
 
     @Override
     public void createAccountFromSeed(CryptoNetAccount account, ManagerRequest request, Context context) {
@@ -55,6 +79,14 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
 
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
+        if(Arrays.asList(SUPPORTED_COINS).contains(request.getCoin())){
+            if(request instanceof GeneralAccountSendRequest){
+                this.send((GeneralAccountSendRequest)request);
+            }else{
+                System.out.println("Invalid " +this.cryptoCoin.getLabel() + " request ");
+            }
+
+        }
 
     }
 
@@ -63,29 +95,35 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
      * @param txi
      */
     public void processTxi(Txi txi){
+        CrystalDatabase db = CrystalDatabase.getAppDatabase(this.context);
+        BitcoinTransaction btTransaction = db.bitcoinTransactionDao().getByTxid(txi.txid);
+        if(btTransaction != null){
+            btTransaction.setConfirmations(txi.confirmations);
+            db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction);
+        }else {
 
-        GeneralCoinAccount tempAccount = null;
-        GeneralTransaction transaction = new GeneralTransaction();
-        //transaction.setAccount(this.mAccount);
-        transaction.setTxid(txi.txid);
-        transaction.setBlock(txi.blockheight);
-        transaction.setDate(new Date(txi.time * 1000));
-        transaction.setFee((long) (txi.fee * Math.pow(10,cryptoCoin.getPrecision())));
-        transaction.setConfirm(txi.confirmations);
-        transaction.setType(cryptoCoin);
-        transaction.setBlockHeight(txi.blockheight);
 
-        for (Vin vin : txi.vin) {
-            GTxIO input = new GTxIO();
-            input.setAmount((long) (vin.value * Math.pow(10,cryptoCoin.getPrecision())));
-            input.setTransaction(transaction);
-            input.setOut(true);
-            input.setType(cryptoCoin);
-            String addr = vin.addr;
-            input.setAddressString(addr);
-            input.setIndex(vin.n);
-            input.setScriptHex(vin.scriptSig.hex);
-            input.setOriginalTxid(vin.txid);
+            GeneralTransaction transaction = new GeneralTransaction();
+            //transaction.setAccount(this.mAccount);
+            transaction.setTxid(txi.txid);
+            transaction.setBlock(txi.blockheight);
+            transaction.setDate(new Date(txi.time * 1000));
+            transaction.setFee((long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision())));
+            transaction.setConfirm(txi.confirmations);
+            transaction.setType(cryptoCoin);
+            transaction.setBlockHeight(txi.blockheight);
+
+            for (Vin vin : txi.vin) {
+                GTxIO input = new GTxIO();
+                input.setAmount((long) (vin.value * Math.pow(10, cryptoCoin.getPrecision())));
+                input.setTransaction(transaction);
+                input.setOut(true);
+                input.setType(cryptoCoin);
+                String addr = vin.addr;
+                input.setAddressString(addr);
+                input.setIndex(vin.n);
+                input.setScriptHex(vin.scriptSig.hex);
+                input.setOriginalTxid(vin.txid);
             /*for (GeneralCoinAddress address : this.mAddresses) {
                 if (address.getAddressString(this.mAccount.getNetworkParam()).equals(addr)) {
                     input.setAddress(address);
@@ -96,31 +134,31 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                     }
                                     }
             }*/
-            transaction.getTxInputs().add(input);
-        }
+                transaction.getTxInputs().add(input);
+            }
 
-        for (Vout vout : txi.vout) {
-            if(vout.scriptPubKey.addresses == null || vout.scriptPubKey.addresses.length <= 0){
-                // The address is null, this must be a memo
-                String hex = vout.scriptPubKey.hex;
-                int opReturnIndex = hex.indexOf("6a");
-                if(opReturnIndex >= 0) {
-                    byte[] memoBytes = new byte[Integer.parseInt(hex.substring(opReturnIndex+2,opReturnIndex+4),16)];
-                    for(int i = 0; i < memoBytes.length;i++){
-                        memoBytes[i] = Byte.parseByte(hex.substring(opReturnIndex+4+(i*2),opReturnIndex+6+(i*2)),16);
+            for (Vout vout : txi.vout) {
+                if (vout.scriptPubKey.addresses == null || vout.scriptPubKey.addresses.length <= 0) {
+                    // The address is null, this must be a memo
+                    String hex = vout.scriptPubKey.hex;
+                    int opReturnIndex = hex.indexOf("6a");
+                    if (opReturnIndex >= 0) {
+                        byte[] memoBytes = new byte[Integer.parseInt(hex.substring(opReturnIndex + 2, opReturnIndex + 4), 16)];
+                        for (int i = 0; i < memoBytes.length; i++) {
+                            memoBytes[i] = Byte.parseByte(hex.substring(opReturnIndex + 4 + (i * 2), opReturnIndex + 6 + (i * 2)), 16);
+                        }
+                        transaction.setMemo(new String(memoBytes));
                     }
-                    transaction.setMemo(new String(memoBytes));
-                }
-            }else {
-                GTxIO output = new GTxIO();
-                output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
-                output.setTransaction(transaction);
-                output.setOut(false);
-                output.setType(cryptoCoin);
-                String addr = vout.scriptPubKey.addresses[0];
-                output.setAddressString(addr);
-                output.setIndex(vout.n);
-                output.setScriptHex(vout.scriptPubKey.hex);
+                } else {
+                    GTxIO output = new GTxIO();
+                    output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
+                    output.setTransaction(transaction);
+                    output.setOut(false);
+                    output.setType(cryptoCoin);
+                    String addr = vout.scriptPubKey.addresses[0];
+                    output.setAddressString(addr);
+                    output.setIndex(vout.n);
+                    output.setScriptHex(vout.scriptPubKey.hex);
                 /*for (GeneralCoinAddress address : this.mAddresses) {
                     if (address.getAddressString(this.mAccount.getNetworkParam()).equals(addr)) {
                         output.setAddress(address);
@@ -133,13 +171,13 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                     }
                 }*/
 
-                transaction.getTxOutputs().add(output);
+                    transaction.getTxOutputs().add(output);
+                }
             }
-        }
-        if(txi.txlock && txi.confirmations< cryptoCoin.getCryptoNet().getConfirmationsNeeded()){
-            transaction.setConfirm(cryptoCoin.getCryptoNet().getConfirmationsNeeded());
-        }
-        //TODO database
+            if (txi.txlock && txi.confirmations < cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
+                transaction.setConfirm(cryptoCoin.getCryptoNet().getConfirmationsNeeded());
+            }
+            //TODO database
                 /*SCWallDatabase db = new SCWallDatabase(this.mContext);
                 long idTransaction = db.getGeneralTransactionId(transaction);
                 if (idTransaction == -1) {
@@ -158,13 +196,14 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 break;
             }
         }*/
+        }
     }
 
     public void send(final GeneralAccountSendRequest request){
         //TODO check server connection
         //TODO validate to address
 
-        InsightApiGenerator.getEstimateFee(request.getAccount().getCryptoNet(),new ApiRequest(1, new ApiRequestListener() {
+        InsightApiGenerator.getEstimateFee(request.getAccount().getCryptoCoin(),new ApiRequest(1, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
                 Transaction tx = new Transaction(request.getAccount().getNetworkParam());
@@ -233,7 +272,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                     tx.addSignedInput(outPoint, script, utxo.getAddress().getKey(), Transaction.SigHash.ALL, true);
                 }
 
-                InsightApiGenerator.broadcastTransaction(request.getAccount().getCryptoNet(),Util.bytesToHex(tx.bitcoinSerialize()),new ApiRequest(1, new ApiRequestListener() {
+                InsightApiGenerator.broadcastTransaction(request.getAccount().getCryptoCoin(),Util.bytesToHex(tx.bitcoinSerialize()),new ApiRequest(1, new ApiRequestListener() {
                     @Override
                     public void success(Object answer, int idPetition) {
                         request.setStatus(GeneralAccountSendRequest.StatusCode.SUCCEEDED);

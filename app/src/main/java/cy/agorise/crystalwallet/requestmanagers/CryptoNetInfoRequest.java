@@ -21,13 +21,6 @@ public abstract class CryptoNetInfoRequest {
      */
     protected CryptoNetInfoRequestListener listener;
 
-
-
-
-
-
-
-
     protected CryptoNetInfoRequest(CryptoCoin coin){
         this.coin = coin;
     }
@@ -43,4 +36,7 @@ public abstract class CryptoNetInfoRequest {
         CryptoNetInfoRequests.getInstance().removeRequest(this);
     }
 
+    public CryptoCoin getCoin() {
+        return coin;
+    }
 }

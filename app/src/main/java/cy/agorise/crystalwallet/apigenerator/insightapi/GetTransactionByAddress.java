@@ -16,6 +16,7 @@ import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vin;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vout;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
+import cy.agorise.crystalwallet.manager.GeneralAccountManager;
 import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.GTxIO;
 import cy.agorise.crystalwallet.models.GeneralCoinAccount;
@@ -41,14 +42,14 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
     private InsightApiServiceGenerator mServiceGenerator;
 
     private String serverUrl;
-    private CryptoNet cryptoNet;
+    private CryptoCoin cryptoNet;
 
     private boolean inProcess = false;
 
     /**
      * Basic consturcotr
      */
-    public GetTransactionByAddress(CryptoNet cryptoNet, String serverUrl) {
+    public GetTransactionByAddress(CryptoCoin cryptoNet, String serverUrl) {
         this.cryptoNet = cryptoNet;
         this.serverUrl = serverUrl;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
@@ -76,7 +77,7 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
             AddressTxi addressTxi = response.body();
 
             for (Txi txi : addressTxi.items) {
-                //TODO call manager
+                GeneralAccountManager.getAccountManager(this.cryptoNet).processTxi(txi);
             }
 
         }

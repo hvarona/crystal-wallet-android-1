@@ -21,6 +21,7 @@ import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.grapheneoperation.AccountUpgradeOperationBuilder;
 import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.AccountSeedDao;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.models.BitsharesAccountNameCache;
 import cy.agorise.crystalwallet.models.seed.BIP39;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
@@ -220,24 +221,26 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
      */
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
-        if (request instanceof ValidateImportBitsharesAccountRequest){
-            this.validateImportAccount((ValidateImportBitsharesAccountRequest) request);
-        } else if (request instanceof ValidateExistBitsharesAccountRequest){
-            this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
-        } else if (request instanceof ValidateBitsharesSendRequest){
-            this.validateSendRequest((ValidateBitsharesSendRequest) request);
-        }else if (request instanceof CryptoNetEquivalentRequest){
-            this.getEquivalentValue((CryptoNetEquivalentRequest) request);
-        }else if (request instanceof ValidateCreateBitsharesAccountRequest){
-            this.validateCreateAccount((ValidateCreateBitsharesAccountRequest) request);
-        }else if (request instanceof ValidateBitsharesLTMUpgradeRequest){
-            this.validateLTMAccountUpgrade((ValidateBitsharesLTMUpgradeRequest) request);
-        }else if (request instanceof GetBitsharesAccountNameCacheRequest){
-            this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
-        }else{
+        if(request.getCoin().equals(CryptoCoin.BITSHARES)) {
+            if (request instanceof ValidateImportBitsharesAccountRequest) {
+                this.validateImportAccount((ValidateImportBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateExistBitsharesAccountRequest) {
+                this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateBitsharesSendRequest) {
+                this.validateSendRequest((ValidateBitsharesSendRequest) request);
+            } else if (request instanceof CryptoNetEquivalentRequest) {
+                this.getEquivalentValue((CryptoNetEquivalentRequest) request);
+            } else if (request instanceof ValidateCreateBitsharesAccountRequest) {
+                this.validateCreateAccount((ValidateCreateBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateBitsharesLTMUpgradeRequest) {
+                this.validateLTMAccountUpgrade((ValidateBitsharesLTMUpgradeRequest) request);
+            } else if (request instanceof GetBitsharesAccountNameCacheRequest) {
+                this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
+            } else {
 
-            //TODO not implemented
-            System.out.println("Error request not implemented " + request.getClass().getName());
+                //TODO not implemented
+                System.out.println("Error request not implemented " + request.getClass().getName());
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.models.GeneralCoinAccount;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -24,12 +25,9 @@ import io.socket.emitter.Emitter;
  *
  */
 
-public class AccountActivityWatcher {
+public class AddressesActivityWatcher {
 
-    /**
-     * The mAccount to be monitor
-     */
-    private final GeneralCoinAccount mAccount;
+    private final CryptoCoin cryptoCoin;
     /**
      * The list of address to monitor
      */
@@ -38,10 +36,6 @@ public class AccountActivityWatcher {
      * the Socket.IO
      */
     private Socket mSocket;
-    /**
-     * This app mContext, used to save on the DB
-     */
-    private final Context mContext;
 
     private final String mServerUrl;
 
@@ -55,9 +49,9 @@ public class AccountActivityWatcher {
             try {
                 System.out.println("Receive accountActivtyWatcher " + os[0].toString() );
                 String txid = ((JSONObject) os[0]).getString(InsightApiConstants.sTxTag);
-                new GetTransactionData(txid, mAccount, mServerUrl, mContext).start();
+                new GetTransactionData(txid, mServerUrl, cryptoCoin).start();
             } catch (JSONException ex) {
-                Logger.getLogger(AccountActivityWatcher.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AddressesActivityWatcher.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     };
@@ -84,7 +78,9 @@ public class AccountActivityWatcher {
     private final Emitter.Listener onDisconnect = new Emitter.Listener() {
         @Override
         public void call(Object... os) {
-            System.out.println("Disconnected to accountActivityWatcher");
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException ignore) {}
             mSocket.connect();
         }
     };
@@ -99,19 +95,20 @@ public class AccountActivityWatcher {
             for(Object ob : os) {
                 System.out.println("accountActivityWatcher " + ob.toString());
             }
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException ignore) {}
+            mSocket.connect();
         }
     };
 
     /**
      * Basic constructor
      *
-     * @param mAccount The mAccount to be monitor
-     * @param mContext This app mContext
      */
-    public AccountActivityWatcher(String serverUrl, GeneralCoinAccount mAccount, Context mContext) {
+    public AddressesActivityWatcher(String serverUrl, CryptoCoin cryptoCoin) {
         this.mServerUrl = serverUrl;
-        this.mAccount = mAccount;
-        this.mContext = mContext;
+        this.cryptoCoin = cryptoCoin;
         try {
             this.mSocket = IO.socket(serverUrl);
             this.mSocket.on(Socket.EVENT_CONNECT, onConnect);
@@ -141,13 +138,11 @@ public class AccountActivityWatcher {
      * Connects the Socket
      */
     public void connect() {
-        //TODO change to use log
-        System.out.println("accountActivityWatcher connecting");
         try{
-            this.mSocket.connect();
-        }catch(Exception e){
-            //TODO change exception handler
-            System.out.println("accountActivityWatcher exception " + e.getMessage());
+            if(this.mSocket == null || !this.mSocket.connected()) {
+                this.mSocket.connect();
+            }
+        }catch(Exception ignore){
         }
     }
 
