@@ -1,44 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/etNewPin"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="26dp"
         android:hint="@string/new_pin"
-        android:inputType="numberPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:inputType="numberPassword" />
+
     <TextView
         android:id="@+id/tvNewPinError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/red"
-        app:layout_constraintTop_toBottomOf="@+id/etNewPin" />
+        android:layout_below="@+id/etNewPin"/>
 
     <EditText
         android:id="@+id/etConfirmPin"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tvNewPinError"
         android:layout_marginTop="16dp"
         android:hint="@string/confirm_pin"
-        android:inputType="numberPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNewPinError" />
+        android:inputType="numberPassword" />
+
     <TextView
         android:id="@+id/tvConfirmPinError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/red"
-        app:layout_constraintTop_toBottomOf="@+id/etConfirmPin" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_below="@+id/etConfirmPin" />
+
+</RelativeLayout>
