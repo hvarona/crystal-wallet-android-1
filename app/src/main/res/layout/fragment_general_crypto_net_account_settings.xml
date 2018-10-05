@@ -1,32 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="0dp"
-    android:paddingLeft="0dp"
-    android:paddingRight="0dp"
+    android:paddingLeft="25dp"
+    android:background="@color/white"
+    android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/tvMnemonicTitle"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/seed_words"
-        android:textStyle="bold" />
+        android:background="@color/white"
+        android:padding="20dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true">
 
-    <TextView
-        android:id="@+id/tvMnemonic"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:background="@drawable/edittext_bg"
-        android:inputType="number"
-        android:maxLines="1"
-        android:textColor="@color/black" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvMnemonicTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="13dp"
+            android:text="@string/Seed"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/linearlayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvMnemonicTitle"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/square"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvMnemonic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:gravity="center"
+                android:text=""
+                android:background="#00000000"
+                android:textColor="@color/gray" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
