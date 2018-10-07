@@ -8,7 +8,6 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -28,12 +27,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +38,6 @@ import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.vincent.filepicker.ToastUtil;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -95,6 +91,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     View viewSend;
     @BindView(R.id.tvToError)
     TextView tvToError;
+    @BindView(R.id.fabCloseCamera)
+    FloatingActionButton btnCloseCamera;
     @BindView(R.id.spAsset)
     Spinner spAsset;
     @BindView(R.id.tvAssetError)
@@ -126,6 +124,11 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
     @BindView(R.id.viewCamera)
     View viewCamera;
+
+    /*
+    * Flag to control when the camera is visible and when is hide
+    * */
+    private boolean cameraVisible = true;
 
     Button btnScanQrCode;
 
@@ -364,17 +367,41 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         mScannerView.stopCamera();
 
         /*
-        * Hide the camera
+        * Hide the camera or show it
         * */
-        hideCamera();
+        if(cameraVisible){
+            hideCamera();
+        }
+        else{
+            showCamera();
+        }
     }
 
     /*
      * Show the camera and hide the black background
      * */
     private void showCamera(){
+
+        /*
+         * Change visibilities of views
+         * */
         viewCamera.setVisibility(View.GONE);
         mScannerView.setVisibility(View.VISIBLE);
+
+        /*
+         * Change icon
+         * */
+        btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ic_close));
+
+        /*
+         * Reset variable
+         * */
+        cameraVisible = true;
+
+        /*
+        * Star the camera again
+        * */
+        beginScanQrCode();
     }
 
 
@@ -382,8 +409,22 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     * Hide the camera and show the black background
     * */
     private void hideCamera(){
+
+        /*
+        * Change visibilities of views
+        * */
         viewCamera.setVisibility(View.VISIBLE);
         mScannerView.setVisibility(View.INVISIBLE);
+
+        /*
+        * Change icon
+        * */
+        btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ok));
+
+        /*
+        * Reset variable
+        * */
+        cameraVisible = false;
     }
 
     @OnTextChanged(value = R.id.etMemo,
