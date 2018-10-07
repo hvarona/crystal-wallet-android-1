@@ -12,6 +12,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -21,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.util.Log;
@@ -38,6 +42,7 @@ import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.vincent.filepicker.ToastUtil;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -54,6 +59,7 @@ import butterknife.OnItemSelected;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
+import cy.agorise.crystalwallet.dialogs.material.ToastIt;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -284,14 +290,116 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
 
         loadUserImage();
-        try {
-            verifyCameraPermissions(getActivity());
-            beginScanQrCode();
-        }catch(Exception e){
-            e.printStackTrace();
+
+        /*
+         * Check for CAMERA permission
+         * */
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkPermission()) {
+                // Code for above or equal 23 API Oriented Device
+                // Your Permission granted already .Do next code
+
+                /*
+                * Init the camera
+                * */
+                try {
+                    beginScanQrCode();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            } else {
+                requestPermission(); // Code for permission
+            }
+        }
+        else {
+
+            // Code for Below 23 API Oriented Device
+            // Do next code
+
+            /*
+             * Init the camera
+             * */
+            try {
+                beginScanQrCode();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         return builder.setView(view).create();
+    }
+
+
+    private void requestPermission() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
+            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
+
+            /*
+            * Disable the button of the camera visibility
+            * */
+            disableVisibilityCamera();
+
+        } else {
+            requestPermissions(new String[] {android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        }
+    }
+
+    private void disableVisibilityCamera(){
+
+        /*
+         * Hide the button, the user can not modify the visibility
+         * */
+        btnCloseCamera.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("value", "Permission Granted, Now you can use camera .");
+
+                    getActivity().runOnUiThread(new Runnable(){
+                        public void run() {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_granted_camera), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    /*
+                     * Init the camera
+                     * */
+                    try {
+                        beginScanQrCode();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    Log.e("value", "Permission Denied, You cannot use the camera.");
+
+                    getActivity().runOnUiThread(new Runnable(){
+                        public void run() {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                break;
+        }
     }
 
     @Override
@@ -557,20 +665,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             Manifest.permission.CAMERA
     };
 
-
-    public static void verifyCameraPermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_CAMERA,
-                    REQUEST_CAMERA_PERMISSION
-            );
-        }
-    }
 
     @Override
     public void onValidationSucceeded(final ValidationField field) {

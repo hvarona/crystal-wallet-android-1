@@ -364,6 +364,9 @@
     <string name="email_name">To display a photo for this Contact, enter its Gravatar e-mail here</string>
     <string name="copied_to_clipboard">Copied to Clipboard</string>
 
+    <string name="permission_denied_camera">Permission Denied. You cannot use the QR camera. Please allow this permission in App Settings.</string>
+    <string name="permission_granted_camera">Great!! Now you can use the QR camera.</string>
+
     <string name="select">"Select</string>
     <string name="are_you_sure">"Are you sure?</string>
     <string name="is_already_added">is already added</string>
