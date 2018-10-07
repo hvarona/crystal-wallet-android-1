@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.widget.Button;
@@ -61,6 +62,9 @@ public class SendTransactionActivity extends AppCompatActivity implements UIVali
     Button btnSend;
     //@BindView(R.id.btnCancel)
     Button btnCancel;
+
+    @BindView(R.id.fabCloseCamera)
+    FloatingActionButton btnCloseCamera;
 
     private long cryptoNetAccountId;
     private CryptoNetAccount cryptoNetAccount;
@@ -145,6 +149,15 @@ public class SendTransactionActivity extends AppCompatActivity implements UIVali
     public void cancel(){
         this.finish();
     }
+
+
+
+    @OnClick(R.id.fabCloseCamera)
+    public void onClicCloseCamera(){
+
+
+    }
+
 
     //@OnClick(R.id.btnSend)
     public void importSend(){

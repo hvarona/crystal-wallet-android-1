@@ -124,6 +124,9 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @BindView(R.id.gravatar)
     CircularImageView userImg;
 
+    @BindView(R.id.viewCamera)
+    View viewCamera;
+
     Button btnScanQrCode;
 
     private long cryptoNetAccountId;
@@ -355,6 +358,33 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         this.sendTransactionValidator.validate();
     }
 
+
+    @OnClick(R.id.fabCloseCamera)
+    public void onClicCloseCamera(){
+        mScannerView.stopCamera();
+
+        /*
+        * Hide the camera
+        * */
+        hideCamera();
+    }
+
+    /*
+     * Show the camera and hide the black background
+     * */
+    private void showCamera(){
+        viewCamera.setVisibility(View.GONE);
+        mScannerView.setVisibility(View.VISIBLE);
+    }
+
+
+    /*
+    * Hide the camera and show the black background
+    * */
+    private void hideCamera(){
+        viewCamera.setVisibility(View.VISIBLE);
+        mScannerView.setVisibility(View.INVISIBLE);
+    }
 
     @OnTextChanged(value = R.id.etMemo,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
