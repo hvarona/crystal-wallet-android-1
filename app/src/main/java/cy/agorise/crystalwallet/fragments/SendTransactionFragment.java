@@ -405,6 +405,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @Override
     public void onResume() {
         super.onResume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
         /*builder.setNeutralButton("Scan QR Code", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -417,6 +419,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         assert dialogWindow != null;
         dialogWindow.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         loadUserImage();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();
     }
 
     @Override
@@ -652,6 +660,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void beginScanQrCode(){
         //mScannerView = new ZXingScannerView(getContext());
         mScannerView.setFormats(listOf(BarcodeFormat.QR_CODE));
+        mScannerView.setAspectTolerance(0.5f);
         mScannerView.setAutoFocus(true);
         mScannerView.setLaserColor(R.color.colorAccent);
         mScannerView.setMaskColor(R.color.colorAccent);
@@ -719,7 +728,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @Override
     public void handleResult(Result result) {
         try {
-            System.out.println("CAMERA result " + result.getText() );
             Invoice invoice = Invoice.fromQrCode(result.getText());
 
             etTo.setText(invoice.getTo());
