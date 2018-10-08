@@ -2,6 +2,7 @@ package cy.agorise.crystalwallet.manager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.primitives.UnsignedLong;
 
@@ -20,6 +21,7 @@ import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.grapheneoperation.AccountUpgradeOperationBuilder;
 import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.AccountSeedDao;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.models.BitsharesAccountNameCache;
 import cy.agorise.crystalwallet.models.seed.BIP39;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
@@ -63,8 +65,6 @@ import cy.agorise.graphenej.operations.TransferOperationBuilder;
  * Created by henry on 26/9/2017.
  */
 public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
-
-    //private final static String BITSHARES_TESTNET_CHAIN_ID= "9cf6f255a208100d2bb275a3c52f4b1589b7ec9c9bfc2cb2a5fe6411295106d8";
 
     private final static String SIMPLE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private final static String DEFAULT_TIME_ZONE = "GMT";
@@ -129,7 +129,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long[] idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         grapheneAccount.setId(idAccount[0]);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        //subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -147,7 +147,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
                         db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        //subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -159,7 +159,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
                 db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
+                //subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
         }
     }
@@ -221,24 +221,26 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
      */
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
-        if (request instanceof ValidateImportBitsharesAccountRequest){
-            this.validateImportAccount((ValidateImportBitsharesAccountRequest) request);
-        } else if (request instanceof ValidateExistBitsharesAccountRequest){
-            this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
-        } else if (request instanceof ValidateBitsharesSendRequest){
-            this.validateSendRequest((ValidateBitsharesSendRequest) request);
-        }else if (request instanceof CryptoNetEquivalentRequest){
-            this.getEquivalentValue((CryptoNetEquivalentRequest) request);
-        }else if (request instanceof ValidateCreateBitsharesAccountRequest){
-            this.validateCreateAccount((ValidateCreateBitsharesAccountRequest) request);
-        }else if (request instanceof ValidateBitsharesLTMUpgradeRequest){
-            this.validateLTMAccountUpgrade((ValidateBitsharesLTMUpgradeRequest) request);
-        }else if (request instanceof GetBitsharesAccountNameCacheRequest){
-            this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
-        }else{
+        if(request.getCoin().equals(CryptoCoin.BITSHARES)) {
+            if (request instanceof ValidateImportBitsharesAccountRequest) {
+                this.validateImportAccount((ValidateImportBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateExistBitsharesAccountRequest) {
+                this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateBitsharesSendRequest) {
+                this.validateSendRequest((ValidateBitsharesSendRequest) request);
+            } else if (request instanceof CryptoNetEquivalentRequest) {
+                this.getEquivalentValue((CryptoNetEquivalentRequest) request);
+            } else if (request instanceof ValidateCreateBitsharesAccountRequest) {
+                this.validateCreateAccount((ValidateCreateBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateBitsharesLTMUpgradeRequest) {
+                this.validateLTMAccountUpgrade((ValidateBitsharesLTMUpgradeRequest) request);
+            } else if (request instanceof GetBitsharesAccountNameCacheRequest) {
+                this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
+            } else {
 
-            //TODO not implemented
-            System.out.println("Error request not implemented " + request.getClass().getName());
+                //TODO not implemented
+                System.out.println("Error request not implemented " + request.getClass().getName());
+            }
         }
     }
 

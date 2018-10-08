@@ -1,47 +1,74 @@
 package cy.agorise.crystalwallet.apigenerator;
 
-import android.content.Context;
-
 import java.util.HashMap;
 
+import cy.agorise.crystalwallet.apigenerator.insightapi.AddressesActivityWatcher;
 import cy.agorise.crystalwallet.apigenerator.insightapi.BroadcastTransaction;
 import cy.agorise.crystalwallet.apigenerator.insightapi.GetEstimateFee;
 import cy.agorise.crystalwallet.apigenerator.insightapi.GetTransactionByAddress;
-import cy.agorise.crystalwallet.apigenerator.insightapi.GetTransactionData;
-import cy.agorise.crystalwallet.enums.CryptoNet;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.network.CryptoNetManager;
 
 public class InsightApiGenerator {
 
-    private static HashMap<CryptoNet,BroadcastTransaction> broadcaster = new HashMap();
-    private static HashMap<CryptoNet,GetTransactionByAddress> transactionGetters = new HashMap();
-    private static HashMap<CryptoNet,GetTransactionData> transacitonFollowers = new HashMap();
+    private static HashMap<CryptoCoin,GetTransactionByAddress> transactionGetters = new HashMap();
+    private static HashMap<CryptoCoin,AddressesActivityWatcher> transactionFollowers = new HashMap();
 
-    public static void getTransactionFromAddress(CryptoNet cryptoNet, String address,
-                                                 ApiRequest request, Context context,
-                                                 boolean subscribe){
-        if(!transactionGetters.containsKey(cryptoNet)){
-            //TODO change this line
-            transactionGetters.put(cryptoNet,new GetTransactionByAddress(null,CryptoNetManager.getURL(cryptoNet),context));
+    /**
+     * Fecth all the transaciton for a giving address
+     * @param cryptoCoin the crypto net of the address
+     * @param address The address String
+     * @param request the request api to response
+     * @param subscribe If needs to follow the address (Real time)
+     */
+    public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address,
+                                                 ApiRequest request, boolean subscribe){
+        if(!transactionGetters.containsKey(cryptoCoin)){
+            transactionGetters.put(cryptoCoin,new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet())));
         }
-
-    }
-
-    public static void followTransaction(CryptoNet cryptoNet, String txid, Context context){
-
-    }
-
-    public static void broadcastTransaction(CryptoNet cryptoNet, String rawtx, ApiRequest request){
-        if(!broadcaster.containsKey(cryptoNet)){
-            //TODO change to multiple broadcast
-            broadcaster.put(cryptoNet,new BroadcastTransaction(rawtx,null,
-                    CryptoNetManager.getURL(cryptoNet),null));
-            broadcaster.get(cryptoNet).start();
+        transactionGetters.get(cryptoCoin).addAddress(address);
+        transactionGetters.get(cryptoCoin).start();
+        if(subscribe){
+            if(!transactionFollowers.containsKey(cryptoCoin)){
+                transactionFollowers.put(cryptoCoin,new AddressesActivityWatcher(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),cryptoCoin));
+            }
+            transactionFollowers.get(cryptoCoin).addAddress(address);
+            transactionFollowers.get(cryptoCoin).connect();
         }
     }
 
-    public static void getEstimateFee(CryptoNet cryptoNet, final ApiRequest request){
-        GetEstimateFee.getEstimateFee(CryptoNetManager.getURL(cryptoNet), new GetEstimateFee.estimateFeeListener() {
+    /**
+     * Broadcast an insight api transaction
+     * @param cryptoCoin The cryptoNet of the transaction
+     * @param rawtx the transaction to be broadcasted
+     */
+    public static void broadcastTransaction(CryptoCoin cryptoCoin, String rawtx, final ApiRequest request){
+        BroadcastTransaction bTransaction = new BroadcastTransaction(rawtx,
+                CryptoNetManager.getURL(cryptoCoin.getCryptoNet()), "api", new BroadcastTransaction.BroadCastTransactionListener() {
+            @Override
+            public void onSuccess() {
+                request.getListener().success(true,request.getId());
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                request.getListener().fail(request.getId());
+            }
+
+            @Override
+            public void onConnecitonFailure() {
+                request.getListener().fail(request.getId());
+            }
+        });
+        bTransaction.start();
+    }
+
+    /**
+     * Fetch the estimated fee for a transaction
+     */
+    public static void getEstimateFee(CryptoCoin cryptoCoin, final ApiRequest request){
+        GetEstimateFee.getEstimateFee(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),
+                new GetEstimateFee.estimateFeeListener() {
             @Override
             public void estimateFee(long value) {
                 request.listener.success(value,request.getId());

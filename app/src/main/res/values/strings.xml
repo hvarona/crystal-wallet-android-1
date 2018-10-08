@@ -18,6 +18,8 @@
     <string name="You_dont_have_transactions">You dont have transactions</string>
     <string name="You_dont_have_contacts">You dont have contacts</string>
 
+    <string name="Permission_Denied_WRITE_EXTERNAL_STORAGE">Permission Denied, You cannot use local drive.</string>
+
     <string name="account_create_register_or_import">ACCOUNT CREATE/REGISTER OR IMPORT</string>
     <string name="txt_account_name">Account Name</string>
     <string name="time_stamp">Time stamp</string>
@@ -362,6 +364,9 @@
     <string name="email_name">To display a photo for this Contact, enter its Gravatar e-mail here</string>
     <string name="copied_to_clipboard">Copied to Clipboard</string>
 
+    <string name="permission_denied_camera">Permission Denied. You cannot use the QR camera. Please allow this permission in App Settings.</string>
+    <string name="permission_granted_camera">Great!! Now you can use the QR camera.</string>
+
     <string name="select">"Select</string>
     <string name="are_you_sure">"Are you sure?</string>
     <string name="is_already_added">is already added</string>
@@ -523,6 +528,7 @@
     <string name="Account_already_exists">Account already exists</string>
     <string name="connection_status">Connection status</string>
     <string name="people_icon">People icon</string>
+    <string name="Account_Settings">Account Settings</string>
     <string name="camera_feed_to_scan_qr">Camera feed to scan QR</string>
     <string name="create_account">Create Account</string>
     <string name="import_account">Import Account</string>

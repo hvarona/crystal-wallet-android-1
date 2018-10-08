@@ -71,7 +71,7 @@ public class BalanceFragment extends Fragment {
                 vCryptoNetBalanceListView.setData(cryptoNetBalances, fragment);
 
                 final int size = cryptoNetBalances.size();
-                if(size==1){
+                if(size==0){
                     tvNobalances.setVisibility(View.VISIBLE);
                 }
                 else{

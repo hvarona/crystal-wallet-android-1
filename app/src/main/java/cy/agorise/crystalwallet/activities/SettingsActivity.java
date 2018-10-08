@@ -50,6 +50,14 @@ public class SettingsActivity extends AppCompatActivity{
 
     private SecuritySettingsFragment securitySettingsFragment;
 
+    /*
+     * For the window animation
+     * */
+    private MediaPlayer mediaPlayer;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +72,7 @@ public class SettingsActivity extends AppCompatActivity{
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceCreated");
-                MediaPlayer mediaPlayer = MediaPlayer.create(SettingsActivity.this, R.raw.appbar_background);
+                mediaPlayer = MediaPlayer.create(SettingsActivity.this, R.raw.appbar_background);
                 mediaPlayer.setDisplay(mSurfaceView.getHolder());
                 mediaPlayer.setLooping(true);
                 mediaPlayer.start();
@@ -120,6 +128,17 @@ public class SettingsActivity extends AppCompatActivity{
         @Override
         public int getCount() {
             return 3;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Release the media player
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 

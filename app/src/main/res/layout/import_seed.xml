@@ -8,19 +8,20 @@
     tools:context=".activities.CreateSeedActivity">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true">
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/tilPin"
-            android:layout_width="290dp"
+            android:layout_width="330dp"
+            android:layout_marginTop="40dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true">
 
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etPin"
-                android:layout_width="match_parent"
+                android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/txt_6_digits_pin"
                 android:inputType="number"
@@ -31,7 +32,7 @@
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/tilPinConfirmation"
-            android:layout_width="290dp"
+            android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tilPin"
             android:layout_marginTop="8dp"
@@ -39,7 +40,7 @@
 
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etPinConfirmation"
-                android:layout_width="match_parent"
+                android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/txt_6_digits_pin_confirm"
                 android:inputType="number"
@@ -48,10 +49,9 @@
 
         </android.support.design.widget.TextInputLayout>
 
-
         <android.support.design.widget.TextInputLayout
             android:id="@+id/etSeedWordsLayout"
-            android:layout_width="290dp"
+            android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tilPinConfirmation"
             android:layout_marginTop="8dp"
@@ -59,16 +59,17 @@
 
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etSeedWords"
-                android:layout_width="match_parent"
+                android:layout_width="330dp"
                 android:layout_height="120dp"
                 android:hint="@string/Seed"
+                android:maxLength="255"
                 android:inputType="textMultiLine" />
 
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/tilAccountName"
-            android:layout_width="290dp"
+            android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etSeedWordsLayout"
             android:layout_marginTop="8dp"
@@ -76,7 +77,7 @@
 
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etAccountName"
-                android:layout_width="match_parent"
+                android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyz1234567890 -"
                 android:hint="@string/txt_account_name"
@@ -91,8 +92,9 @@
             android:id="@+id/linearlayoutButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_below="@+id/tilAccountName"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="40dp">
 
             <Button
                 android:id="@+id/btnCancel"

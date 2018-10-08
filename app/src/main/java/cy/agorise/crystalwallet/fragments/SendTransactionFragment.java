@@ -8,11 +8,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -22,20 +24,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -56,6 +58,8 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
+import cy.agorise.crystalwallet.dialogs.material.ToastIt;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -93,6 +97,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     View viewSend;
     @BindView(R.id.tvToError)
     TextView tvToError;
+    @BindView(R.id.fabCloseCamera)
+    FloatingActionButton btnCloseCamera;
     @BindView(R.id.spAsset)
     Spinner spAsset;
     @BindView(R.id.tvAssetError)
@@ -122,6 +128,14 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @BindView(R.id.gravatar)
     CircularImageView userImg;
 
+    @BindView(R.id.viewCamera)
+    View viewCamera;
+
+    /*
+    * Flag to control when the camera is visible and when is hide
+    * */
+    private boolean cameraVisible = true;
+
     Button btnScanQrCode;
 
     private long cryptoNetAccountId;
@@ -131,7 +145,10 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     private FloatingActionButton fabSend;
     private AlertDialog.Builder builder;
 
-
+    /*
+        Dialog for loading
+    */
+    private CrystalDialog crystalDialog;
 
     public static SendTransactionFragment newInstance(long cryptoNetAccountId) {
         SendTransactionFragment f = new SendTransactionFragment();
@@ -273,19 +290,123 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
 
         loadUserImage();
-        try {
-            verifyCameraPermissions(getActivity());
-            beginScanQrCode();
-        }catch(Exception e){
-            e.printStackTrace();
+
+        /*
+         * Check for CAMERA permission
+         * */
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkPermission()) {
+                // Code for above or equal 23 API Oriented Device
+                // Your Permission granted already .Do next code
+
+                /*
+                * Init the camera
+                * */
+                try {
+                    beginScanQrCode();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            } else {
+                requestPermission(); // Code for permission
+            }
+        }
+        else {
+
+            // Code for Below 23 API Oriented Device
+            // Do next code
+
+            /*
+             * Init the camera
+             * */
+            try {
+                beginScanQrCode();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         return builder.setView(view).create();
     }
 
+
+    private void requestPermission() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
+            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
+
+            /*
+            * Disable the button of the camera visibility
+            * */
+            disableVisibilityCamera();
+
+        } else {
+            requestPermissions(new String[] {android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        }
+    }
+
+    private void disableVisibilityCamera(){
+
+        /*
+         * Hide the button, the user can not modify the visibility
+         * */
+        btnCloseCamera.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("value", "Permission Granted, Now you can use camera .");
+
+                    getActivity().runOnUiThread(new Runnable(){
+                        public void run() {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_granted_camera), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    /*
+                     * Init the camera
+                     * */
+                    try {
+                        beginScanQrCode();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    Log.e("value", "Permission Denied, You cannot use the camera.");
+
+                    getActivity().runOnUiThread(new Runnable(){
+                        public void run() {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                break;
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
         /*builder.setNeutralButton("Scan QR Code", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -298,6 +419,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         assert dialogWindow != null;
         dialogWindow.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         loadUserImage();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();
     }
 
     @Override
@@ -350,6 +477,71 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         this.sendTransactionValidator.validate();
     }
 
+
+    @OnClick(R.id.fabCloseCamera)
+    public void onClicCloseCamera(){
+        mScannerView.stopCamera();
+
+        /*
+        * Hide the camera or show it
+        * */
+        if(cameraVisible){
+            hideCamera();
+        }
+        else{
+            showCamera();
+        }
+    }
+
+    /*
+     * Show the camera and hide the black background
+     * */
+    private void showCamera(){
+
+        /*
+         * Change visibilities of views
+         * */
+        viewCamera.setVisibility(View.GONE);
+        mScannerView.setVisibility(View.VISIBLE);
+
+        /*
+         * Change icon
+         * */
+        btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ic_close));
+
+        /*
+         * Reset variable
+         * */
+        cameraVisible = true;
+
+        /*
+        * Star the camera again
+        * */
+        beginScanQrCode();
+    }
+
+
+    /*
+    * Hide the camera and show the black background
+    * */
+    private void hideCamera(){
+
+        /*
+        * Change visibilities of views
+        * */
+        viewCamera.setVisibility(View.VISIBLE);
+        mScannerView.setVisibility(View.INVISIBLE);
+
+        /*
+        * Change icon
+        * */
+        btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ok));
+
+        /*
+        * Reset variable
+        * */
+        cameraVisible = false;
+    }
 
     @OnTextChanged(value = R.id.etMemo,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
@@ -408,6 +600,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
     @OnClick(R.id.btnSend)
     public void sendTransaction(){
+        final SendTransactionFragment thisFragment = this;
+
         if (this.sendTransactionValidator.isValid()) {
             CryptoNetAccount fromAccountSelected = (CryptoNetAccount) spFrom.getItems().get(spFrom.getSelectedIndex());
 
@@ -439,13 +633,26 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 public void onCarryOut() {
                     if (sendRequest.getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)){
                         try {
-                            this.finalize();
+                            crystalDialog.dismiss();
+                            thisFragment.dismiss();
+                            //thisFragment.finalize();
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
+                    } else {
+                        Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                     }
                 }
             });
+
+            /*
+             * Show loading dialog
+             * */
+            crystalDialog = new CrystalDialog((Activity) getContext());
+            crystalDialog.setText("Sending");
+            crystalDialog.progress();
+            crystalDialog.show();
+
             CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
         }
     }
@@ -453,6 +660,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void beginScanQrCode(){
         //mScannerView = new ZXingScannerView(getContext());
         mScannerView.setFormats(listOf(BarcodeFormat.QR_CODE));
+        mScannerView.setAspectTolerance(0.5f);
         mScannerView.setAutoFocus(true);
         mScannerView.setLaserColor(R.color.colorAccent);
         mScannerView.setMaskColor(R.color.colorAccent);
@@ -466,20 +674,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             Manifest.permission.CAMERA
     };
 
-
-    public static void verifyCameraPermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_CAMERA,
-                    REQUEST_CAMERA_PERMISSION
-            );
-        }
-    }
 
     @Override
     public void onValidationSucceeded(final ValidationField field) {
@@ -534,7 +728,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @Override
     public void handleResult(Result result) {
         try {
-            System.out.println("CAMERA result " + result.getText() );
             Invoice invoice = Invoice.fromQrCode(result.getText());
 
             etTo.setText(invoice.getTo());

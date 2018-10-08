@@ -1,6 +1,10 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,11 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.models.AccountSeed;
@@ -30,8 +36,14 @@ public class GeneralCryptoNetAccountSettingsFragment extends Fragment {
     @BindView(R.id.tvMnemonic)
     TextView tvMnemonic;
 
+    @BindView(R.id.btnCopy)
+    Button btnCopy;
+
     CryptoNetAccount cryptoNetAccount;
     AccountSeed accountSeed;
+
+
+
 
     public GeneralCryptoNetAccountSettingsFragment() {
 
@@ -82,5 +94,25 @@ public class GeneralCryptoNetAccountSettingsFragment extends Fragment {
         if (this.cryptoNetAccount != null) {
             tvMnemonic.setText(this.accountSeed.getMasterSeed());
         }
+    }
+
+    /*
+     *   Clic on button copy to clipboard
+     * */
+    @OnClick(R.id.btnCopy)
+    public void btnCopyClick(){
+
+        /*
+         *  Save to clipboard the brainkey chain
+         * */
+        final Activity activity = getActivity();
+        ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(tvMnemonic.getText(), tvMnemonic.getText().toString());
+        clipboard.setPrimaryClip(clip);
+
+        /*
+         * Success message
+         * */
+        Toast.makeText(activity,getResources().getString(R.string.window_seed_toast_clipboard), Toast.LENGTH_SHORT).show();
     }
 }

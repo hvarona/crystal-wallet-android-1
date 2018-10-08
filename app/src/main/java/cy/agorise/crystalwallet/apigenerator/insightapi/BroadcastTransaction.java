@@ -22,29 +22,21 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
      * The serviceGenerator to call
      */
     private InsightApiServiceGenerator mServiceGenerator;
-    /**
-     * This app context, used to save on the DB
-     */
-    private Context mContext;
-    /**
-     * The account who sign the transaction
-     */
-    private GeneralCoinAccount mAccount;
 
-    private String serverUrl;
+    private String mPath;
+
+    private BroadCastTransactionListener listener;
 
     /**
      * Basic Consturctor
      * @param RawTx The RawTX in Hex String
-     * @param account The account who signs the transaction
-     * @param context This app context
+     *
      */
-    public BroadcastTransaction(String RawTx, GeneralCoinAccount account, String serverUrl, Context context){
-        this.serverUrl = serverUrl;
+    public BroadcastTransaction(String RawTx, String serverUrl, String path, BroadCastTransactionListener listener){
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
-        this.mContext = context;
         this.mRawTx = RawTx;
-        this.mAccount = account;
+        this.listener = listener;
+        this.mPath = path;
     }
 
     /**
@@ -54,13 +46,9 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
     @Override
     public void onResponse(Call<Txi> call, Response<Txi> response) {
         if (response.isSuccessful()) {
-            //TODO invalidated send
-            //TODO call getTransactionData
-            GetTransactionData trData = new GetTransactionData(response.body().txid,this.mAccount, this.serverUrl, this.mContext);
-            trData.start();
+            listener.onSuccess();
         } else {
-            System.out.println("SENDTEST: not succesful " + response.message());
-            //TODO change how to handle invalid transaction
+            listener.onFailure(response.message());
         }
     }
 
@@ -69,8 +57,7 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
      */
     @Override
     public void onFailure(Call<Txi> call, Throwable t) {
-        //TODO change how to handle invalid transaction
-        System.out.println("SENDTEST: sendError " + t.getMessage() );
+        listener.onConnecitonFailure();
     }
 
     /**
@@ -79,7 +66,13 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
     @Override
     public void run() {
         InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
-        Call<Txi> broadcastTransaction = service.broadcastTransaction(InsightApiConstants.getPath(this.mAccount.getCryptoCoin()),this.mRawTx);
+        Call<Txi> broadcastTransaction = service.broadcastTransaction(this.mPath,this.mRawTx);
         broadcastTransaction.enqueue(this);
+    }
+
+    public interface BroadCastTransactionListener{
+        void onSuccess();
+        void onFailure(String msg);
+        void onConnecitonFailure();
     }
 }

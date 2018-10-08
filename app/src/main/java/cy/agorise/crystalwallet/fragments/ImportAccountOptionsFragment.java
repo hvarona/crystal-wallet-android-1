@@ -5,12 +5,17 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +23,8 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.vincent.filepicker.ToastUtil;
 
 import java.net.URISyntaxException;
 
@@ -50,6 +57,7 @@ public class ImportAccountOptionsFragment extends DialogFragment {
     @BindView(R.id.btnImportBackup)
     Button btnImportBackup;
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     /*
         Dialog for loading
@@ -110,18 +118,88 @@ public class ImportAccountOptionsFragment extends DialogFragment {
 
     @OnClick (R.id.btnImportBackup)
     public void importBackup(){
-        Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        fileIntent.setType("*/*");
-        fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(fileIntent, FILE_CONTENT_REQUEST_CODE);
 
+        if (Build.VERSION.SDK_INT >= 23) {
 
+            if (checkPermission()) {
+
+                Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                fileIntent.setType("*/*");
+                fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(fileIntent, FILE_CONTENT_REQUEST_CODE);
+
+            } else {
+                requestPermission(); // Code for permission
+            }
+        }
+        else {
+
+            Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            fileIntent.setType("*/*");
+            fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(fileIntent, FILE_CONTENT_REQUEST_CODE);
+        }
     }
 
     @OnClick (R.id.btnImportSeed)
     public void importSeed(){
-        Intent intent = new Intent(this.getActivity(), ImportSeedActivity.class);
-        startActivity(intent);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            if (checkPermission()) {
+
+                Intent intent = new Intent(this.getActivity(), ImportSeedActivity.class);
+                startActivity(intent);
+
+            } else {
+                requestPermission(); // Code for permission
+            }
+        }
+        else {
+            Intent intent = new Intent(this.getActivity(), ImportSeedActivity.class);
+            startActivity(intent);
+        }
+    }
+
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private void requestPermission() {
+
+        Log.i("log", "requestPermission() entered");
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Toast.makeText(getActivity(), "Write External Storage permission allows us to do store images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+        } else {
+           // ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            requestPermissions(new String[] {android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    Intent intent = new Intent(getActivity(), ImportSeedActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    ToastUtil.getInstance(getActivity()).showToast(getActivity().getString(R.string.Permission_Denied_WRITE_EXTERNAL_STORAGE));
+                }
+                break;
+        }
     }
 
     @Override

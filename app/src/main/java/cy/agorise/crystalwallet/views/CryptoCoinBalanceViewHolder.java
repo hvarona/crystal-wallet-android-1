@@ -105,12 +105,19 @@ public class CryptoCoinBalanceViewHolder extends RecyclerView.ViewHolder {
                                         public void onChanged(@Nullable CryptoCurrencyEquivalence cryptoCurrencyEquivalence) {
                                             if (cryptoCurrencyEquivalence != null) {
                                                 CryptoCurrency toCurrency = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getById(cryptoCurrencyEquivalence.getFromCurrencyId());
-                                                double equivalentValue = (balance.getBalance() / Math.pow(10, currencyFrom.getPrecision())) /
-                                                        (cryptoCurrencyEquivalence.getValue() / Math.pow(10, toCurrency.getPrecision()));
-                                                String equivalenceString = String.format(
-                                                        "%.2f",
-                                                        equivalentValue
-                                                );
+                                                double equivalentValue = 0;
+                                                String equivalenceString = "";
+                                                if (cryptoCurrencyEquivalence.getValue() > 0) {
+                                                    equivalentValue = (balance.getBalance() / Math.pow(10, currencyFrom.getPrecision())) /
+                                                            (cryptoCurrencyEquivalence.getValue() / Math.pow(10, toCurrency.getPrecision()));
+                                                    equivalenceString = String.format(
+                                                            "%.2f",
+                                                            equivalentValue
+                                                    );
+                                                } else {
+                                                    equivalentValue = 0;
+                                                    equivalenceString = "0";
+                                                }
 
                                                 cryptoNetBalanceViewHolder.setEquivalentBalance(balance,equivalentValue);
                                                 cryptoCoinBalanceEquivalence.setText(

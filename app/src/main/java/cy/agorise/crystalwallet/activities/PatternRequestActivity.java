@@ -71,7 +71,8 @@ public class PatternRequestActivity extends AppCompatActivity {
                                     public void onComplete(List<PatternLockView.Dot> pattern) {
                                         if (PasswordManager.checkPassword(patternEncrypted,patternToString(pattern))){
                                             if (CrystalSecurityMonitor.getInstance(null).is2ndFactorSet()) {
-                                                CrystalSecurityMonitor.getInstance(null).call2ndFactor(thisActivity);
+                                                //CrystalSecurityMonitor.getInstance(null).call2ndFactor(thisActivity);
+                                                thisActivity.finish();
                                             } else {
                                                 thisActivity.finish();
                                             }
