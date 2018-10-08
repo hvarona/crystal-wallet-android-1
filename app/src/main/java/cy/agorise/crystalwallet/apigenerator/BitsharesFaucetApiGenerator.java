@@ -219,7 +219,7 @@ public abstract class BitsharesFaucetApiGenerator {
 
     public interface IWebService {
         @Headers({"Content-Type: application/json"})
-        @POST("/faucet/api/v1/accounts")
+        @POST("/api/v1/accounts")
         Call<RegisterAccountResponse> getReg(@Body Map<String, HashMap> params);
 
     }
