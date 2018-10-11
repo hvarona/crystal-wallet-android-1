@@ -660,7 +660,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void beginScanQrCode(){
         //mScannerView = new ZXingScannerView(getContext());
         mScannerView.setFormats(listOf(BarcodeFormat.QR_CODE));
-        mScannerView.setAspectTolerance(0.5f);
+        mScannerView.setAspectTolerance(20f);
         mScannerView.setAutoFocus(true);
         mScannerView.setLaserColor(R.color.colorAccent);
         mScannerView.setMaskColor(R.color.colorAccent);

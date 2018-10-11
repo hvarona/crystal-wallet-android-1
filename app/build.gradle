@@ -17,8 +17,8 @@ android {
         applicationId "cy.agorise.crystalwallet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 3
-        versionName "0.3M.alpha"
+        versionCode 4
+        versionName "0.4M.alpha"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
