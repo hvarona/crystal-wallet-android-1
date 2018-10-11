@@ -57,17 +57,16 @@
     <Button
         android:id="@+id/btnCancel"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:background="@color/redColor"
-        android:text="@string/dialog_cancel"
+        android:layout_height="59dp"
+        android:layout_marginTop="22dp"
         android:theme="@style/RedButton"
+        android:text="@string/dialog_cancel"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/btnImportSeed"
+        app:layout_constraintEnd_toEndOf="@id/btnImportSeed"
         app:layout_constraintStart_toStartOf="@id/btnImportSeed"
-        app:layout_constraintEnd_toEndOf="@id/btnImportSeed"/>
+        app:layout_constraintTop_toBottomOf="@id/btnImportSeed" />
 
 </android.support.constraint.ConstraintLayout>
