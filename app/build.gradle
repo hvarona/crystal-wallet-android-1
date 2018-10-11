@@ -54,6 +54,9 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation( 'com.github.thekhaeng:pushdown-anim-click:1.1.1' ){
+        exclude group: 'com.android.support'
+    }
     implementation 'com.jaredrummler:material-spinner:1.2.5'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.1.60"
     //testCompile 'com.android.support.test:runner:1.0.1'
