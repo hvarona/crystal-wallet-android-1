@@ -69,66 +69,81 @@ public class CryptoCoinBalanceViewHolder extends RecyclerView.ViewHolder {
             this.clear();
         } else {
             //Retrieves the preferred currency selected by the user
-            LiveData<GeneralSetting> preferedCurrencySetting = CrystalDatabase.getAppDatabase(this.context).generalSettingDao().getByName(GeneralSetting.SETTING_NAME_PREFERRED_CURRENCY);
+            final LiveData<GeneralSetting> preferedCurrencySetting = CrystalDatabase.getAppDatabase(this.context).generalSettingDao().getByName(GeneralSetting.SETTING_NAME_PREFERRED_CURRENCY);
             //Retrieves the currency of this balance
-            final CryptoCurrency currencyFrom = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getById(balance.getCryptoCurrencyId());
-            //Sets the name and amount of the balance in the view
-            String balanceString = String.format("%.2f",balance.getBalance()/Math.pow(10,currencyFrom.getPrecision()));
-            cryptoCoinName.setText(currencyFrom.getName());
-            cryptoCoinBalance.setText(balanceString);
+            //final CryptoCurrency currencyFrom = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getById(balance.getCryptoCurrencyId());
+            LiveData<CryptoCurrency> currencyFromLD = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getLDById(balance.getCryptoCurrencyId());
 
-            //Observes the preferred currency of the user. If the user changes it, this will change the equivalent value
-            preferedCurrencySetting.observe((LifecycleOwner) this.context, new Observer<GeneralSetting>() {
+
+            currencyFromLD.observe((LifecycleOwner) this.context, new Observer<CryptoCurrency>() {
                 @Override
-                public void onChanged(@Nullable GeneralSetting generalSetting) {
-                    if (generalSetting != null) {
-                        //Gets the currency object of the preferred currency
-                        LiveData<CryptoCurrency> currencyToLiveData = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getLiveDataByName(generalSetting.getValue());
+                public void onChanged(@Nullable final CryptoCurrency currencyFrom) {
+                    //Sets the name and amount of the balance in the view
+                    String balanceString = String.format("%.2f",balance.getBalance()/Math.pow(10,currencyFrom.getPrecision()));
+                    cryptoCoinName.setText(currencyFrom.getName());
+                    cryptoCoinBalance.setText(balanceString);
 
-                        currencyToLiveData.observe((LifecycleOwner) context, new Observer<CryptoCurrency>() {
-                            @Override
-                            public void onChanged(@Nullable CryptoCurrency cryptoCurrency) {
-                                if (cryptoCurrency != null) {
-                                    CryptoCurrency currencyTo = cryptoCurrency;
+                    //Observes the preferred currency of the user. If the user changes it, this will change the equivalent value
+                    preferedCurrencySetting.observe((LifecycleOwner) context, new Observer<GeneralSetting>() {
+                        @Override
+                        public void onChanged(@Nullable GeneralSetting generalSetting) {
+                            if (generalSetting != null) {
+                                //Gets the currency object of the preferred currency
+                                LiveData<CryptoCurrency> currencyToLiveData = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getLiveDataByName(generalSetting.getValue());
 
-                                    //Retrieves the equivalent value of this balance using the "From" currency and the "To" currency
-                                    LiveData<CryptoCurrencyEquivalence> currencyEquivalenceLiveData = CrystalDatabase.getAppDatabase(context)
-                                            .cryptoCurrencyEquivalenceDao().getByFromTo(
-                                                    currencyTo.getId(),
-                                                    currencyFrom.getId()
+                                currencyToLiveData.observe((LifecycleOwner) context, new Observer<CryptoCurrency>() {
+                                    @Override
+                                    public void onChanged(@Nullable CryptoCurrency cryptoCurrency) {
+                                        if (cryptoCurrency != null) {
+                                            CryptoCurrency currencyTo = cryptoCurrency;
 
-                                            );
+                                            //Retrieves the equivalent value of this balance using the "From" currency and the "To" currency
+                                            LiveData<CryptoCurrencyEquivalence> currencyEquivalenceLiveData = CrystalDatabase.getAppDatabase(context)
+                                                    .cryptoCurrencyEquivalenceDao().getByFromTo(
+                                                            currencyTo.getId(),
+                                                            currencyFrom.getId()
 
-                                    //Observes the equivalent value. If the equivalent value changes, this will keep the value showed correct
-                                    currencyEquivalenceLiveData.observe((LifecycleOwner) context, new Observer<CryptoCurrencyEquivalence>() {
-                                        @Override
-                                        public void onChanged(@Nullable CryptoCurrencyEquivalence cryptoCurrencyEquivalence) {
-                                            if (cryptoCurrencyEquivalence != null) {
-                                                CryptoCurrency toCurrency = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getById(cryptoCurrencyEquivalence.getFromCurrencyId());
-                                                double equivalentValue = 0;
-                                                String equivalenceString = "";
-                                                if (cryptoCurrencyEquivalence.getValue() > 0) {
-                                                    equivalentValue = (balance.getBalance() / Math.pow(10, currencyFrom.getPrecision())) /
-                                                            (cryptoCurrencyEquivalence.getValue() / Math.pow(10, toCurrency.getPrecision()));
-                                                    equivalenceString = String.format(
-                                                            "%.2f",
-                                                            equivalentValue
                                                     );
-                                                } else {
-                                                    equivalentValue = 0;
-                                                    equivalenceString = "0";
-                                                }
 
-                                                cryptoNetBalanceViewHolder.setEquivalentBalance(balance,equivalentValue);
-                                                cryptoCoinBalanceEquivalence.setText(
-                                                        equivalenceString + " " + toCurrency.getName());
-                                            }
+                                            //Observes the equivalent value. If the equivalent value changes, this will keep the value showed correct
+                                            currencyEquivalenceLiveData.observe((LifecycleOwner) context, new Observer<CryptoCurrencyEquivalence>() {
+                                                @Override
+                                                public void onChanged(final @Nullable CryptoCurrencyEquivalence cryptoCurrencyEquivalence) {
+                                                    if (cryptoCurrencyEquivalence != null) {
+                                                        LiveData<CryptoCurrency> toCurrencyLD = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getLDById(cryptoCurrencyEquivalence.getFromCurrencyId());
+
+                                                        toCurrencyLD.observe((LifecycleOwner) context, new Observer<CryptoCurrency>() {
+                                                            @Override
+                                                            public void onChanged(@Nullable CryptoCurrency toCurrency) {
+
+                                                                double equivalentValue = 0;
+                                                                String equivalenceString = "";
+                                                                if (cryptoCurrencyEquivalence.getValue() > 0) {
+                                                                    equivalentValue = (balance.getBalance() / Math.pow(10, currencyFrom.getPrecision())) /
+                                                                            (cryptoCurrencyEquivalence.getValue() / Math.pow(10, toCurrency.getPrecision()));
+                                                                    equivalenceString = String.format(
+                                                                            "%.2f",
+                                                                            equivalentValue
+                                                                    );
+                                                                } else {
+                                                                    equivalentValue = 0;
+                                                                    equivalenceString = "0";
+                                                                }
+
+                                                                cryptoNetBalanceViewHolder.setEquivalentBalance(balance,equivalentValue);
+                                                                cryptoCoinBalanceEquivalence.setText(
+                                                                        equivalenceString + " " + toCurrency.getName());
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             });
         }
