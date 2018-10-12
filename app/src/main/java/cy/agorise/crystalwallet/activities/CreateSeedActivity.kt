@@ -4,11 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
+import com.thekhaeng.pushdownanim.PushDownAnim
 import com.vincent.filepicker.ToastUtil
 import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.dialogs.material.*
@@ -50,6 +52,14 @@ class CreateSeedActivity : CustomActivity() {
         this.fieldsValidator.add(tietPin)
         this.fieldsValidator.add(tietPinConfirmation)
         this.fieldsValidator.add(tietAccountName)
+
+        /*
+        *   Integration of library with button efects
+        * */
+        PushDownAnim.setPushDownAnimTo(btnCancel)
+                .setOnClickListener { cancel() }
+        PushDownAnim.setPushDownAnimTo(btnCreate)
+                .setOnClickListener { createSeed() }
 
         /*
         * Validations listener
