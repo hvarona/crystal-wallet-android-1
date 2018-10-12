@@ -18,10 +18,12 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.thekhaeng.pushdownanim.PushDownAnim;
 //import com.nicdahlquist.pngquant.LibPngQuant;
 
 import java.io.File;
@@ -73,6 +75,18 @@ public class AccountsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accounts);
         ButterKnife.bind(this);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(fabAddAccount)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        goToAddAccount();
+                    }
+
+                } );
 
         CryptoNetAccountListViewModel crytpoNetAccountListViewModel = ViewModelProviders.of(this).get(CryptoNetAccountListViewModel.class);
         LiveData<List<CryptoNetAccount>> accountData = crytpoNetAccountListViewModel.getCryptoNetAccounts();

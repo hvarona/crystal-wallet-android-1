@@ -57,10 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/linearlayout1"
             android:layout_marginTop="25dp"
+            android:theme="@style/BlueButton"
             android:layout_alignParentRight="true"
             android:text="@string/window_seed_copy"
-            android:textColor="#0099ff"
-            android:background="?android:attr/selectableItemBackground"/>
+            android:textColor="@color/white"/>
 
     </RelativeLayout>
 
