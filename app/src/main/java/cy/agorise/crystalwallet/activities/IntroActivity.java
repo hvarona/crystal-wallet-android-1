@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.thekhaeng.pushdownanim.PushDownAnim;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -68,6 +70,24 @@ public class IntroActivity extends CustomActivity {
         setContentView(R.layout.activity_intro);
 
         ButterKnife.bind(this);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnCreateAccount)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        createAccount();
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnImportAccount)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        importAccount();
+                    }
+                } );
 
         // Appbar animation
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
