@@ -15,10 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.thekhaeng.pushdownanim.PushDownAnim;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
@@ -71,6 +73,8 @@ public class GeneralSettingsFragment extends Fragment {
     Spinner spDisplayDateTime;
     @BindView (R.id.tvReceiveFundsSoundValue)
     TextView tvReceiveFundsSound;
+    @BindView (R.id.btnContact)
+    Button btnContact;
 
     public GeneralSettingsFragment() {
         this.spPreferredLanguageInitialized = false;
@@ -98,6 +102,17 @@ public class GeneralSettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_general_settings, container, false);
         ButterKnife.bind(this, v);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnContact)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+
+                    }
+                } );
 
         generalSettingListViewModel = ViewModelProviders.of(this).get(GeneralSettingListViewModel.class);
         generalSettingListLiveData = generalSettingListViewModel.getGeneralSettingList();
