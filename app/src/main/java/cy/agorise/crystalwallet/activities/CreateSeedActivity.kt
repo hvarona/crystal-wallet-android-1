@@ -320,7 +320,7 @@ class CreateSeedActivity : CustomActivity() {
     * */
     private fun enableCreate() {
         runOnUiThread(Runnable {
-            btnCreate?.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+            //btnCreate?.setBackgroundColor(resources.getColor(R.color.colorPrimary))
             btnCreate?.setEnabled(true)
         })
     }
@@ -331,7 +331,7 @@ class CreateSeedActivity : CustomActivity() {
     private fun disableCreate() {
         runOnUiThread(Runnable {
             btnCreate?.setEnabled(false)
-            btnCreate?.setBackground(resources.getDrawable(R.drawable.disable_style))
+            //btnCreate?.setBackground(resources.getDrawable(R.drawable.disable_style))
         })
     }
 }
