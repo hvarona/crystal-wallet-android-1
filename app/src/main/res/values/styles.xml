@@ -79,6 +79,11 @@
         <item name="colorControlHighlight">@color/colorPrimaryDark</item>
     </style>
 
+    <style name="WhiteButton" parent="BaseButton">
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlHighlight">@color/lightGray</item>
+    </style>
+
     <style name="RedButton" parent="BaseButton">
         <item name="colorAccent">@color/red</item>
         <item name="colorControlHighlight">@color/redColor</item>
