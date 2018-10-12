@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thekhaeng.pushdownanim.PushDownAnim;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -30,11 +32,12 @@ public class BackupSeedActivity extends AppCompatActivity {
 
     @BindView(R.id.tvBrainKey)
     TextView textfieldBrainkey;
-    @BindView(R.id.btnCancel)
+    @BindView(R.id.btnOK)
     Button btnOk;
     @BindView(R.id.btnCopy)
     Button btnCopy;
-
+    @BindView(R.id.btnCancel)
+    Button btnCancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,30 @@ public class BackupSeedActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnCancel)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        btnCancelClick();
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnOk)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        btnOkClick();
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnCopy)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        btnCopyClick();
+                    }
+                } );
         /*
         *   If comes from new account creation hide the cancel button
         * */
