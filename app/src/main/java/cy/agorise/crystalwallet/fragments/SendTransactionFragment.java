@@ -265,6 +265,13 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             List<CryptoNetAccount> cryptoNetAccounts = cryptoNetAccountListViewModel.getCryptoNetAccountList();
             CryptoNetAccountAdapter fromSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
 
+            /*
+            *   If only one account block the control
+            * */
+            if(cryptoNetAccounts.size()==1){
+                spFrom.setEnabled(false);
+            }
+
             spFrom.setAdapter(fromSpinnerAdapter);
             //spFrom.setSelection(0);
 
