@@ -7,7 +7,10 @@ import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
+import com.thekhaeng.pushdownanim.PushDownAnim;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +44,22 @@ public class AccountsSettingsFragment extends Fragment {
     @BindView(R.id.tvRemove)
     public  TextView tvRemove;
 
+    @BindView(R.id.btnUpgrade)
+    public Button btnUpgrade;
+
+    @BindView(R.id.btnImport)
+    public Button btnImport;
+
+    @BindView(R.id.btnRefresh)
+    public Button btnRefresh;
+
+    @BindView(R.id.btnRemove)
+    public Button btnRemove;
+
+
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,6 +71,36 @@ public class AccountsSettingsFragment extends Fragment {
         tvImport.setText(makeFirstWordsBold(getResources().getString(R.string.import_description)));
         tvRefresh.setText(makeFirstWordsBold(getResources().getString(R.string.refresh_description)));
         tvRemove.setText(makeFirstWordsBold(getResources().getString(R.string.remove_description)));
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnUpgrade)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnImport)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnRefresh)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnRemove)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                    }
+                } );
+
 
         return v;
     }
