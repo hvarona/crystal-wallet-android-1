@@ -90,33 +90,36 @@
 
         <LinearLayout
             android:id="@+id/linearlayoutButtons"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/tilAccountName"
+            android:orientation="horizontal"
             android:layout_marginTop="40dp">
 
             <Button
                 android:id="@+id/btnCancel"
-                android:layout_width="140dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginRight="5dp"
-                android:background="@color/redColor"
-                android:text="@string/cancel"
+                android:layout_weight="0.50"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:theme="@style/RedButton"
                 android:textColor="@color/white"
-                android:textStyle="bold" />
-
+                android:textSize="14sp"
+                android:text="@string/cancel" />
             <Button
                 android:id="@+id/btnImport"
-                android:layout_width="140dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
-                android:background="@color/colorPrimary"
+                android:layout_weight="0.50"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:theme="@style/BlueButton"
                 android:text="@string/create_wallet"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                android:textSize="14sp"
+                android:textColor="@color/white" />
 
         </LinearLayout>
 

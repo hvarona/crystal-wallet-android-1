@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.thekhaeng.pushdownanim.PushDownAnim;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,12 +61,33 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
     final Activity activity = this;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.import_seed);
 
         ButterKnife.bind(this);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnCancel)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        cancel();
+                    }
+                } );
+        PushDownAnim.setPushDownAnimTo(btnImport)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        importSeed();
+                    }
+                } );
 
         /*
         * Initially the button CREATE WALLET should be disabled
@@ -354,7 +378,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                btnImport.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                //btnImport.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 btnImport.setEnabled(true);
             }
         });
@@ -368,7 +392,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             @Override
             public void run() {
                 btnImport.setEnabled(false);
-                btnImport.setBackground(getDrawable(R.drawable.disable_style));
+                //btnImport.setBackground(getDrawable(R.drawable.disable_style));
             }
         });
     }
