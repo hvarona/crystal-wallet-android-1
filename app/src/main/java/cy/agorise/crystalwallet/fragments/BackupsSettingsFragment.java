@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thekhaeng.pushdownanim.PushDownAnim;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -84,6 +86,25 @@ public class BackupsSettingsFragment extends Fragment{
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_backups_settings, container, false);
         ButterKnife.bind(this, v);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnBinFile)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        makeBackupFile();
+                    }
+
+                } );
+        PushDownAnim.setPushDownAnimTo(btnBrainkey)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        btnBrainOnClick();
+                    }
+                } );
 
         tvBinFile.setText(makeFirstWordsBold(getResources().getString(R.string.bin_file_description)));
         tvBrainkey.setText(makeFirstWordsBold(getResources().getString(R.string.brainkey_description)));
