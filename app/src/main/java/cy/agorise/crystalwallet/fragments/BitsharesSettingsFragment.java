@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thekhaeng.pushdownanim.PushDownAnim;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
@@ -73,6 +74,9 @@ public class BitsharesSettingsFragment extends Fragment {
     GrapheneAccountInfo grapheneAccountInfo;
     GrapheneAccount grapheneAccount;
 
+
+
+
     public BitsharesSettingsFragment() {
         if (getArguments() != null) {
             long cryptoNetAcountId = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID", -1);
@@ -113,6 +117,17 @@ public class BitsharesSettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_bitshares_settings, container, false);
         ButterKnife.bind(this, v);
+
+        /*
+         *   Integration of library with button efects
+         * */
+        PushDownAnim.setPushDownAnimTo(btnUpgradeToLtm)
+                .setOnClickListener( new View.OnClickListener(){
+                    @Override
+                    public void onClick( View view ){
+                        upgradeAccountToLtm();
+                    }
+                } );
 
         initAlreadyLtm();
 
