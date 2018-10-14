@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,7 +77,10 @@ public class BackupSeedActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         boolean newAccount = b.getBoolean("newAccount");
         if(newAccount ){
-            btnOk.setVisibility(View.INVISIBLE);
+            ViewGroup layout = (ViewGroup) btnOk.getParent();
+            if(null!=layout) //for safety only  as you are doing onClick
+                layout.removeView(btnOk);
+            //btnOk.setVisibility(View.INVISIBLE);
         }
 
         long seedId = getIntent().getLongExtra("SEED_ID",-1);
