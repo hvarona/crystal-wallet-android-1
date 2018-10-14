@@ -1,10 +1,12 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
@@ -52,6 +55,11 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
 
     @BindView(R.id.btnOK)
     Button btnOK;
+
+    /*
+    * Validates the new typing for the patterns
+    * */
+    private boolean first = true;
 
     /*
     * Flag to check if validation of fields is correct
@@ -91,9 +99,68 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
         pinSecurityValidator = new PinSecurityValidator(this.getContext(), etNewPin, etConfirmPin);
         pinSecurityValidator.setListener(this);
 
+        /*
+         * If PIN is configured set some text
+         * */
+        final CrystalSecurityMonitor crystalSecurityMonitor = CrystalSecurityMonitor.getInstance(getActivity());
+        switch(CrystalSecurityMonitor.getInstance(getActivity()).actualSecurity()) {
+            case GeneralSetting.SETTING_PASSWORD:
+
+                if(etNewPin!=null && etConfirmPin!=null){
+                    etNewPin.setText("123456");
+                    etConfirmPin.setText("123456");
+                }
+
+                break;
+            case GeneralSetting.SETTING_PATTERN:
+                break;
+
+            default:
+
+        }
+
+        /*
+         * Focus in no where
+         * */
+        tvNewPinError.requestFocus();
+
         return v;
     }
 
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        first = true;
+
+        /*
+         * If PIN is configured set some text
+         * */
+        final CrystalSecurityMonitor crystalSecurityMonitor = CrystalSecurityMonitor.getInstance(getActivity());
+        switch(CrystalSecurityMonitor.getInstance(getActivity()).actualSecurity()) {
+            case GeneralSetting.SETTING_PASSWORD:
+
+                if(etNewPin!=null && etConfirmPin!=null){
+                    etNewPin.setText("123456");
+                    etConfirmPin.setText("123456");
+                }
+
+                break;
+            case GeneralSetting.SETTING_PATTERN:
+                break;
+
+            default:
+
+        }
+
+        /*
+         * Focus in no where
+         * */
+        if(getActivity()!=null){
+            tvNewPinError.requestFocus();
+        }
+    }
 
     @OnClick(R.id.btnOK)
     void okClic(final View view) {
@@ -144,6 +211,16 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
         }
     }
 
+    @OnFocusChange({R.id.etNewPin,R.id.etConfirmPin})
+    public void focusChangePIN(View view, boolean hasFocus){
+        if(hasFocus){
+            if(first){
+                first = false;
+                clearFields();
+            }
+        }
+    }
+
     @Override
     public void onValidationSucceeded(final ValidationField field) {
         final PinSecurityFragment fragment = this;
@@ -160,13 +237,16 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
                 if (pinSecurityValidator.isValid()){
                     //savePassword();
 
-                    //Now is valid
-                    valid = true;
+                    if(!first){
 
-                    /*
-                     *   Enable ok button to continue
-                     * */
-                    btnOK.setEnabled(true);
+                        //Now is valid
+                        valid = true;
+
+                        /*
+                         *   Enable ok button to continue
+                         * */
+                        btnOK.setEnabled(true);
+                    }
 
                 }
             }
@@ -174,22 +254,32 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
     }
 
     private void savePassword(){
-        CharSequence text = "Your password has been sucessfully changed!";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(getContext(), text, duration);
-        toast.show();
 
         savePassword(etNewPin.getText().toString());
 
+        CharSequence text = "Your password has been sucessfully changed!";
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(getContext(), text, duration);
+        toast.show();
 
-        clearFields();
+        etNewPin.setText("123456");
+        etConfirmPin.setText("123456");
+
+        first = true;
+
+        btnOK.setEnabled(false);
+
+        /*
+         * Focus in no where
+         * */
+        tvNewPinError.requestFocus();
     }
 
     public void savePassword(String password) {
         String passwordEncripted = PasswordManager.encriptPassword(password);
-        CrystalSecurityMonitor.getInstance(null).setPasswordSecurity(passwordEncripted);
-        CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
+        CrystalSecurityMonitor.getInstance(getActivity()).setPasswordSecurity(passwordEncripted);
+
+        //CrystalSecurityMonitor.getInstance(getActivity()).callPasswordRequest(this.getActivity());
     }
 
     @Override
