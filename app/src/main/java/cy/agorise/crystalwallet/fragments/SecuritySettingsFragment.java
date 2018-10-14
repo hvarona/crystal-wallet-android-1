@@ -86,7 +86,7 @@ public class SecuritySettingsFragment extends Fragment {
         securityPagerAdapter = new SecurityPagerAdapter(getChildFragmentManager());
         mPager.setAdapter(securityPagerAdapter);
 
-        switch(CrystalSecurityMonitor.getInstance(null).actualSecurity()) {
+        switch(CrystalSecurityMonitor.getInstance(getActivity()).actualSecurity()) {
             case GeneralSetting.SETTING_PASSWORD:
                 mPager.setCurrentItem(1);
                 break;
@@ -117,7 +117,7 @@ public class SecuritySettingsFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
+            //CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
         }
     }
 

@@ -111,7 +111,7 @@ public class IntroActivity extends CustomActivity {
             }
         });
 
-        this.getApplication().registerActivityLifecycleCallbacks(CrystalSecurityMonitor.getInstance(this));
+            //this.getApplication().registerActivityLifecycleCallbacks(CrystalSecurityMonitor.getInstance(this));
 
 
 
