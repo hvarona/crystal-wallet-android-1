@@ -36,4 +36,15 @@
         android:textColor="@color/red"
         android:layout_below="@+id/etConfirmPin" />
 
+    <Button
+        android:id="@+id/btnOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/WhiteButton"
+        android:text="@string/ok"
+        android:layout_below="@+id/etConfirmPin"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

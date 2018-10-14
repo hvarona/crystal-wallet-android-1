@@ -8,17 +8,25 @@ import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
+import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
+import cy.agorise.crystalwallet.dialogs.material.NegativeResponse;
+import cy.agorise.crystalwallet.dialogs.material.PositiveResponse;
+import cy.agorise.crystalwallet.dialogs.material.QuestionDialog;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
@@ -42,6 +50,14 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
     @BindView(R.id.tvConfirmPinError)
     TextView tvConfirmPinError;
 
+    @BindView(R.id.btnOK)
+    Button btnOK;
+
+    /*
+    * Flag to check if validation of fields is correct
+    * */
+    private boolean valid = false;
+
     GeneralSettingListViewModel generalSettingListViewModel;
     GeneralSetting passwordGeneralSetting;
     PinSecurityValidator pinSecurityValidator;
@@ -64,6 +80,11 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
         View v = inflater.inflate(R.layout.fragment_pin_security, container, false);
         ButterKnife.bind(this, v);
 
+        /*
+        *   Initially not enabled til it passes validations
+        * */
+        btnOK.setEnabled(false);
+
         generalSettingListViewModel = ViewModelProviders.of(this).get(GeneralSettingListViewModel.class);
         LiveData<List<GeneralSetting>> generalSettingsLiveData = generalSettingListViewModel.getGeneralSettingList();
 
@@ -71,6 +92,35 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
         pinSecurityValidator.setListener(this);
 
         return v;
+    }
+
+
+    @OnClick(R.id.btnOK)
+    void okClic(final View view) {
+
+        /*
+        * Only can continue if the fields are correctly validated
+        * */
+        if(valid){
+
+            /*
+             *   Question if continue or not
+             * */
+            final QuestionDialog questionDialog = new QuestionDialog(getActivity());
+            questionDialog.setText(getActivity().getString(R.string.question_continue));
+            questionDialog.setOnNegative(new NegativeResponse() {
+                @Override
+                public void onNegative(@NotNull DialogMaterial dialogMaterial) {
+                }
+            });
+            questionDialog.setOnPositive(new PositiveResponse() {
+                @Override
+                public void onPositive() {
+                    savePassword();
+                }
+            });
+            questionDialog.show();
+        }
     }
 
     @OnTextChanged(value = R.id.etNewPin,
@@ -108,19 +158,32 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
                 }
 
                 if (pinSecurityValidator.isValid()){
-                    CharSequence text = "Your password has been sucessfully changed!";
-                    int duration = Toast.LENGTH_SHORT;
+                    //savePassword();
 
-                    Toast toast = Toast.makeText(getContext(), text, duration);
-                    toast.show();
+                    //Now is valid
+                    valid = true;
 
-                    savePassword(etNewPin.getText().toString());
+                    /*
+                     *   Enable ok button to continue
+                     * */
+                    btnOK.setEnabled(true);
 
-
-                    clearFields();
                 }
             }
         });
+    }
+
+    private void savePassword(){
+        CharSequence text = "Your password has been sucessfully changed!";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(getContext(), text, duration);
+        toast.show();
+
+        savePassword(etNewPin.getText().toString());
+
+
+        clearFields();
     }
 
     public void savePassword(String password) {
@@ -131,6 +194,15 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
 
     @Override
     public void onValidationFailed(final ValidationField field) {
+
+        //Still false
+        valid = false;
+
+        /*
+         *   Disable til it passes validations
+         * */
+        btnOK.setEnabled(false);
+
         this.getActivity().runOnUiThread(new Runnable() {
 
             @Override

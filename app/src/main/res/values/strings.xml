@@ -369,6 +369,8 @@
     <string name="permission_denied_camera">Permission Denied. You cannot use the QR camera. Please allow this permission in App Settings.</string>
     <string name="permission_granted_camera">Great!! Now you can use the QR camera.</string>
 
+    <string name="question_continue">¿Are you sure to continue?</string>
+
     <string name="select">"Select</string>
     <string name="are_you_sure">"Are you sure?</string>
     <string name="is_already_added">is already added</string>
