@@ -108,6 +108,9 @@ public class IntroActivity extends CustomActivity {
             @Override
             public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceDestroyed");
+                //Log.d(TAG,"surfaceDestroyed");
+                mediaPlayer.stop();
+                mediaPlayer.release();
             }
         });
 

@@ -86,6 +86,8 @@ public class SettingsActivity extends AppCompatActivity{
             @Override
             public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
                 //Log.d(TAG,"surfaceDestroyed");
+                mediaPlayer.stop();
+                mediaPlayer.release();
             }
         });
 
