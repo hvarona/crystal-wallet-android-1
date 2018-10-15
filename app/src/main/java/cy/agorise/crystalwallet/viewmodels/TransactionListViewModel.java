@@ -3,19 +3,12 @@ package cy.agorise.crystalwallet.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 import android.arch.paging.DataSource;
 import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.LivePagedListProvider;
 import android.arch.paging.PagedList;
-import android.content.Context;
-
-import java.util.List;
 
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCoinTransactionExtended;
-import cy.agorise.crystalwallet.views.TransactionListView;
 
 /**
  * Created by Henry Varona on 12/9/2017.

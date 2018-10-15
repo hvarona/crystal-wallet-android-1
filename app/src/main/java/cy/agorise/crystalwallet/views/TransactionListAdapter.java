@@ -34,7 +34,7 @@ public class TransactionListAdapter extends PagedListAdapter<CryptoCoinTransacti
 
     private Fragment fragment;
 
-    TransactionListAdapter(Fragment fragment) {
+    public TransactionListAdapter(Fragment fragment) {
         super(CryptoCoinTransactionExtended.DIFF_CALLBACK);
         this.fragment = fragment;
     }

@@ -5,12 +5,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +27,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCoinTransactionExtended;
 import cy.agorise.crystalwallet.viewmodels.TransactionListViewModel;
-import cy.agorise.crystalwallet.views.TransactionListView;
+import cy.agorise.crystalwallet.views.TransactionListAdapter;
 import cy.agorise.crystalwallet.views.TransactionOrderSpinnerAdapter;
 
 public class TransactionsFragment extends Fragment {
-
-    @BindView(R.id.vTransactionListView)
-    TransactionListView transactionListView;
 
     @BindView(R.id.spTransactionsOrder)
     Spinner spTransactionsOrder;
@@ -43,13 +40,17 @@ public class TransactionsFragment extends Fragment {
     @BindView(R.id.etTransactionSearch)
     EditText etTransactionSearch;
 
-    @BindView(R.id.tvNobalances)
-    public TextView tvNobalances;
+    @BindView(R.id.tvNoTransactions)
+    TextView tvNoTransactions;
 
-    RecyclerView balanceRecyclerView;
+    @BindView(R.id.rvTransactions)
+    RecyclerView rvTransactions;
+
     FloatingActionButton fabSend;
     FloatingActionButton fabReceive;
 
+
+    TransactionListAdapter transactionListAdapter;
     TransactionListViewModel transactionListViewModel;
     LiveData<PagedList<CryptoCoinTransactionExtended>> transactionsLiveData;
 
@@ -70,20 +71,22 @@ public class TransactionsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_transactions, container, false);
         ButterKnife.bind(this, view);
 
-        // Gets the Balance RecyclerView
-        balanceRecyclerView = view.findViewById(R.id.transactionListView);
+        rvTransactions.setLayoutManager(new LinearLayoutManager(getContext()));
+        transactionListAdapter = new TransactionListAdapter(this);
+        rvTransactions.setAdapter(transactionListAdapter);
+
         fabSend = getActivity().findViewById(R.id.fabSend);
         fabReceive = getActivity().findViewById(R.id.fabReceive);
 
         // TODO move this listener to the activity, to make this fragment reusable
         // Adds listener to the RecyclerView to show and hide buttons at the bottom of the screen
-        balanceRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvTransactions.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx,int dy){
                 super.onScrolled(recyclerView, dx, dy);
@@ -123,19 +126,16 @@ public class TransactionsFragment extends Fragment {
         transactionListViewModel.initTransactionList(orderSelected.getField(),etTransactionSearch.getText().toString());
         transactionsLiveData = transactionListViewModel.getTransactionList();
 
-        final Fragment fragment = this;
         transactionsLiveData.observe(this, new Observer<PagedList<CryptoCoinTransactionExtended>>() {
             @Override
-            public void onChanged(@Nullable PagedList<CryptoCoinTransactionExtended> cryptoCoinTransactions) {
-                Log.i("Transactions","Transactions have change! Count:"+cryptoCoinTransactions.size());
-                transactionListView.setData(cryptoCoinTransactions, fragment);
+            public void onChanged(@Nullable PagedList<CryptoCoinTransactionExtended> transactions) {
+                transactionListAdapter.submitList(transactions);
 
-                final int size = cryptoCoinTransactions.size();
-                if(size==0){
-                    tvNobalances.setVisibility(View.VISIBLE);
+                if(transactions != null && transactions.size() > 0){
+                    tvNoTransactions.setVisibility(View.INVISIBLE);
                 }
                 else{
-                    tvNobalances.setVisibility(View.INVISIBLE);
+                    tvNoTransactions.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -148,7 +148,7 @@ public class TransactionsFragment extends Fragment {
     }
 
     public void initTransactionsOrderSpinner(){
-        List<TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem> spinnerValues = new ArrayList<TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem>();
+        List<TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem> spinnerValues = new ArrayList<>();
         spinnerValues.add(new TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem("date","Date",0,false));
         spinnerValues.add(new TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem("amount","Amount",0,false));
         spinnerValues.add(new TransactionOrderSpinnerAdapter.TransactionOrderSpinnerItem("is_input","In/Out",0,false));

@@ -2,48 +2,23 @@ package cy.agorise.crystalwallet.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.thekhaeng.pushdownanim.PushDownAnim;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
-import cy.agorise.crystalwallet.application.CrystalApplication;
-import cy.agorise.crystalwallet.dao.CrystalDatabase;
-import cy.agorise.crystalwallet.dialogs.material.ToastIt;
-import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.fragments.ImportAccountOptionsFragment;
-import cy.agorise.crystalwallet.models.AccountSeed;
-import cy.agorise.crystalwallet.models.CryptoCoinBalance;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
-import cy.agorise.crystalwallet.models.CryptoNetAccount;
-import cy.agorise.crystalwallet.models.GeneralSetting;
-import cy.agorise.crystalwallet.network.CryptoNetManager;
-import cy.agorise.crystalwallet.randomdatagenerators.RandomCryptoCoinBalanceGenerator;
-import cy.agorise.crystalwallet.randomdatagenerators.RandomCryptoNetAccountGenerator;
-import cy.agorise.crystalwallet.randomdatagenerators.RandomSeedGenerator;
-import cy.agorise.crystalwallet.randomdatagenerators.RandomTransactionsGenerator;
-import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
-import cy.agorise.crystalwallet.viewmodels.TransactionListViewModel;
-import cy.agorise.crystalwallet.views.TransactionListView;
 
 public class IntroActivity extends CustomActivity {
 

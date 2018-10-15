@@ -28,8 +28,8 @@ public class ContactsFragment extends Fragment {
     @BindView(R.id.rvContacts)
     RecyclerView rvContacts;
 
-    @BindView(R.id.tvNobalances)
-    public TextView tvNobalances;
+    @BindView(R.id.tvNoContacts)
+    TextView tvNoContacts;
 
     ContactListAdapter adapter;
 
@@ -91,12 +91,11 @@ public class ContactsFragment extends Fragment {
             public void onChanged(@Nullable PagedList<Contact> contacts) {
                 adapter.submitList(contacts);
 
-                final int size = contacts.size();
-                if(size==0){
-                    tvNobalances.setVisibility(View.VISIBLE);
+                if(contacts != null && contacts.size() > 0){
+                    tvNoContacts.setVisibility(View.INVISIBLE);
                 }
                 else{
-                    tvNobalances.setVisibility(View.INVISIBLE);
+                    tvNoContacts.setVisibility(View.VISIBLE);
                 }
             }
         });
