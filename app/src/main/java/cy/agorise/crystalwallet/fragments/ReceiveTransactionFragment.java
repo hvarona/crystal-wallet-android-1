@@ -9,6 +9,7 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -94,6 +95,8 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
     private ArrayList<LineItem> invoiceItems;
 
     private FloatingActionButton fabReceive;
+
+    private AsyncTask qrCodeTask;
 
     public static ReceiveTransactionFragment newInstance(long cryptoNetAccountId) {
         ReceiveTransactionFragment f = new ReceiveTransactionFragment();
@@ -323,12 +326,33 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
         this.invoice.setTo(grapheneAccountSelected.getName());
         this.invoice.setCurrency(this.cryptoCurrency.getName());
 
-        try {
-            Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
-            ivQrCode.setImageBitmap(bitmap);
-        } catch (WriterException e) {
-            Log.e("ReceiveFragment", "Error creating QrCode");
+        if (this.qrCodeTask != null){
+            this.qrCodeTask.cancel(true);
         }
+
+        this.qrCodeTask = new AsyncTask<Object, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Object... voids) {
+                try {
+                    final Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
+
+                    if (!this.isCancelled()) {
+                        ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ivQrCode.setImageBitmap(bitmap);
+                            }
+                        });
+                    }
+                } catch (WriterException e) {
+                    Log.e("ReceiveFragment", "Error creating QrCode");
+                }
+                return null;
+            }
+        };
+
+        this.qrCodeTask.execute(null,null,null);
     }
 
     Bitmap textToImageEncode(String Value) throws WriterException {
