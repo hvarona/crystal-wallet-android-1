@@ -3,11 +3,11 @@ package cy.agorise.crystalwallet.fragments;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,22 +19,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.models.CryptoNetBalance;
-import cy.agorise.crystalwallet.viewmodels.CryptoCoinBalanceListViewModel;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetBalanceListViewModel;
-import cy.agorise.crystalwallet.views.CryptoNetBalanceListView;
+import cy.agorise.crystalwallet.views.CryptoNetBalanceListAdapter;
 
 public class BalanceFragment extends Fragment {
+
     CryptoNetBalanceListViewModel cryptoNetBalanceListViewModel;
 
-    @BindView(R.id.vCryptoNetBalanceListView)
-    CryptoNetBalanceListView vCryptoNetBalanceListView;
+    @BindView(R.id.tvNoBalances)
+    TextView tvNoBalances;
 
-    @BindView(R.id.tvNobalances)
-    public TextView tvNobalances;
+    @BindView(R.id.rvBalances)
+    RecyclerView rvBalances;
 
-
-
-
+    CryptoNetBalanceListAdapter balancesAdapter;
 
     public BalanceFragment() {
         // Required empty public constructor
@@ -53,29 +51,32 @@ public class BalanceFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_balance, container, false);
         ButterKnife.bind(this, view);
 
-        cryptoNetBalanceListViewModel = ViewModelProviders.of(this).get(CryptoNetBalanceListViewModel.class);
-        LiveData<List<CryptoNetBalance>> cryptoNetBalanceData = cryptoNetBalanceListViewModel.getCryptoNetBalanceList();
-        vCryptoNetBalanceListView.setData(null, this);
+        // Configure RecyclerView and its adapter
+        rvBalances.setLayoutManager(new LinearLayoutManager(getContext()));
+        balancesAdapter = new CryptoNetBalanceListAdapter(this);
+        rvBalances.setAdapter(balancesAdapter);
 
-        final Fragment fragment = this;
+        //Prevents the UI from an infinite scrolling of balances
+        rvBalances.setNestedScrollingEnabled(false);
+
+        cryptoNetBalanceListViewModel = ViewModelProviders.of(this).get(CryptoNetBalanceListViewModel.class);
+        final LiveData<List<CryptoNetBalance>> cryptoNetBalanceData = cryptoNetBalanceListViewModel.getCryptoNetBalanceList();
 
         cryptoNetBalanceData.observe(this, new Observer<List<CryptoNetBalance>>() {
             @Override
             public void onChanged(List<CryptoNetBalance> cryptoNetBalances) {
-                vCryptoNetBalanceListView.setData(cryptoNetBalances, fragment);
+                balancesAdapter.submitList(cryptoNetBalances);
 
-                final int size = cryptoNetBalances.size();
-                if(size==0){
-                    tvNobalances.setVisibility(View.VISIBLE);
-                }
-                else{
-                    tvNobalances.setVisibility(View.INVISIBLE);
+                if(cryptoNetBalances != null && cryptoNetBalances.size() > 0) {
+                    tvNoBalances.setVisibility(View.INVISIBLE);
+                } else {
+                    tvNoBalances.setVisibility(View.VISIBLE);
                 }
             }
         });

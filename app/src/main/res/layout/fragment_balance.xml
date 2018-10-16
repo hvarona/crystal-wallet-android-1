@@ -1,23 +1,25 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cy.agorise.crystalwallet.fragments.BalanceFragment">
 
     <TextView
-        android:id="@+id/tvNobalances"
+        android:id="@+id/tvNoBalances"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/You_dont_have_balances"
         android:textColor="@color/gray"
         android:layout_marginTop="190dp"
-        android:layout_marginLeft="90dp"
-        android:textSize="15dp" />
+        android:layout_marginStart="100dp"
+        android:textSize="15sp" />
 
-    <cy.agorise.crystalwallet.views.CryptoNetBalanceListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvBalances"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:id="@+id/vCryptoNetBalanceListView" />
+        tools:listitem="@layout/balance_list_item"
+        tools:itemCount="1"/>
 
 </FrameLayout>

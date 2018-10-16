@@ -1,6 +1,7 @@
 package cy.agorise.crystalwallet.views;
 
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.view.LayoutInflater;
@@ -22,22 +23,23 @@ public class CryptoNetBalanceListAdapter extends ListAdapter<CryptoNetBalance, C
     /*
      * A LifecycleOwner fragment that will be used to call the ViewModelProviders
      */
-    Fragment fragment;
+    private Fragment fragment;
 
     public CryptoNetBalanceListAdapter(Fragment fragment) {
         super(CryptoNetBalance.DIFF_CALLBACK);
         this.fragment = fragment;
     }
 
+    @NonNull
     @Override
-    public CryptoNetBalanceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CryptoNetBalanceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.balance_list_item,parent,false);
 
         return new CryptoNetBalanceViewHolder(v, fragment);
     }
 
     @Override
-    public void onBindViewHolder(CryptoNetBalanceViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CryptoNetBalanceViewHolder holder, int position) {
         CryptoNetBalance balance = getItem(position);
         if (balance != null) {
             holder.bindTo(balance);

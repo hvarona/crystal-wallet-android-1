@@ -1,15 +1,12 @@
 package cy.agorise.crystalwallet.views;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -21,16 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.activities.SendTransactionActivity;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.fragments.ReceiveTransactionFragment;
 import cy.agorise.crystalwallet.fragments.SendTransactionFragment;
 import cy.agorise.crystalwallet.models.CryptoCoinBalance;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
-import cy.agorise.crystalwallet.models.CryptoCurrencyEquivalence;
 import cy.agorise.crystalwallet.models.CryptoNetBalance;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.viewmodels.CryptoCoinBalanceListViewModel;
@@ -45,7 +37,7 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
     /*
      * the view holding the icon of the crypto net
      */
-    ImageView cryptoNetIcon;
+    private ImageView cryptoNetIcon;
 
     /*
      * the view holding the name of the crypto net
@@ -97,12 +89,12 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
         this.cryptoNetAccountId = -1;
 
         //TODO: use ButterKnife to load the views
-        cryptoNetIcon = (ImageView) itemView.findViewById(R.id.ivCryptoNetIcon);
-        cryptoNetName = (TextView) itemView.findViewById(R.id.tvCryptoNetName);
-        cryptoNetEquivalentTotal = (TextView) itemView.findViewById(R.id.tvCryptoNetEquivalentTotal);
-        cryptoCoinBalanceListView = (CryptoCoinBalanceListView) itemView.findViewById(R.id.cryptoCoinBalancesListView);
-        btnSendFromThisAccount = (Button) itemView.findViewById(R.id.btnSendFromThisAccount);
-        btnReceiveToThisAccount = (Button) itemView.findViewById(R.id.btnReceiveWithThisAccount);
+        cryptoNetIcon = itemView.findViewById(R.id.ivCryptoNetIcon);
+        cryptoNetName = itemView.findViewById(R.id.tvCryptoNetName);
+        cryptoNetEquivalentTotal = itemView.findViewById(R.id.tvCryptoNetEquivalentTotal);
+        cryptoCoinBalanceListView = itemView.findViewById(R.id.cryptoCoinBalancesListView);
+        btnSendFromThisAccount = itemView.findViewById(R.id.btnSendFromThisAccount);
+        btnReceiveToThisAccount = itemView.findViewById(R.id.btnReceiveWithThisAccount);
 
         //Setting the send button
         btnSendFromThisAccount.setOnClickListener(new View.OnClickListener() {
@@ -211,9 +203,9 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
             this.cryptoNetAccountId = balance.getAccountId();
 
             /*
-            * The first letter should be in mayus
+            * The first letter should be in Uppercase
             * */
-            final String crypto = balance.getCryptoNet().getLabel().toString().toLowerCase();
+            final String crypto = balance.getCryptoNet().getLabel().toLowerCase();
             final String upperString = crypto.substring(0,1).toUpperCase() + crypto.substring(1);
 
             cryptoNetName.setText(upperString);
@@ -225,7 +217,7 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
 
             cryptoCoinBalanceListView.setData(null, this);
 
-            //Observes the livedata, so any of its changes on the database will be reloaded here
+            //Observes the LiveData, so any of its changes on the database will be reloaded here
             cryptoCoinBalanceData.observe((LifecycleOwner)this.itemView.getContext(), new Observer<List<CryptoCoinBalance>>() {
                 @Override
                 public void onChanged(List<CryptoCoinBalance> cryptoCoinBalances) {

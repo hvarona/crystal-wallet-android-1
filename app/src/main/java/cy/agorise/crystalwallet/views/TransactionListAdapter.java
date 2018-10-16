@@ -1,24 +1,13 @@
 package cy.agorise.crystalwallet.views;
 
-
-import android.arch.lifecycle.LiveData;
 import android.arch.paging.PagedListAdapter;
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.TextView;
-
-import java.util.List;
 
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCoinTransactionExtended;
 
 /**
@@ -39,8 +28,9 @@ public class TransactionListAdapter extends PagedListAdapter<CryptoCoinTransacti
         this.fragment = fragment;
     }
 
+    @NonNull
     @Override
-    public TransactionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.transaction_list_item,parent,false);
 
 
@@ -48,7 +38,7 @@ public class TransactionListAdapter extends PagedListAdapter<CryptoCoinTransacti
     }
 
     @Override
-    public void onBindViewHolder(TransactionViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         CryptoCoinTransactionExtended transaction = getItem(position);
         if (transaction != null) {
             holder.bindTo(transaction);

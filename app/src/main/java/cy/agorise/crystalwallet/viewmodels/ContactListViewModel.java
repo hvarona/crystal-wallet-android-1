@@ -9,7 +9,6 @@ import android.arch.paging.PagedList;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.models.Contact;
-import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 
 /**
  * Created by Henry Varona on 1/17/2018.
