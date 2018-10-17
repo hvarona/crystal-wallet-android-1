@@ -3,6 +3,7 @@ package cy.agorise.crystalwallet.activities;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -10,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thekhaeng.pushdownanim.PushDownAnim;
@@ -35,6 +37,10 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
     @BindView(R.id.etPin)
     EditText etPin;
+
+    @BindView(R.id.txtErrorPIN)
+    TextView txtErrorPIN;
+
     //@BindView(R.id.tvPinError)
     //TextView tvPinError;
 
@@ -120,6 +126,11 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 else{
                     disableCreate();
                 }
+
+                /*
+                * Validate that PINs are equals
+                * */
+                validatePINS();
             }
         });
         etPinConfirmation.addTextChangedListener(new TextWatcher() {
@@ -145,6 +156,11 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 else{
                     disableCreate();
                 }
+
+                /*
+                 * Validate that PINs are equals
+                 * */
+                validatePINS();
             }
         });
         etSeedWords.addTextChangedListener(new TextWatcher() {
@@ -201,6 +217,26 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         accountSeedViewModel = ViewModelProviders.of(this).get(AccountSeedViewModel.class);
         importSeedValidator = new ImportSeedValidator(this.getApplicationContext(),etPin,etPinConfirmation,etAccountName,etSeedWords);
         importSeedValidator.setListener(this);
+    }
+
+    /*
+    * Validate that PINs are equals
+    * */
+    private void validatePINS(){
+
+        final String pin = etPin.getText().toString().trim();
+        final String confirmoPIN = etPinConfirmation.getText().toString().trim();
+        if(!pin.isEmpty() && !confirmoPIN.isEmpty()){
+            if(pin.compareTo(confirmoPIN)!=0){
+                txtErrorPIN.setVisibility(View.VISIBLE);
+            }
+            else{
+                txtErrorPIN.setVisibility(View.INVISIBLE);
+            }
+        }
+        else{
+            txtErrorPIN.setVisibility(View.INVISIBLE);
+        }
     }
 
 
