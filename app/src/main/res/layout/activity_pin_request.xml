@@ -45,4 +45,16 @@
         android:textSize="18dp"
         android:layout_alignParentRight="true"/>
 
+    <TextView
+        android:id="@+id/txtBadtry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnOK"
+        android:text="@string/wrong_pin_wait"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/red"
+        android:layout_marginRight="10dp"
+        android:visibility="invisible"/>
+
 </RelativeLayout>

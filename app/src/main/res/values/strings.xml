@@ -206,6 +206,8 @@
     <string name="fee_capital">Fee</string>
     <string name="ok">OK</string>
 
+    <string name="wrong_pin_wait">Wrong PIN you have to wait %% seconds ...</string>
+
     <string name="loading">Loading...</string>
     <string name="pay_to">Pay to</string>
 
