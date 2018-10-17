@@ -1,8 +1,10 @@
 package cy.agorise.crystalwallet.activities;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,8 @@ import android.widget.Toast;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,8 +96,34 @@ public class PinRequestActivity extends AppCompatActivity {
             }
         }
         else{
-            Toast.makeText(getBaseContext(),this.getResources().getString(R.string.invalid_pin),
-                    Toast.LENGTH_SHORT).show();
+
+            /*
+            *   Set in red the rext and reset the password after a period of time
+            * */
+            final Activity activity = this;
+            etPassword.setTextColor(Color.RED);
+            final Timer t = new Timer();
+            //Set the schedule function and rate
+            t.scheduleAtFixedRate(new TimerTask() {
+
+                                      @Override
+                                      public void run() {
+                                          //Called each time when 1000 milliseconds (1 second) (the period parameter)
+                                          activity.runOnUiThread(new Runnable() {
+                                              @Override
+                                              public void run() {
+                                                  etPassword.setText("");
+                                                  etPassword.setTextColor(Color.WHITE);
+                                                  t.cancel();
+                                              }
+                                          });
+                                      }
+
+                                  },
+            //Set how long before to start calling the TimerTask (in milliseconds)
+                    500,
+            //Set the amount of time between each execution (in milliseconds)
+                    500);
         }
     }
 
