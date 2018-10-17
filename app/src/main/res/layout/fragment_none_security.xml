@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="0dp"
+        android:id="@+id/txtFirst"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="It is recommended to use some kind of security."
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_centerInParent="true"/>
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/btnOK"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/txtFirst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/WhiteButton"
+        android:textColor="@color/black"
+        android:text="@string/ok"/>
+
+</RelativeLayout>

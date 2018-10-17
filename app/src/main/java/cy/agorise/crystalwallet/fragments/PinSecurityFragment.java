@@ -117,6 +117,11 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
 
             default:
 
+                if(etNewPin!=null && etConfirmPin!=null) {
+                    etNewPin.setText("");
+                    etConfirmPin.setText("");
+                }
+
         }
 
         /*
@@ -152,6 +157,10 @@ public class PinSecurityFragment extends Fragment implements UIValidatorListener
 
             default:
 
+                if(etNewPin!=null && etConfirmPin!=null) {
+                    etNewPin.setText("");
+                    etConfirmPin.setText("");
+                }
         }
 
         /*
