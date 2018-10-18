@@ -71,7 +71,7 @@ public class CryptoCoinBalanceViewHolder extends RecyclerView.ViewHolder {
             //Retrieves the preferred currency selected by the user
             final LiveData<GeneralSetting> preferedCurrencySetting = CrystalDatabase.getAppDatabase(this.context).generalSettingDao().getByName(GeneralSetting.SETTING_NAME_PREFERRED_CURRENCY);
             //Retrieves the currency of this balance
-            //final CryptoCurrency currencyFrom = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getById(balance.getCryptoCurrencyId());
+            //final CryptoCurrency currencyFrom = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getByIdLiveData(balance.getCryptoCurrencyId());
             LiveData<CryptoCurrency> currencyFromLD = CrystalDatabase.getAppDatabase(context).cryptoCurrencyDao().getLDById(balance.getCryptoCurrencyId());
 
 

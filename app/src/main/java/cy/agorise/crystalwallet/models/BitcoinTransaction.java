@@ -60,6 +60,9 @@ public class BitcoinTransaction {
     @ColumnInfo(name="confirmations")
     protected int confirmations;
 
+    public BitcoinTransaction() {
+    }
+
     public BitcoinTransaction(long cryptoCoinTransactionId, String txId, long block, long fee, int confirmations) {
         this.cryptoCoinTransactionId = cryptoCoinTransactionId;
         this.txId = txId;

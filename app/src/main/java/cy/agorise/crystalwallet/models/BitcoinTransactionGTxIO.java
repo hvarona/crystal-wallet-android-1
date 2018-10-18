@@ -47,6 +47,18 @@ public class BitcoinTransactionGTxIO {
     @ColumnInfo(name="is_output")
     protected boolean isOutput;
 
+    @ColumnInfo(name="amount")
+    protected long amount;
+
+    @ColumnInfo(name="script_hex")
+    protected String scriptHex;
+
+    @ColumnInfo(name="original_txid")
+    protected String originalTxId;
+
+    public BitcoinTransactionGTxIO() {
+    }
+
     public BitcoinTransactionGTxIO(long bitcoinTransactionId, int index, String address, boolean isOutput) {
         this.bitcoinTransactionId = bitcoinTransactionId;
         this.index = index;
@@ -84,5 +96,29 @@ public class BitcoinTransactionGTxIO {
 
     public void setOutput(boolean output) {
         isOutput = output;
+    }
+
+    public long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(long amount) {
+        this.amount = amount;
+    }
+
+    public String getScriptHex() {
+        return scriptHex;
+    }
+
+    public void setScriptHex(String scriptHex) {
+        this.scriptHex = scriptHex;
+    }
+
+    public String getOriginalTxId() {
+        return originalTxId;
+    }
+
+    public void setOriginalTxId(String originalTxId) {
+        this.originalTxId = originalTxId;
     }
 }

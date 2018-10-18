@@ -2,14 +2,10 @@ package cy.agorise.crystalwallet.activities;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 
@@ -47,7 +43,7 @@ public class CryptoCoinTransactionReceiptActivity extends AppCompatActivity {
 
         if (this.cryptoCoinTransactionId != -1) {
             db = CrystalDatabase.getAppDatabase(this);
-            this.cryptoCoinTransactionLiveData = db.transactionDao().getById(this.cryptoCoinTransactionId);
+            this.cryptoCoinTransactionLiveData = db.transactionDao().getByIdLiveData(this.cryptoCoinTransactionId);
 
             this.cryptoCoinTransactionLiveData.observe(this, new Observer<CryptoCoinTransaction>() {
                 @Override

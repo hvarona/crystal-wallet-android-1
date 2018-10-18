@@ -51,7 +51,10 @@ public interface TransactionDao {
     List<CryptoCoinTransaction> getByIdAccount(long idAccount);
 
     @Query("SELECT * FROM crypto_coin_transaction WHERE id = :id")
-    LiveData<CryptoCoinTransaction> getById(long id);
+    LiveData<CryptoCoinTransaction> getByIdLiveData(long id);
+
+    @Query("SELECT * FROM crypto_coin_transaction WHERE id = :id")
+    CryptoCoinTransaction getById(long id);
 
     @Query("SELECT * FROM crypto_coin_transaction WHERE date = :date and 'from' = :from and 'to' = :to and amount = :amount ")
     CryptoCoinTransaction getByTransaction(Date date, String from, String to, long amount);

@@ -20,19 +20,17 @@ import java.util.List;
 import cy.agorise.crystalwallet.apigenerator.ApiRequest;
 import cy.agorise.crystalwallet.apigenerator.ApiRequestListener;
 import cy.agorise.crystalwallet.apigenerator.InsightApiGenerator;
-import cy.agorise.crystalwallet.apigenerator.insightapi.BroadcastTransaction;
-import cy.agorise.crystalwallet.apigenerator.insightapi.GetTransactionData;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Txi;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vin;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vout;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.models.BitcoinTransaction;
+import cy.agorise.crystalwallet.models.BitcoinTransactionGTxIO;
+import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.models.GTxIO;
-import cy.agorise.crystalwallet.models.GeneralCoinAccount;
 import cy.agorise.crystalwallet.models.GeneralCoinAddress;
-import cy.agorise.crystalwallet.models.GeneralTransaction;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
 import cy.agorise.crystalwallet.requestmanagers.GeneralAccountSendRequest;
@@ -96,69 +94,69 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
      */
     public void processTxi(Txi txi){
         CrystalDatabase db = CrystalDatabase.getAppDatabase(this.context);
-        BitcoinTransaction btTransaction = db.bitcoinTransactionDao().getByTxid(txi.txid);
-        if(btTransaction != null){
-            btTransaction.setConfirmations(txi.confirmations);
-            db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction);
+        List<BitcoinTransaction> btTransactions = db.bitcoinTransactionDao().getTransactionsByTxid(txi.txid);
+        if(!btTransactions.isEmpty()){
+            for(BitcoinTransaction btTransaction : btTransactions) {
+                btTransaction.setConfirmations(txi.confirmations);
+                CryptoCoinTransaction ccTransaction = db.transactionDao().getById(btTransaction.getCryptoCoinTransactionId());
+                if (!ccTransaction.isConfirmed() && btTransaction.getConfirmations() >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
+                    ccTransaction.setConfirmed(true);
+                    db.transactionDao().insertTransaction(ccTransaction);
+                }
+
+                db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction);
+            }
         }else {
+            /*List<CryptoCoinTransaction> ccTransactions = new ArrayList();
+            btTransactions = new ArrayList();*/ //TODO transactions involving multiples accounts
+            CryptoCoinTransaction ccTransaction = new CryptoCoinTransaction();
+            BitcoinTransaction btTransaction = new BitcoinTransaction();
+            btTransaction.setTxId(txi.txid);
+            btTransaction.setBlock(txi.blockheight);
+            btTransaction.setFee((long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision())));
+            btTransaction.setConfirmations(txi.confirmations);
+            ccTransaction.setDate(new Date(txi.time * 1000));
+            if(txi.txlock || txi.confirmations >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
+                ccTransaction.setConfirmed(true);
+            }else{
+                ccTransaction.setConfirmed(false);
+            }
+
+            ccTransaction.setInput(false);
+
+            long amount = 0;
 
 
-            GeneralTransaction transaction = new GeneralTransaction();
             //transaction.setAccount(this.mAccount);
-            transaction.setTxid(txi.txid);
-            transaction.setBlock(txi.blockheight);
-            transaction.setDate(new Date(txi.time * 1000));
-            transaction.setFee((long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision())));
-            transaction.setConfirm(txi.confirmations);
-            transaction.setType(cryptoCoin);
-            transaction.setBlockHeight(txi.blockheight);
-
+            //transaction.setType(cryptoCoin);
+            List<BitcoinTransactionGTxIO> gtxios = new ArrayList();
             for (Vin vin : txi.vin) {
-                GTxIO input = new GTxIO();
-                input.setAmount((long) (vin.value * Math.pow(10, cryptoCoin.getPrecision())));
-                input.setTransaction(transaction);
-                input.setOut(true);
-                input.setType(cryptoCoin);
+                BitcoinTransactionGTxIO input = new BitcoinTransactionGTxIO();
                 String addr = vin.addr;
-                input.setAddressString(addr);
+                input.setAddress(addr);
                 input.setIndex(vin.n);
+                input.setOutput(true);
+                input.setAmount((long) (vin.value * Math.pow(10, cryptoCoin.getPrecision())));
+                input.setOriginalTxId(vin.txid);
                 input.setScriptHex(vin.scriptSig.hex);
-                input.setOriginalTxid(vin.txid);
-            /*for (GeneralCoinAddress address : this.mAddresses) {
-                if (address.getAddressString(this.mAccount.getNetworkParam()).equals(addr)) {
-                    input.setAddress(address);
-                    tempAccount = address.getAccount();
 
-                    if (!address.hasTransactionOutput(input, this.mAccount.getNetworkParam())) {
-                        address.getTransactionOutput().add(input);
-                    }
-                                    }
-            }*/
-                transaction.getTxInputs().add(input);
+                gtxios.add(input);
+
             }
 
             for (Vout vout : txi.vout) {
                 if (vout.scriptPubKey.addresses == null || vout.scriptPubKey.addresses.length <= 0) {
-                    // The address is null, this must be a memo
-                    String hex = vout.scriptPubKey.hex;
-                    int opReturnIndex = hex.indexOf("6a");
-                    if (opReturnIndex >= 0) {
-                        byte[] memoBytes = new byte[Integer.parseInt(hex.substring(opReturnIndex + 2, opReturnIndex + 4), 16)];
-                        for (int i = 0; i < memoBytes.length; i++) {
-                            memoBytes[i] = Byte.parseByte(hex.substring(opReturnIndex + 4 + (i * 2), opReturnIndex + 6 + (i * 2)), 16);
-                        }
-                        transaction.setMemo(new String(memoBytes));
-                    }
+
                 } else {
-                    GTxIO output = new GTxIO();
-                    output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
-                    output.setTransaction(transaction);
-                    output.setOut(false);
-                    output.setType(cryptoCoin);
+                    BitcoinTransactionGTxIO output = new BitcoinTransactionGTxIO();
                     String addr = vout.scriptPubKey.addresses[0];
-                    output.setAddressString(addr);
+                    output.setAddress(addr);
                     output.setIndex(vout.n);
+                    output.setOutput(false);
+                    output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
                     output.setScriptHex(vout.scriptPubKey.hex);
+
+                    gtxios.add(output);
                 /*for (GeneralCoinAddress address : this.mAddresses) {
                     if (address.getAddressString(this.mAccount.getNetworkParam()).equals(addr)) {
                         output.setAddress(address);
@@ -170,12 +168,14 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                         changed = true;
                     }
                 }*/
-
-                    transaction.getTxOutputs().add(output);
                 }
             }
-            if (txi.txlock && txi.confirmations < cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
-                transaction.setConfirm(cryptoCoin.getCryptoNet().getConfirmationsNeeded());
+
+            long ccId = db.transactionDao().insertTransaction(ccTransaction)[0];
+            btTransaction.setCryptoCoinTransactionId(ccId);
+            long btId = db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction)[0];
+            for(BitcoinTransactionGTxIO gtxio : gtxios){
+                gtxio.setBitcoinTransactionId(btId);
             }
             //TODO database
                 /*SCWallDatabase db = new SCWallDatabase(this.mContext);

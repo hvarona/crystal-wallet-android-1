@@ -6,8 +6,11 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
+import java.util.List;
+
 import cy.agorise.crystalwallet.models.BitcoinTransaction;
 import cy.agorise.crystalwallet.models.BitcoinTransactionExtended;
+import cy.agorise.crystalwallet.models.BitcoinTransactionGTxIO;
 
 /**
  * Created by Henry Varona on 10/02/2018.
@@ -19,8 +22,11 @@ public interface BitcoinTransactionDao {
     LiveData<BitcoinTransactionExtended> getAll();
 
     @Query("SELECT * FROM bitcoin_transaction bt WHERE bt.tx_id = :txid")
-    BitcoinTransaction getByTxid(String txid);
+    List<BitcoinTransaction> getTransactionsByTxid(String txid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertBitcoinTransaction(BitcoinTransaction... transactions);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public long[] insertBitcoinTransactionGTxIO(BitcoinTransactionGTxIO... transactiongtxios);
 }
