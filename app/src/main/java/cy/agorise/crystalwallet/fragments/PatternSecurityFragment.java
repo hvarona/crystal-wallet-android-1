@@ -3,6 +3,7 @@ package cy.agorise.crystalwallet.fragments;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,8 @@ import com.andrognito.patternlockview.PatternLockView;
 import com.andrognito.patternlockview.listener.PatternLockViewListener;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,7 +90,8 @@ public class PatternSecurityFragment extends Fragment {
     public void showNewPatternUI(){
         removePatternListener();
         patternLockView.clearPattern();
-        tvPatternText.setText("Enter new pattern");
+        tvPatternText.setTextColor(Color.WHITE);
+        tvPatternText.setText(getActivity().getResources().getString(R.string.Enter_new_pattern));
 
         actualPatternListener = new PatternLockViewListener() {
             @Override
@@ -118,7 +122,7 @@ public class PatternSecurityFragment extends Fragment {
         removePatternListener();
         patternLockView.clearPattern();
         patternLockView.requestFocus();
-        tvPatternText.setText("Confirm new pattern");
+        tvPatternText.setText(getActivity().getResources().getString(R.string.Confirm_new_pattern));
 
         actualPatternListener = new PatternLockViewListener() {
             @Override
@@ -137,6 +141,9 @@ public class PatternSecurityFragment extends Fragment {
                     savePattern(patternEntered);
                     showNewPatternUI();
                 }
+                else{
+                    resetPattern();
+                }
             }
 
             @Override
@@ -147,9 +154,39 @@ public class PatternSecurityFragment extends Fragment {
         patternLockView.addPatternLockListener(actualPatternListener);
     }
 
+    private void resetPattern(){
+
+        /*
+        * Show error
+        * */
+        tvPatternText.setText(getActivity().getResources().getString(R.string.Incorrect_pattern));
+        tvPatternText.setTextColor(Color.RED);
+        final Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+
+                                  @Override
+                                  public void run() {
+
+                                      getActivity().runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+
+                                              t.cancel();
+                                              showNewPatternUI();
+                                          }
+                                      });
+                                  }
+
+                              },
+                //Set how long before to start calling the TimerTask (in milliseconds)
+                1000,
+                //Set the amount of time between each execution (in milliseconds)
+                1000);
+    }
+
     public void savePattern(String pattern){
         String patternEncripted = PasswordManager.encriptPassword(pattern);
         CrystalSecurityMonitor.getInstance(null).setPatternEncrypted(patternEncripted);
-        CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
+        //CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
     }
 }
