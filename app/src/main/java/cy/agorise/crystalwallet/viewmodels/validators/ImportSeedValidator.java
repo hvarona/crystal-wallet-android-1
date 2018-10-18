@@ -18,7 +18,7 @@ public class ImportSeedValidator extends UIValidator {
         super(context);
         this.addField(new PinValidationField(pinEdit));
         this.addField(new PinConfirmationValidationField(pinEdit,pinConfirmationEdit));
-        this.addField(new BitsharesAccountNameValidationField(bitsharesAccountNameEdit));
-        this.addField(new BitsharesAccountMnemonicValidationField(mnemonicEdit,bitsharesAccountNameEdit));
+        //this.addField(new BitsharesAccountNameValidationField(bitsharesAccountNameEdit));
+        //this.addField(new BitsharesAccountMnemonicValidationField(mnemonicEdit,bitsharesAccountNameEdit));
     }
 }

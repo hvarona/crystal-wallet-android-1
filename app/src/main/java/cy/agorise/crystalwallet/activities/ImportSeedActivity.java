@@ -41,6 +41,9 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
     @BindView(R.id.txtErrorPIN)
     TextView txtErrorPIN;
 
+    @BindView(R.id.txtErrorAccount)
+    TextView txtErrorAccount;
+
     //@BindView(R.id.tvPinError)
     //TextView tvPinError;
 
@@ -186,6 +189,11 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 else{
                     disableCreate();
                 }
+
+                /*
+                * Hide error field
+                * */
+                txtErrorAccount.setVisibility(View.INVISIBLE);
             }
         });
         etAccountName.addTextChangedListener(new TextWatcher() {
@@ -272,8 +280,6 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
     void afterSeedWordsChanged(Editable editable) {
         this.importSeedValidator.validate();
     }
-
-
     @OnTextChanged(value = R.id.etAccountName,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void afterAccountNameChanged(Editable editable) {
@@ -298,72 +304,87 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             final CrystalLoading crystalLoading = new CrystalLoading(activity);
             crystalLoading.show();
 
-            final ValidateImportBitsharesAccountRequest validatorRequest =
-                    new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
-
-            validatorRequest.setListener(new CryptoNetInfoRequestListener() {
+            /*
+            * Validate mnemonic with the server
+            * */
+            final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),this);
+            request.setListener(new CryptoNetInfoRequestListener() {
                 @Override
                 public void onCarryOut() {
+                    if(request.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)){
 
-                    /*
-                    * Hide the loading dialog
-                    * */
-                    crystalLoading.dismiss();
+                        //Correct
 
-                    if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
-                        String errorText = "An error ocurred attempting to import the account";
+                        /*
+                        * Final service connection
+                        * */
+                        finalStep(crystalLoading);
 
-                        switch (validatorRequest.getStatus()){
-                            case PETITION_FAILED:
-                            case NO_INTERNET:
-                            case NO_SERVER_CONNECTION:
-                                errorText = "There was an error with the connection. Try again later";
-                                break;
-                            case ACCOUNT_DOESNT_EXIST:
-                                errorText = "The account doesn't exists";
-                                break;
-                            case BAD_SEED:
-                                errorText = "The seed is not valid";
-                                break;
-                            case NO_ACCOUNT_DATA:
-                                errorText = "The account doesn't have any data";
-                                break;
-                        }
+                    }
+                    else{
 
-                        Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
-                    } else {
-                        Intent intent = new Intent(thisActivity, BoardActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+                        crystalLoading.dismiss();
+
+                        txtErrorAccount.setVisibility(View.VISIBLE);
+                        txtErrorAccount.setText(activity.getResources().getString(R.string.error_invalid_account));
                     }
                 }
             });
-            /*CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
+            CryptoNetInfoRequests.getInstance().addRequest(request);
 
-            AccountSeed seed = new AccountSeed();
 
-            //TODO verify if words are already in the db
-            //TODO check if name has been asigned to other seed
-            seed.setMasterSeed(etSeedWords.getText().toString());
-            seed.setName(etAccountName.getText().toString());
-            seed.setType(SeedType.BRAINKEY);
-
-            accountSeedViewModel.addSeed(seed);
-
-            CryptoNetAccountViewModel cryptoNetAccountViewModel = ViewModelProviders.of(this).get(CryptoNetAccountViewModel.class);
-            GrapheneAccountInfoViewModel grapheneAccountInfoViewModel = ViewModelProviders.of(this).get(GrapheneAccountInfoViewModel.class);
-            CryptoNetAccount cryptoNetAccount = new CryptoNetAccount();
-            cryptoNetAccount.setSeedId(seed.getId());
-            cryptoNetAccount.setAccountIndex(0);
-            cryptoNetAccount.setCryptoNet(cy.agorise.crystalwallet.enums.CryptoNet.BITSHARES);
-            cryptoNetAccountViewModel.addCryptoNetAccount(cryptoNetAccount);
-            GrapheneAccountInfo grapheneAccountInfo = new GrapheneAccountInfo(cryptoNetAccount.getId());
-            grapheneAccountInfo.setName(etAccountName.getText().toString());
-            grapheneAccountInfoViewModel.addGrapheneAccountInfo(grapheneAccountInfo);
-
-            this.finish();*/
-            CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
         }
+    }
+
+
+
+
+    private void finalStep(final CrystalLoading crystalLoading){
+
+        final ImportSeedActivity thisActivity = this;
+
+        final ValidateImportBitsharesAccountRequest validatorRequest =
+                new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
+
+        validatorRequest.setListener(new CryptoNetInfoRequestListener() {
+            @Override
+            public void onCarryOut() {
+
+                /*
+                 * Hide the loading dialog
+                 * */
+                crystalLoading.dismiss();
+
+                if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
+                    String errorText = "An error ocurred attempting to import the account";
+
+                    switch (validatorRequest.getStatus()){
+                        case PETITION_FAILED:
+                        case NO_INTERNET:
+                        case NO_SERVER_CONNECTION:
+                            errorText = "There was an error with the connection. Try again later";
+                            break;
+                        case ACCOUNT_DOESNT_EXIST:
+                            errorText = "The account doesn't exists";
+                            break;
+                        case BAD_SEED:
+                            errorText = "The seed is not valid";
+                            break;
+                        case NO_ACCOUNT_DATA:
+                            errorText = "The account doesn't have any data";
+                            break;
+                    }
+
+                    Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
+                } else {
+                    Intent intent = new Intent(thisActivity, BoardActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        CryptoNetInfoRequests.getInstance().addRequest(validatorRequest);
     }
 
     @Override
