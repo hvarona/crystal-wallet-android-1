@@ -16,12 +16,19 @@ import android.widget.Toast;
 
 import com.thekhaeng.pushdownanim.PushDownAnim;
 
+import org.jetbrains.annotations.NotNull;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalLoading;
+import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
+import cy.agorise.crystalwallet.dialogs.material.NegativeResponse;
+import cy.agorise.crystalwallet.dialogs.material.PositiveResponse;
+import cy.agorise.crystalwallet.dialogs.material.QuestionDialog;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
@@ -297,42 +304,57 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
         if (this.importSeedValidator.isValid()) {
 
-
             /*
-            * Loading dialog
-            * */
-            final CrystalLoading crystalLoading = new CrystalLoading(activity);
-            crystalLoading.show();
-
-            /*
-            * Validate mnemonic with the server
-            * */
-            final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),this);
-            request.setListener(new CryptoNetInfoRequestListener() {
+             * Question if continue
+             * */
+            final QuestionDialog questionDialog = new QuestionDialog(activity);
+            questionDialog.setText(activity.getString(R.string.question_continue));
+            questionDialog.setOnNegative(new NegativeResponse() {
                 @Override
-                public void onCarryOut() {
-                    if(request.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)){
-
-                        //Correct
-
-                        /*
-                        * Final service connection
-                        * */
-                        finalStep(crystalLoading);
-
-                    }
-                    else{
-
-                        crystalLoading.dismiss();
-
-                        txtErrorAccount.setVisibility(View.VISIBLE);
-                        txtErrorAccount.setText(activity.getResources().getString(R.string.error_invalid_account));
-                    }
+                public void onNegative(@NotNull DialogMaterial dialogMaterial) {
                 }
             });
-            CryptoNetInfoRequests.getInstance().addRequest(request);
+            questionDialog.setOnPositive(new PositiveResponse() {
+                @Override
+                public void onPositive() {
 
+                    /*
+                     * Loading dialog
+                     * */
+                    final CrystalLoading crystalLoading = new CrystalLoading(activity);
+                    crystalLoading.show();
 
+                    /*
+                     * Validate mnemonic with the server
+                     * */
+                    final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),activity);
+                    request.setListener(new CryptoNetInfoRequestListener() {
+                        @Override
+                        public void onCarryOut() {
+                            if(request.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)){
+
+                                //Correct
+
+                                /*
+                                 * Final service connection
+                                 * */
+                                finalStep(crystalLoading);
+
+                            }
+                            else{
+
+                                crystalLoading.dismiss();
+
+                                txtErrorAccount.setVisibility(View.VISIBLE);
+                                txtErrorAccount.setText(activity.getResources().getString(R.string.error_invalid_account));
+                            }
+                        }
+                    });
+                    CryptoNetInfoRequests.getInstance().addRequest(request);
+
+                }
+            });
+            questionDialog.show();
         }
     }
 
