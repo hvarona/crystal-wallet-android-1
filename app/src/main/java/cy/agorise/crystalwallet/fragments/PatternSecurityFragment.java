@@ -139,7 +139,6 @@ public class PatternSecurityFragment extends Fragment {
             public void onComplete(List<PatternLockView.Dot> pattern) {
                 if (patternEntered.equals(patternToString(pattern))){
                     savePattern(patternEntered);
-                    showNewPatternUI();
                 }
                 else{
                     resetPattern();
@@ -188,5 +187,32 @@ public class PatternSecurityFragment extends Fragment {
         String patternEncripted = PasswordManager.encriptPassword(pattern);
         CrystalSecurityMonitor.getInstance(null).setPatternEncrypted(patternEncripted);
         //CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
+
+        /*
+         * Show success
+         * */
+        tvPatternText.setText(getActivity().getResources().getString(R.string.Pattern_set_correctly));
+        tvPatternText.setTextColor(Color.GREEN);
+        final Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+
+                                  @Override
+                                  public void run() {
+
+                                      getActivity().runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+
+                                              t.cancel();
+                                              showNewPatternUI();
+                                          }
+                                      });
+                                  }
+
+                              },
+                //Set how long before to start calling the TimerTask (in milliseconds)
+                1000,
+                //Set the amount of time between each execution (in milliseconds)
+                1000);
     }
 }

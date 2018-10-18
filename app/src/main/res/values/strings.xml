@@ -78,6 +78,8 @@
     <string name="Enter_new_pattern">Enter new pattern</string>
     <string name="Incorrect_pattern">Incorrect pattern</string>
 
+    <string name="Pattern_set_correctly">Pattern set correctly</string>
+
     <string name="Confirm_new_pattern">Confirm new pattern</string>
 
     <string name="error_invalid_account">Invalid account, please check your brain key for typing errors</string>
