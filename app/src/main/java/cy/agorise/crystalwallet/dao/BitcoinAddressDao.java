@@ -22,6 +22,9 @@ public interface BitcoinAddressDao {
     @Query("SELECT COUNT(*) FROM bitcoin_address ba WHERE ba.address = :address")
     Boolean addressExists(String address);
 
+    @Query("SELECT * FROM bitcoin_address ba WHERE ba.address = :address")
+    BitcoinAddress getdadress(String address);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertBitcoinAddresses(BitcoinAddress... addresses);
 }
