@@ -1,18 +1,24 @@
 package cy.agorise.crystalwallet.activities;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.andrognito.patternlockview.PatternLockView;
 import com.andrognito.patternlockview.listener.PatternLockViewListener;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,7 +30,14 @@ import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
 
 public class PatternRequestActivity extends AppCompatActivity {
+
     private String patternEncrypted;
+
+    @BindView(R.id.tvPatternText)
+    TextView tvPatternText;
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -33,6 +46,7 @@ public class PatternRequestActivity extends AppCompatActivity {
 
     @BindView(R.id.patternLockView)
     PatternLockView patternLockView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +91,7 @@ public class PatternRequestActivity extends AppCompatActivity {
                                                 thisActivity.finish();
                                             }
                                         } else {
-                                            patternLockView.clearPattern();
-                                            patternLockView.requestFocus();
+                                            incorrect();
                                         }
                                     }
 
@@ -94,6 +107,41 @@ public class PatternRequestActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void incorrect(){
+
+        /*
+         * Show error
+         * */
+        final Activity activity = this;
+        tvPatternText.setText(activity.getResources().getString(R.string.Incorrect_pattern));
+        tvPatternText.setTextColor(Color.RED);
+        tvPatternText.setVisibility(View.VISIBLE);
+        final Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+
+                                  @Override
+                                  public void run() {
+
+                                      activity.runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+
+                                              t.cancel();
+                                              tvPatternText.setVisibility(View.INVISIBLE);
+                                              patternLockView.clearPattern();
+                                              patternLockView.requestFocus();
+
+                                          }
+                                      });
+                                  }
+
+                              },
+                //Set how long before to start calling the TimerTask (in milliseconds)
+                1000,
+                //Set the amount of time between each execution (in milliseconds)
+                1000);
     }
 
     public String patternToString(List<PatternLockView.Dot> pattern){

@@ -5,6 +5,15 @@
     android:orientation="vertical"
     android:background="@drawable/gradient">
 
+    <TextView
+        android:id="@+id/tvPatternText"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        android:layout_marginTop="25dp"/>
+
     <com.andrognito.patternlockview.PatternLockView
         android:id="@+id/patternLockView"
         android:layout_width="280dp"

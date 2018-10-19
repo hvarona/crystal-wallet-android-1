@@ -72,7 +72,7 @@
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etSeedWords"
                 android:layout_width="330dp"
-                android:layout_height="120dp"
+                android:layout_height="100dp"
                 android:hint="@string/Seed"
                 android:maxLength="255"
                 android:inputType="textMultiLine" />
@@ -99,15 +99,27 @@
 
         </android.support.design.widget.TextInputLayout>
 
+        <TextView
+            android:id="@+id/txtErrorAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tilAccountName"
+            android:textColor="@color/red"
+            android:textSize="14sp"
+            android:text="@string/error_invalid_account"
+            android:layout_marginLeft="30dp"
+            android:visibility="invisible"
+            android:layout_marginTop="5dp"/>
+
 
         <LinearLayout
             android:id="@+id/linearlayoutButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_below="@+id/tilAccountName"
+            android:layout_below="@+id/txtErrorAccount"
             android:orientation="horizontal"
-            android:layout_marginTop="40dp">
+            android:layout_marginTop="10dp">
 
             <Button
                 android:id="@+id/btnCancel"
