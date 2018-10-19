@@ -3,7 +3,7 @@ package cy.agorise.crystalwallet.requestmanagers;
 import android.content.Context;
 
 import cy.agorise.crystalwallet.enums.CryptoCoin;
-import cy.agorise.crystalwallet.models.GeneralCoinAccount;
+import cy.agorise.crystalwallet.models.CryptoNetAccount;
 
 public class GeneralAccountSendRequest extends CryptoNetInfoRequest {
     /**
@@ -23,7 +23,7 @@ public class GeneralAccountSendRequest extends CryptoNetInfoRequest {
     // The app context
     private Context mContext;
     //The soruce Account
-    private GeneralCoinAccount mAccount;
+    private CryptoNetAccount mAccount;
     // The destination account address
     private String mToAccount;
     // The amount of the transaction
@@ -33,7 +33,7 @@ public class GeneralAccountSendRequest extends CryptoNetInfoRequest {
     // The state of this request
     private StatusCode status = StatusCode.NOT_STARTED;
 
-    public GeneralAccountSendRequest(CryptoCoin coin, Context context, GeneralCoinAccount account, String toAccount, long amount, String memo) {
+    public GeneralAccountSendRequest(CryptoCoin coin, Context context, CryptoNetAccount account, String toAccount, long amount, String memo) {
         super(coin);
         this.mContext = context;
         this.mAccount = account;
@@ -42,7 +42,7 @@ public class GeneralAccountSendRequest extends CryptoNetInfoRequest {
         this.mMemo = memo;
     }
 
-    public GeneralAccountSendRequest(CryptoCoin coin, Context context, GeneralCoinAccount account, String toAccount, long amount) {
+    public GeneralAccountSendRequest(CryptoCoin coin, Context context, CryptoNetAccount account, String toAccount, long amount) {
         this(coin,context,account,toAccount,amount,null);
 
     }
@@ -51,7 +51,7 @@ public class GeneralAccountSendRequest extends CryptoNetInfoRequest {
         return mContext;
     }
 
-    public GeneralCoinAccount getAccount() {
+    public CryptoNetAccount getAccount() {
         return mAccount;
     }
 

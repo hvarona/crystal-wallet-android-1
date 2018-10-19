@@ -66,7 +66,7 @@ public class CryptoCoinTransaction {
      * The id of the account assoiciated, this is used for the foreign key definition
      */
     @ColumnInfo(name="account_id")
-    protected long accountId;
+    protected long accountId = -1;
     /**
      * The amount of asset is moved in this transaction
      */

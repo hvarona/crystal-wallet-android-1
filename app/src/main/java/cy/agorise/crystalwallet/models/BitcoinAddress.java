@@ -55,6 +55,9 @@ public class BitcoinAddress {
         this.address = address;
     }
 
+    public BitcoinAddress() {
+    }
+
     public long getAccountId() {
         return accountId;
     }
