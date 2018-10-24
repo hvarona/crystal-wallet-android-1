@@ -21,4 +21,15 @@
         android:layout_centerInParent="true"
         android:background="@drawable/gradient"/>
 
+    <TextView
+        android:id="@+id/txtBadtry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patternLockView"
+        android:text="@string/wrong_pin_wait"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/red"
+        android:visibility="invisible"/>
+
 </RelativeLayout>

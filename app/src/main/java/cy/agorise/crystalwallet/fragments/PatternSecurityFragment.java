@@ -193,8 +193,8 @@ public class PatternSecurityFragment extends Fragment {
          * */
         tvPatternText.setText(getActivity().getResources().getString(R.string.Pattern_set_correctly));
         tvPatternText.setTextColor(Color.GREEN);
-        final Timer t = new Timer();
-        t.scheduleAtFixedRate(new TimerTask() {
+        final Timer t_ = new Timer();
+        t_.scheduleAtFixedRate(new TimerTask() {
 
                                   @Override
                                   public void run() {
@@ -203,7 +203,7 @@ public class PatternSecurityFragment extends Fragment {
                                           @Override
                                           public void run() {
 
-                                              t.cancel();
+                                              t_.cancel();
                                               showNewPatternUI();
                                           }
                                       });
