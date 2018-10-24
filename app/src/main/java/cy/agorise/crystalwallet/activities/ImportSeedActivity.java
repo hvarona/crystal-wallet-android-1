@@ -3,7 +3,6 @@ package cy.agorise.crystalwallet.activities;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.thekhaeng.pushdownanim.PushDownAnim;
 
@@ -23,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalLoading;
 import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
 import cy.agorise.crystalwallet.dialogs.material.NegativeResponse;
@@ -77,6 +74,11 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
     final Activity activity = this;
 
+    /*
+    * Flag to check correct PIN equality
+    * */
+    private boolean pinsOK = false;
+
 
 
 
@@ -128,19 +130,19 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             public void afterTextChanged(Editable s) {
 
                 /*
+                 * Validate that PINs are equals
+                 * */
+                validatePINS();
+
+                /*
                  * If all is ready to continue enable the button, contrarie case disable it
                  * */
-                if(allFieldsAreFill()){
+                if(allFieldsAreOK()){
                     enableCreate();
                 }
                 else{
                     disableCreate();
                 }
-
-                /*
-                * Validate that PINs are equals
-                * */
-                validatePINS();
             }
         });
         etPinConfirmation.addTextChangedListener(new TextWatcher() {
@@ -158,19 +160,19 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             public void afterTextChanged(Editable s) {
 
                 /*
+                 * Validate that PINs are equals
+                 * */
+                validatePINS();
+
+                /*
                  * If all is ready to continue enable the button, contrarie case disable it
                  * */
-                if(allFieldsAreFill()){
+                if(allFieldsAreOK()){
                     enableCreate();
                 }
                 else{
                     disableCreate();
                 }
-
-                /*
-                 * Validate that PINs are equals
-                 * */
-                validatePINS();
             }
         });
         etSeedWords.addTextChangedListener(new TextWatcher() {
@@ -188,9 +190,14 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             public void afterTextChanged(Editable s) {
 
                 /*
+                 * Validate that PINs are equals
+                 * */
+                validatePINS();
+
+                /*
                  * If all is ready to continue enable the button, contrarie case disable it
                  * */
-                if(allFieldsAreFill()){
+                if(allFieldsAreOK()){
                     enableCreate();
                 }
                 else{
@@ -200,7 +207,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 /*
                 * Hide error field
                 * */
-                txtErrorAccount.setVisibility(View.INVISIBLE);
+                clearErrors();
             }
         });
         etAccountName.addTextChangedListener(new TextWatcher() {
@@ -218,9 +225,14 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             public void afterTextChanged(Editable s) {
 
                 /*
+                 * Validate that PINs are equals
+                 * */
+                validatePINS();
+
+                /*
                  * If all is ready to continue enable the button, contrarie case disable it
                  * */
-                if(allFieldsAreFill()){
+                if(allFieldsAreOK()){
                     enableCreate();
                 }
                 else{
@@ -234,6 +246,13 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         importSeedValidator.setListener(this);
     }
 
+
+    private void clearErrors(){
+        txtErrorPIN.setVisibility(View.INVISIBLE);
+        txtErrorAccount.setVisibility(View.INVISIBLE);
+    }
+
+
     /*
     * Validate that PINs are equals
     * */
@@ -243,29 +262,34 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         final String confirmoPIN = etPinConfirmation.getText().toString().trim();
         if(!pin.isEmpty() && !confirmoPIN.isEmpty()){
             if(pin.compareTo(confirmoPIN)!=0){
+                pinsOK = false;
                 txtErrorPIN.setVisibility(View.VISIBLE);
             }
             else{
-                txtErrorPIN.setVisibility(View.INVISIBLE);
+                pinsOK = true;
+                clearErrors();
             }
         }
         else{
-            txtErrorPIN.setVisibility(View.INVISIBLE);
+            pinsOK = false;
+            clearErrors();
         }
     }
 
 
     /*
-    *   Method to validate if all the fields are fill
+    *   Method to validate if all the fields are fill and correctly
     * */
-    private boolean allFieldsAreFill(){
+    private boolean allFieldsAreOK(){
 
         boolean complete = false;
         if( etPin.getText().toString().trim().compareTo("")!=0 &&
             etPinConfirmation.getText().toString().trim().compareTo("")!=0 &&
                 etSeedWords.getText().toString().trim().compareTo("")!=0 &&
                 etAccountName.getText().toString().trim().compareTo("")!=0){
-            complete = true;
+            if(pinsOK){
+                complete = true;
+            }
         }
         return complete;
     }
@@ -325,9 +349,14 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                     crystalLoading.show();
 
                     /*
+                     * Final service connection
+                     * */
+                    finalStep(crystalLoading);
+
+                    /*
                      * Validate mnemonic with the server
                      * */
-                    final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),activity);
+                    /*final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),activity);
                     request.setListener(new CryptoNetInfoRequestListener() {
                         @Override
                         public void onCarryOut() {
@@ -335,9 +364,6 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
                                 //Correct
 
-                                /*
-                                 * Final service connection
-                                 * */
                                 finalStep(crystalLoading);
 
                             }
@@ -350,7 +376,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                             }
                         }
                     });
-                    CryptoNetInfoRequests.getInstance().addRequest(request);
+                    CryptoNetInfoRequests.getInstance().addRequest(request);*/
 
                 }
             });
@@ -378,26 +404,57 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 crystalLoading.dismiss();
 
                 if (!validatorRequest.getStatus().equals(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED)) {
-                    String errorText = "An error ocurred attempting to import the account";
 
                     switch (validatorRequest.getStatus()){
                         case PETITION_FAILED:
                         case NO_INTERNET:
                         case NO_SERVER_CONNECTION:
-                            errorText = "There was an error with the connection. Try again later";
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    txtErrorAccount.setText(activity.getResources().getString(R.string.NO_SERVER_CONNECTION));
+                                }
+                            });
                             break;
                         case ACCOUNT_DOESNT_EXIST:
-                            errorText = "The account doesn't exists";
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    txtErrorAccount.setText(activity.getResources().getString(R.string.ACCOUNT_DOESNT_EXIST));
+                                }
+                            });
                             break;
                         case BAD_SEED:
-                            errorText = "The seed is not valid";
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    txtErrorAccount.setText(activity.getResources().getString(R.string.BAD_SEED));
+                                }
+                            });
                             break;
                         case NO_ACCOUNT_DATA:
-                            errorText = "The account doesn't have any data";
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    txtErrorAccount.setText(activity.getResources().getString(R.string.NO_ACCOUNT_DATA));
+                                }
+                            });
                             break;
+
+                            default:
+                                txtErrorAccount.setText(activity.getResources().getString(R.string.ERROR_UNRECOGNIZABLE));
+
                     }
 
-                    Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            txtErrorAccount.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    //Toast.makeText(thisActivity.getApplicationContext(),errorText,Toast.LENGTH_LONG).show();
+
                 } else {
                     Intent intent = new Intent(thisActivity, BoardActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
