@@ -31,6 +31,9 @@ public interface BitcoinAddressDao {
     @Query("SELECT MAX(ba.address_index) FROM bitcoin_address ba WHERE ba.account_id = :accountId and ba.is_change = 'true' ")
     long getLastChangeAddress(long accountId);
 
+    @Query("SELECT MAX(ba.address_index) FROM bitcoin_address ba WHERE ba.account_id = :accountId and ba.is_change = 'false' ")
+    long getLastExternalAddress(long accountId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertBitcoinAddresses(BitcoinAddress... addresses);
 }

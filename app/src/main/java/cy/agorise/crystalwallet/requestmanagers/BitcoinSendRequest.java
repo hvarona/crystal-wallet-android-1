@@ -21,6 +21,8 @@ public class BitcoinSendRequest extends CryptoNetInfoRequest {
         SUCCEEDED,
         NO_INTERNET,
         NO_SERVER_CONNECTION,
+        NO_BALANCE,
+        NO_FEE,
         PETITION_FAILED
     }
 
