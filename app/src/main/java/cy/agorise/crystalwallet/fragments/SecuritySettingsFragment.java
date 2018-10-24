@@ -96,7 +96,6 @@ public class SecuritySettingsFragment extends Fragment {
             default:
                 mPager.setCurrentItem(0);
         }
-        mPager.setSwipeLocked(true);
 
         TabLayout tabLayout = v.findViewById(R.id.tabs);
 
@@ -134,7 +133,9 @@ public class SecuritySettingsFragment extends Fragment {
                 case 1:
                     return new PinSecurityFragment();
                 case 2:
-                    return new PatternSecurityFragment();
+                    final PatternSecurityFragment patternSecurityFragment = new PatternSecurityFragment();
+                    patternSecurityFragment.setChildViewPager(mPager);
+                    return patternSecurityFragment;
             }
 
             return null; //new OnConstructionFragment();
