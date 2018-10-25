@@ -28,6 +28,7 @@ import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
 import cy.agorise.crystalwallet.requestmanagers.GetBitsharesAccountNameCacheRequest;
+import cy.agorise.crystalwallet.requestmanagers.ImportBitsharesAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesLTMUpgradeRequest;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
 import cy.agorise.crystalwallet.requestmanagers.ValidateCreateBitsharesAccountRequest;
@@ -222,7 +223,9 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
         if(request.getCoin().equals(CryptoCoin.BITSHARES)) {
-            if (request instanceof ValidateImportBitsharesAccountRequest) {
+            if (request instanceof ImportBitsharesAccountRequest) {
+                this.importAccount((ImportBitsharesAccountRequest) request);
+            } else if (request instanceof ValidateImportBitsharesAccountRequest) {
                 this.validateImportAccount((ValidateImportBitsharesAccountRequest) request);
             } else if (request instanceof ValidateExistBitsharesAccountRequest) {
                 this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
@@ -242,6 +245,76 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 System.out.println("Error request not implemented " + request.getClass().getName());
             }
         }
+    }
+
+    private void importAccount(final ImportBitsharesAccountRequest importRequest){
+        final CrystalDatabase db = CrystalDatabase.getAppDatabase(importRequest.getContext());
+        final AccountSeedDao accountSeedDao = db.accountSeedDao();
+        ApiRequest getAccountNamesBK = new ApiRequest(0, new ApiRequestListener() {
+            @Override
+            public void success(Object answer, int idPetition) {
+                if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
+                    UserAccount userAccount = (UserAccount) answer;
+                    importRequest.setSeedType(SeedType.BRAINKEY);
+                    importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
+
+                    AccountSeed seed = new AccountSeed();
+                    seed.setName(userAccount.getName());
+                    seed.setType(importRequest.getSeedType());
+                    seed.setMasterSeed(importRequest.getMnemonic());
+                    long idSeed = accountSeedDao.insertAccountSeed(seed);
+                    if (idSeed >= 0) {
+                        GrapheneAccount account = new GrapheneAccount();
+                        account.setCryptoNet(CryptoNet.BITSHARES);
+                        account.setAccountIndex(0);
+                        account.setSeedId(idSeed);
+                        account.setAccountId(userAccount.getObjectId());
+                        importAccountFromSeed(account, importRequest.getContext());
+                    }
+                }
+            }
+
+            @Override
+            public void fail(int idPetition) {
+                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+            }
+        });
+
+        ApiRequest getAccountNamesBP39 = new ApiRequest(0, new ApiRequestListener() {
+            @Override
+            public void success(Object answer, int idPetition) {
+                if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
+                    UserAccount userAccount = (UserAccount) answer;
+                    importRequest.setSeedType(SeedType.BIP39);
+                    importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
+
+                    AccountSeed seed = new AccountSeed();
+                    seed.setName(userAccount.getName());
+                    seed.setType(importRequest.getSeedType());
+                    seed.setMasterSeed(importRequest.getMnemonic());
+                    long idSeed = accountSeedDao.insertAccountSeed(seed);
+                    if (idSeed >= 0) {
+                        GrapheneAccount account = new GrapheneAccount();
+                        account.setCryptoNet(CryptoNet.BITSHARES);
+                        account.setAccountIndex(0);
+                        account.setSeedId(idSeed);
+                        account.setAccountId(userAccount.getObjectId());
+                        importAccountFromSeed(account, importRequest.getContext());
+                    }
+                }
+            }
+
+            @Override
+            public void fail(int idPetition) {
+                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+            }
+        });
+
+        BrainKey bk = new BrainKey(importRequest.getMnemonic(), 0);
+        BIP39 bip39 = new BIP39(-1, importRequest.getMnemonic());
+        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("BTS"),getAccountNamesBK);
+        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
+
     }
 
     /**
