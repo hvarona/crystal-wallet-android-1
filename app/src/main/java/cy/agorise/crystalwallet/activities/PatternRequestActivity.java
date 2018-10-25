@@ -40,6 +40,11 @@ public class PatternRequestActivity extends AppCompatActivity {
     TextView txtBadtry;
 
     /*
+    * External listener for success or fail
+    * */
+    private OnResponse onResponse;
+
+    /*
      * Contains the bad tries
      * */
     private int tries = 0;
@@ -100,11 +105,24 @@ public class PatternRequestActivity extends AppCompatActivity {
                                             if (CrystalSecurityMonitor.getInstance(null).is2ndFactorSet()) {
                                                 //CrystalSecurityMonitor.getInstance(null).call2ndFactor(thisActivity);
                                                 thisActivity.finish();
+
+                                                if(onResponse != null){
+                                                    onResponse.onSuccess();
+                                                }
+
                                             } else {
                                                 thisActivity.finish();
+
+                                                if(onResponse != null){
+                                                    onResponse.onSuccess();
+                                                }
                                             }
                                         } else {
                                             incorrect();
+
+                                            if(onResponse != null){
+                                                onResponse.onFailed();
+                                            }
                                         }
                                     }
 
@@ -120,6 +138,10 @@ public class PatternRequestActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void setOnResponse(OnResponse onResponse) {
+        this.onResponse = onResponse;
     }
 
     private void incorrect(){
@@ -223,6 +245,14 @@ public class PatternRequestActivity extends AppCompatActivity {
         }
 
         return patternString;
+    }
+
+    /*
+    * Listener events for success and fail
+    * */
+    public interface OnResponse{
+        void onSuccess();
+        void onFailed();
     }
 }
 
