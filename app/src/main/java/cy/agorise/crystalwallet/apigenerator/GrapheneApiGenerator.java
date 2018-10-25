@@ -129,8 +129,13 @@ public abstract class GrapheneApiGenerator {
                             List<UserAccount> accounts = resp.get(0);
                             if(accounts.size() > 0){
                                 for(UserAccount account : accounts) {
-                                    request.getListener().success(account,request.getId());}}}
-                        request.getListener().fail(request.getId());
+                                        request.getListener().success(account, request.getId());
+                                        break;
+                                }
+                            }
+                        }else{
+                            request.getListener().fail(request.getId());
+                        }
                     }
 
                     @Override

@@ -276,44 +276,46 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
 
             @Override
             public void fail(int idPetition) {
-                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
-            }
-        });
+                BIP39 bip39 = new BIP39(-1, importRequest.getMnemonic());
+                ApiRequest getAccountNamesBP39 = new ApiRequest(0, new ApiRequestListener() {
+                    @Override
+                    public void success(Object answer, int idPetition) {
+                        if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
+                            UserAccount userAccount = (UserAccount) answer;
+                            importRequest.setSeedType(SeedType.BIP39);
+                            importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
 
-        ApiRequest getAccountNamesBP39 = new ApiRequest(0, new ApiRequestListener() {
-            @Override
-            public void success(Object answer, int idPetition) {
-                if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
-                    UserAccount userAccount = (UserAccount) answer;
-                    importRequest.setSeedType(SeedType.BIP39);
-                    importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
-
-                    AccountSeed seed = new AccountSeed();
-                    seed.setName(userAccount.getName());
-                    seed.setType(importRequest.getSeedType());
-                    seed.setMasterSeed(importRequest.getMnemonic());
-                    long idSeed = accountSeedDao.insertAccountSeed(seed);
-                    if (idSeed >= 0) {
-                        GrapheneAccount account = new GrapheneAccount();
-                        account.setCryptoNet(CryptoNet.BITSHARES);
-                        account.setAccountIndex(0);
-                        account.setSeedId(idSeed);
-                        account.setAccountId(userAccount.getObjectId());
-                        importAccountFromSeed(account, importRequest.getContext());
+                            AccountSeed seed = new AccountSeed();
+                            seed.setName(userAccount.getName());
+                            seed.setType(importRequest.getSeedType());
+                            seed.setMasterSeed(importRequest.getMnemonic());
+                            long idSeed = accountSeedDao.insertAccountSeed(seed);
+                            if (idSeed >= 0) {
+                                GrapheneAccount account = new GrapheneAccount();
+                                account.setCryptoNet(CryptoNet.BITSHARES);
+                                account.setAccountIndex(0);
+                                account.setSeedId(idSeed);
+                                account.setAccountId(userAccount.getObjectId());
+                                importAccountFromSeed(account, importRequest.getContext());
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void fail(int idPetition) {
-                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+                    @Override
+                    public void fail(int idPetition) {
+                        importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+                    }
+                });
+                GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
             }
         });
+
+
 
         BrainKey bk = new BrainKey(importRequest.getMnemonic(), 0);
-        BIP39 bip39 = new BIP39(-1, importRequest.getMnemonic());
+
         GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("BTS"),getAccountNamesBK);
-        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
+
 
     }
 
