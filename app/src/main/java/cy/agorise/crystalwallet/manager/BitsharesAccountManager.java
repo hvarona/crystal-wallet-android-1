@@ -253,7 +253,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         ApiRequest getAccountNamesBK = new ApiRequest(0, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
-                if(answer != null) {
+                if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
                     UserAccount userAccount = (UserAccount) answer;
                     importRequest.setSeedType(SeedType.BRAINKEY);
                     importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
@@ -268,7 +268,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         account.setCryptoNet(CryptoNet.BITSHARES);
                         account.setAccountIndex(0);
                         account.setSeedId(idSeed);
-                        account.setName(userAccount.getName());
+                        account.setAccountId(userAccount.getObjectId());
                         importAccountFromSeed(account, importRequest.getContext());
                     }
                 }
@@ -276,14 +276,14 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
 
             @Override
             public void fail(int idPetition) {
-                importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
             }
         });
 
         ApiRequest getAccountNamesBP39 = new ApiRequest(0, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
-                if(answer != null) {
+                if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
                     UserAccount userAccount = (UserAccount) answer;
                     importRequest.setSeedType(SeedType.BIP39);
                     importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
@@ -298,7 +298,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         account.setCryptoNet(CryptoNet.BITSHARES);
                         account.setAccountIndex(0);
                         account.setSeedId(idSeed);
-                        account.setName(userAccount.getName());
+                        account.setAccountId(userAccount.getObjectId());
                         importAccountFromSeed(account, importRequest.getContext());
                     }
                 }
@@ -306,7 +306,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
 
             @Override
             public void fail(int idPetition) {
-                importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+                //importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
             }
         });
 
