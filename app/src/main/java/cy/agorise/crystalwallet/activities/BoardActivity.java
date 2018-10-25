@@ -8,9 +8,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -20,18 +17,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -48,7 +37,6 @@ import cy.agorise.crystalwallet.fragments.MerchantsFragment;
 import cy.agorise.crystalwallet.fragments.ReceiveTransactionFragment;
 import cy.agorise.crystalwallet.fragments.SendTransactionFragment;
 import cy.agorise.crystalwallet.fragments.TransactionsFragment;
-import cy.agorise.crystalwallet.views.natives.GIFView;
 import de.hdodenhof.circleimageview.CircleImageView;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetBalanceListViewModel;
 
@@ -73,8 +61,8 @@ public class BoardActivity  extends CustomActivity {
     @BindView(R.id.fabAddContact)
     public FloatingActionButton fabAddContact;
 
-    @BindView(R.id.imagevieGIF)
-    public GIFView imagevieGIF;
+    @BindView(R.id.ivAppBarAnimation)
+    ImageView ivAppBarAnimation;
 
     public BoardPagerAdapter boardAdapter;
 
@@ -83,9 +71,6 @@ public class BoardActivity  extends CustomActivity {
      * when the element is bounded.
      */
     long cryptoNetAccountId;
-
-    @BindView(R.id.surface_view)
-    public SurfaceView mSurfaceView;
 
     @BindView(R.id.toolbar_user_img)
     public CircleImageView userImage;
@@ -97,14 +82,6 @@ public class BoardActivity  extends CustomActivity {
     public ImageView triangle;
 
     File photoDirectory;
-
-    /*
-    * For the window animation
-    * */
-    private MediaPlayer mediaPlayer;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,39 +95,11 @@ public class BoardActivity  extends CustomActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        *  Set the bubbles animation
-        * */
-        //imagevieGIF.centerCrop();
-        //imagevieGIF.load(R.raw.burbujas);
-
-        /*
-        * Listener tabLayout to resalt text when clicked
-        * */
-
-        // Appbar animation
-        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceCreated");
-                mediaPlayer = MediaPlayer.create(BoardActivity.this, R.raw.appbar_background);
-                mediaPlayer.setDisplay(mSurfaceView.getHolder());
-                mediaPlayer.setLooping(true);
-                mediaPlayer.start();
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-                //Log.d(TAG,"surfaceChanged");
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceDestroyed");
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
-        });
+        // Sets AppBar animation
+        Glide.with(this)
+                .load(R.drawable.appbar_background)
+                .apply(new RequestOptions().centerCrop())
+                .into(ivAppBarAnimation);
 
         boardAdapter = new BoardPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(boardAdapter);
@@ -234,17 +183,6 @@ public class BoardActivity  extends CustomActivity {
         super.onResume();
 
         loadUserImage();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        //Release the media player
-        if(mediaPlayer!=null){
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
     }
 
     public void loadUserImage(){

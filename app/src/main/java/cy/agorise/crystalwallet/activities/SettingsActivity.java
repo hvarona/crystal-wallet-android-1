@@ -14,6 +14,8 @@ import android.view.SurfaceView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.sjaramillo10.animatedtablayout.AnimatedTabLayout;
 
 import butterknife.BindView;
@@ -42,20 +44,13 @@ public class SettingsActivity extends AppCompatActivity{
 
     public SettingsPagerAdapter settingsPagerAdapter;
 
-    @BindView(R.id.surface_view)
-    public SurfaceView mSurfaceView;
-
     @BindView(R.id.tvBuildVersion)
     public TextView tvBuildVersion;
 
     private SecuritySettingsFragment securitySettingsFragment;
 
-    /*
-     * For the window animation
-     * */
-    private MediaPlayer mediaPlayer;
-
-
+    @BindView(R.id.ivAppBarAnimation)
+    ImageView ivAppBarAnimation;
 
 
     @Override
@@ -67,29 +62,11 @@ public class SettingsActivity extends AppCompatActivity{
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Appbar animation
-        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceCreated");
-                mediaPlayer = MediaPlayer.create(SettingsActivity.this, R.raw.appbar_background);
-                mediaPlayer.setDisplay(mSurfaceView.getHolder());
-                mediaPlayer.setLooping(true);
-                mediaPlayer.start();
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-                //Log.d(TAG,"surfaceChanged");
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceDestroyed");
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
-        });
+        // Sets AppBar animation
+        Glide.with(this)
+                .load(R.drawable.appbar_background)
+                .apply(new RequestOptions().centerCrop())
+                .into(ivAppBarAnimation);
 
         settingsPagerAdapter = new SettingsPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(settingsPagerAdapter);
@@ -130,17 +107,6 @@ public class SettingsActivity extends AppCompatActivity{
         @Override
         public int getCount() {
             return 3;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        //Release the media player
-        if(mediaPlayer != null){
-            mediaPlayer.release();
-            mediaPlayer = null;
         }
     }
 

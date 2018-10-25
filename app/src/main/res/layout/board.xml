@@ -20,21 +20,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            android:background="@color/red"
             app:contentScrim="@color/transparent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
-            <SurfaceView
-                android:id="@+id/surface_view"
+            <ImageView
+                android:id="@+id/ivAppBarAnimation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <cy.agorise.crystalwallet.views.natives.GIFView
-                android:id="@+id/imagevieGIF"
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                />
+                android:background="@color/colorPrimaryTransparent"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

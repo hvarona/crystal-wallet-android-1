@@ -18,6 +18,9 @@ import android.view.SurfaceView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -45,8 +48,6 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
 
     public SettingsPagerAdapter settingsPagerAdapter;
 
-    @BindView(R.id.surface_view)
-    public SurfaceView mSurfaceView;
 
     @BindView(R.id.tvBuildVersion)
     public TextView tvBuildVersion;
@@ -56,13 +57,8 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
 
     private CryptoNetAccount cryptoNetAccount;
 
-    /*
-     * For the window animation
-     * */
-    private MediaPlayer mediaPlayer;
-
-
-
+    @BindView(R.id.ivAppBarAnimation)
+    ImageView ivAppBarAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,46 +97,17 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
-            // Appbar animation
-            mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-                @Override
-                public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                    //Log.d(TAG,"surfaceCreated");
-                    mediaPlayer = MediaPlayer.create(CryptoNetAccountSettingsActivity.this, R.raw.appbar_background);
-                    mediaPlayer.setDisplay(mSurfaceView.getHolder());
-                    mediaPlayer.setLooping(true);
-                    mediaPlayer.start();
-                }
-
-                @Override
-                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-                    //Log.d(TAG,"surfaceChanged");
-                }
-
-                @Override
-                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                    //Log.d(TAG,"surfaceDestroyed");
-                }
-            });
+            // Sets AppBar animation
+            Glide.with(this)
+                    .load(R.drawable.appbar_background)
+                    .apply(new RequestOptions().centerCrop())
+                    .into(ivAppBarAnimation);
 
 
         } else {
             this.finish();
         }
     }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        //Release the media player
-        if(mediaPlayer!=null){
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
 
     private class SettingsPagerAdapter extends FragmentStatePagerAdapter {
         SettingsPagerAdapter(FragmentManager fm) {
