@@ -31,7 +31,7 @@ import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
 import cy.agorise.crystalwallet.dialogs.material.NegativeResponse;
 import cy.agorise.crystalwallet.dialogs.material.PositiveResponse;
 import cy.agorise.crystalwallet.dialogs.material.QuestionDialog;
-//import cy.agorise.crystalwallet.interfaces.OnResponse;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.util.PasswordManager;
@@ -47,19 +47,19 @@ public class PinRequestActivity extends AppCompatActivity {
     TextView txtBadtry;
 
     /*
-    * Contains the bad tries
-    * */
+     * Contains the bad tries
+     * */
     private int tries = 0;
 
     /*
-    * Seconds counter
-    * */
+     * Seconds counter
+     * */
     private int seconds = 15;
 
     /*
      * External listener for success or fail
      * */
-    //private static OnResponse onResponse;
+    private static OnResponse onResponse;
 
 
 
@@ -80,8 +80,8 @@ public class PinRequestActivity extends AppCompatActivity {
         //onResponse = null;
 
         /*
-        * Initially the button is disabled till the user type a valid PIN
-        * */
+         * Initially the button is disabled till the user type a valid PIN
+         * */
         btnOK.setEnabled(false);
 
         GeneralSettingListViewModel generalSettingListViewModel = ViewModelProviders.of(this).get(GeneralSettingListViewModel.class);
@@ -113,23 +113,23 @@ public class PinRequestActivity extends AppCompatActivity {
             if (CrystalSecurityMonitor.getInstance(null).is2ndFactorSet()) {
                 CrystalSecurityMonitor.getInstance(null).call2ndFactor(this);
 
-                /*if(onResponse != null){
+                if(onResponse != null){
                     onResponse.onSuccess();
-                }*/
+                }
 
             } else {
                 this.finish();
 
-                /*if(onResponse != null){
+                if(onResponse != null){
                     onResponse.onFailed();
-                }*/
+                }
             }
         }
         else{
 
             /*
-            * One more bad try
-            * */
+             * One more bad try
+             * */
             ++tries;
 
             final Activity activity = this;
@@ -137,8 +137,8 @@ public class PinRequestActivity extends AppCompatActivity {
             etPassword.setTextColor(Color.RED);
 
             /*
-            * User can not go more up to 5 bad tries
-            * */
+             * User can not go more up to 5 bad tries
+             * */
             if(tries==4){
                 tries = 0;
 
@@ -193,8 +193,8 @@ public class PinRequestActivity extends AppCompatActivity {
             }
 
             /*
-            *   Set in red the rext and reset the password after a period of time
-            * */
+             *   Set in red the rext and reset the password after a period of time
+             * */
             final Timer t = new Timer();
             //Set the schedule function and rate
             t.scheduleAtFixedRate(new TimerTask() {
@@ -213,17 +213,17 @@ public class PinRequestActivity extends AppCompatActivity {
                                       }
 
                                   },
-            //Set how long before to start calling the TimerTask (in milliseconds)
+                    //Set how long before to start calling the TimerTask (in milliseconds)
                     500,
-            //Set the amount of time between each execution (in milliseconds)
+                    //Set the amount of time between each execution (in milliseconds)
                     500);
         }
     }
 
 
-    /*public static void setOnResponse(OnResponse onResponse) {
+    public static void setOnResponse(OnResponse onResponse) {
         PinRequestActivity.onResponse = onResponse;
-    }*/
+    }
 
 
     @OnTextChanged(value = R.id.etPassword,
@@ -231,8 +231,8 @@ public class PinRequestActivity extends AppCompatActivity {
     void afterPasswordChanged(Editable editable) {
 
         /*
-        * If it is valid length enable button
-        * */
+         * If it is valid length enable button
+         * */
         if(etPassword.getText().length()>=6){
             btnOK.setEnabled(true);
         }
@@ -241,5 +241,3 @@ public class PinRequestActivity extends AppCompatActivity {
         }
     }
 }
-
-

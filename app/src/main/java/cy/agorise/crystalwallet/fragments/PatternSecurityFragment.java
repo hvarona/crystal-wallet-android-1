@@ -30,7 +30,7 @@ import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
-//import cy.agorise.crystalwallet.interfaces.OnResponse;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.util.ChildViewPager;
@@ -52,8 +52,8 @@ public class PatternSecurityFragment extends Fragment {
     TextView tvPatternText;
 
     /*
-    * Contains the ChildViewPager to block the viewpager when the user is using the pattern control
-    * */
+     * Contains the ChildViewPager to block the viewpager when the user is using the pattern control
+     * */
     private ChildViewPager childViewPager;
 
     private PatternLockViewListener actualPatternListener;
@@ -174,8 +174,8 @@ public class PatternSecurityFragment extends Fragment {
     private void resetPattern(){
 
         /*
-        * Show error
-        * */
+         * Show error
+         * */
         tvPatternText.setText(getActivity().getResources().getString(R.string.Incorrect_pattern));
         tvPatternText.setTextColor(Color.RED);
         final Timer t = new Timer();
@@ -227,20 +227,20 @@ public class PatternSecurityFragment extends Fragment {
         final Timer t_ = new Timer();
         t_.scheduleAtFixedRate(new TimerTask() {
 
-                                  @Override
-                                  public void run() {
+                                   @Override
+                                   public void run() {
 
-                                      getActivity().runOnUiThread(new Runnable() {
-                                          @Override
-                                          public void run() {
+                                       getActivity().runOnUiThread(new Runnable() {
+                                           @Override
+                                           public void run() {
 
-                                              t_.cancel();
-                                              showNewPatternUI();
-                                          }
-                                      });
-                                  }
+                                               t_.cancel();
+                                               showNewPatternUI();
+                                           }
+                                       });
+                                   }
 
-                              },
+                               },
                 //Set how long before to start calling the TimerTask (in milliseconds)
                 1000,
                 //Set the amount of time between each execution (in milliseconds)

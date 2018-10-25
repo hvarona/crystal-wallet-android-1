@@ -17,7 +17,7 @@ import cy.agorise.crystalwallet.activities.PatternRequestActivity;
 import cy.agorise.crystalwallet.activities.PinRequestActivity;
 import cy.agorise.crystalwallet.activities.PocketRequestActivity;
 import cy.agorise.crystalwallet.fragments.PatternSecurityFragment;
-//import cy.agorise.crystalwallet.interfaces.OnResponse;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.notifiers.CrystalWalletNotifier;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
@@ -131,7 +131,7 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
     public void onActivityStarted(Activity activity) {
         if (numStarted == 0) {
             if (!actualSecurity().equals("")){
-                callPasswordRequest(activity);
+                callPasswordRequest(activity,null);
             }
         }
         numStarted++;
@@ -142,39 +142,39 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
         numStarted--;
         if (numStarted == 0) {
             if (!actualSecurity().equals("")){
-                callPasswordRequest(activity);
+                callPasswordRequest(activity,null);
             }
         }
     }
 
-    public void callPasswordRequest(Activity activity){
+    public void callPasswordRequest(Activity activity, final OnResponse onResponsePattern){
         if ((!activity.getIntent().hasExtra("ACTIVITY_TYPE")) || (!activity.getIntent().getStringExtra("ACTIVITY_TYPE").equals("PASSWORD_REQUEST"))) {
             Intent intent = null;
             if ((this.passwordEncrypted != null) && (!this.passwordEncrypted.equals(""))) {
 
                 intent = new Intent(activity, PinRequestActivity.class);
 
-                //PinRequestActivity.setOnResponse(null);
+                PinRequestActivity.setOnResponse(null);
 
                 /*
-                * Connect error and success listeners
-                * */
-                /*if(onResponsePattern != null){
+                 * Connect error and success listeners
+                 * */
+                if(onResponsePattern != null){
                     PinRequestActivity.setOnResponse(onResponsePattern);
-                }*/
+                }
 
             } else if ((this.patternEncrypted != null) && (!this.patternEncrypted.equals(""))) {
 
                 intent = new Intent(activity, PatternRequestActivity.class);
 
-                //PatternRequestActivity.setOnResponse(null);
+                PatternRequestActivity.setOnResponse(null);
 
                 /*
                  * Connect error and success listeners
                  * */
-                /*if(onResponsePattern != null){
+                if(onResponsePattern != null){
                     PatternRequestActivity.setOnResponse(onResponsePattern);
-                }*/
+                }
             }
             if (intent != null) {
                 intent.putExtra("ACTIVITY_TYPE", "PASSWORD_REQUEST");
@@ -220,7 +220,4 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
     public void onActivityDestroyed(Activity activity) {
         //
     }
-
-
-
 }
