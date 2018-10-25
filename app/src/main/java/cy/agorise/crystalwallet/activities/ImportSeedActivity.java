@@ -31,6 +31,7 @@ import cy.agorise.crystalwallet.dialogs.material.PositiveResponse;
 import cy.agorise.crystalwallet.dialogs.material.QuestionDialog;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
+import cy.agorise.crystalwallet.requestmanagers.ImportBitsharesAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedViewModel;
 import cy.agorise.crystalwallet.viewmodels.validators.ImportSeedValidator;
@@ -203,6 +204,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 txtErrorAccount.setVisibility(View.INVISIBLE);
             }
         });
+        /*
         etAccountName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -217,9 +219,9 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
             @Override
             public void afterTextChanged(Editable s) {
 
-                /*
-                 * If all is ready to continue enable the button, contrarie case disable it
-                 * */
+                //
+                // If all is ready to continue enable the button, contrarie case disable it
+                //
                 if(allFieldsAreFill()){
                     enableCreate();
                 }
@@ -228,6 +230,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                 }
             }
         });
+        */
 
         accountSeedViewModel = ViewModelProviders.of(this).get(AccountSeedViewModel.class);
         importSeedValidator = new ImportSeedValidator(this.getApplicationContext(),etPin,etPinConfirmation,etAccountName,etSeedWords);
@@ -263,8 +266,8 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
         boolean complete = false;
         if( etPin.getText().toString().trim().compareTo("")!=0 &&
             etPinConfirmation.getText().toString().trim().compareTo("")!=0 &&
-                etSeedWords.getText().toString().trim().compareTo("")!=0 &&
-                etAccountName.getText().toString().trim().compareTo("")!=0){
+                etSeedWords.getText().toString().trim().compareTo("")!=0 /*&&
+                etAccountName.getText().toString().trim().compareTo("")!=0*/){
             complete = true;
         }
         return complete;
@@ -287,11 +290,11 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
     void afterSeedWordsChanged(Editable editable) {
         this.importSeedValidator.validate();
     }
-    @OnTextChanged(value = R.id.etAccountName,
+    /*@OnTextChanged(value = R.id.etAccountName,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void afterAccountNameChanged(Editable editable) {
         this.importSeedValidator.validate();
-    }
+    }*/
 
     @OnClick(R.id.btnCancel)
     public void cancel(){
@@ -327,7 +330,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                     /*
                      * Validate mnemonic with the server
                      * */
-                    final ValidateImportBitsharesAccountRequest request = new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString().trim(),etSeedWords.getText().toString().trim(),activity);
+                    final ImportBitsharesAccountRequest request = new ImportBitsharesAccountRequest(etSeedWords.getText().toString().trim(),activity);
                     request.setListener(new CryptoNetInfoRequestListener() {
                         @Override
                         public void onCarryOut() {
@@ -365,8 +368,8 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
 
         final ImportSeedActivity thisActivity = this;
 
-        final ValidateImportBitsharesAccountRequest validatorRequest =
-                new ValidateImportBitsharesAccountRequest(etAccountName.getText().toString(), etSeedWords.getText().toString(), getApplicationContext(), true);
+        final ImportBitsharesAccountRequest validatorRequest =
+                new ImportBitsharesAccountRequest(etSeedWords.getText().toString(), getApplicationContext(), true);
 
         validatorRequest.setListener(new CryptoNetInfoRequestListener() {
             @Override
