@@ -61,7 +61,7 @@ import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
 import cy.agorise.crystalwallet.dialogs.material.ToastIt;
-import cy.agorise.crystalwallet.interfaces.OnResponse;
+//import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -623,14 +623,14 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             /*
             * If exists mode scurity show it and valide events in case of success or fail
             * */
-            CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
+            /*CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
                 @Override
                 public void onSuccess() {
 
                     /*
                      * Show loading dialog
                      * */
-                    crystalDialog = new CrystalDialog((Activity) getContext());
+/*                    crystalDialog = new CrystalDialog((Activity) getContext());
                     crystalDialog.setText("Sending");
                     crystalDialog.progress();
                     crystalDialog.show();
@@ -642,7 +642,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 public void onFailed() {
 
                 }
-            });
+            });*/
         }
     }
 
