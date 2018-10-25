@@ -48,7 +48,12 @@ public class AmountValidationField extends ValidationField {
 
             CryptoCoinBalance balance = CrystalDatabase.getAppDatabase(amountField.getContext()).cryptoCoinBalanceDao().getBalanceFromAccount(this.account.getId(),cryptoCurrency.getId());
 
-            if (newAmountValue > balance.getBalance()){
+            double balanceDouble = 0;
+            if(balance != null){
+                balanceDouble = balance.getBalance();
+            }
+
+            if (newAmountValue > balanceDouble){
                 setMessageForValue(mixedValues, validator.getContext().getResources().getString(R.string.insufficient_amount));
                 setValidForValue(mixedValues, false);
             } else if (newAmountValue == 0){
