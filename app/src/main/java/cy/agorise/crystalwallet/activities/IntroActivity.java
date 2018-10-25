@@ -2,15 +2,15 @@ package cy.agorise.crystalwallet.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.thekhaeng.pushdownanim.PushDownAnim;
 
 import butterknife.BindView;
@@ -22,19 +22,19 @@ import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
 
 public class IntroActivity extends CustomActivity {
 
-    @BindView(R.id.surface_view)
-    public SurfaceView mSurfaceView;
+    @BindView(R.id.ivAnimation)
+    ImageView ivAnimation;
 
     @BindView(R.id.btnCreateAccount)
-    public Button btnCreateAccount;
+    Button btnCreateAccount;
 
     @BindView(R.id.btnImportAccount)
-    public Button btnImportAccount;
+    Button btnImportAccount;
 
     /*
      * For the window animation
      * */
-    private MediaPlayer mediaPlayer;
+//    private MediaPlayer mediaPlayer;
 
 
 
@@ -46,8 +46,13 @@ public class IntroActivity extends CustomActivity {
 
         ButterKnife.bind(this);
 
+        Glide.with(this)
+                .load(R.drawable.appbar_background)
+                .apply(new RequestOptions().centerCrop())
+                .into(ivAnimation);
+
         /*
-         *   Integration of library with button efects
+         *   Integration of library with button effects
          * */
         PushDownAnim.setPushDownAnimTo(btnCreateAccount)
                 .setOnClickListener( new View.OnClickListener(){
@@ -64,53 +69,23 @@ public class IntroActivity extends CustomActivity {
                     }
                 } );
 
-        // Appbar animation
-        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceCreated");
-                mediaPlayer = MediaPlayer.create(IntroActivity.this, R.raw.appbar_background);
-                mediaPlayer.setDisplay(mSurfaceView.getHolder());
-                mediaPlayer.setLooping(true);
-                mediaPlayer.start();
-            }
+        //Checks if the user has any seed created
+        AccountSeedListViewModel accountSeedListViewModel = ViewModelProviders.of(this).get(AccountSeedListViewModel.class);
 
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-                //Log.d(TAG,"surfaceChanged");
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                //Log.d(TAG,"surfaceDestroyed");
-                //Log.d(TAG,"surfaceDestroyed");
-                mediaPlayer.stop();
-                mediaPlayer.release();
-            }
-        });
-
-            //this.getApplication().registerActivityLifecycleCallbacks(CrystalSecurityMonitor.getInstance(this));
-
-
-
-
-            //Checks if the user has any seed created
-            AccountSeedListViewModel accountSeedListViewModel = ViewModelProviders.of(this).get(AccountSeedListViewModel.class);
-
-            if (accountSeedListViewModel.accountSeedsCount() == 0) {
-                //If the user doesn't have any seeds created, then
-                //send the user to create/import an account
-                //Intent intent = new Intent(this, AccountSeedsManagementActivity.class);
-                //Intent intent = new Intent(this, ImportSeedActivity.class);
-                //Intent intent = new Intent(this, CreateSeedActivity.class);
-                //startActivity(intent);
-            } else {
-                //Intent intent = new Intent(this, CreateSeedActivity.class);
-                Intent intent = new Intent(this, BoardActivity.class);
-                //Intent intent = new Intent(this, PocketRequestActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        if (accountSeedListViewModel.accountSeedsCount() == 0) {
+            //If the user doesn't have any seeds created, then
+            //send the user to create/import an account
+            //Intent intent = new Intent(this, AccountSeedsManagementActivity.class);
+            //Intent intent = new Intent(this, ImportSeedActivity.class);
+            //Intent intent = new Intent(this, CreateSeedActivity.class);
+            //startActivity(intent);
+        } else {
+            //Intent intent = new Intent(this, CreateSeedActivity.class);
+            Intent intent = new Intent(this, BoardActivity.class);
+            //Intent intent = new Intent(this, PocketRequestActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         /*CrystalDatabase db = CrystalDatabase.getAppDatabase(getApplicationContext());
         List<AccountSeed> seeds = RandomSeedGenerator.generateSeeds(2);
@@ -152,17 +127,6 @@ public class IntroActivity extends CustomActivity {
     public void createAccount() {
         Intent intent = new Intent(this, CreateSeedActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        //Release the media player
-        if(mediaPlayer!=null){
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
     }
 
     @OnClick(R.id.btnImportAccount)
