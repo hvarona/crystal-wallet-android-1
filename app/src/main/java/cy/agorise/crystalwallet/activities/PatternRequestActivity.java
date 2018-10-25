@@ -36,6 +36,19 @@ public class PatternRequestActivity extends AppCompatActivity {
     @BindView(R.id.tvPatternText)
     TextView tvPatternText;
 
+    @BindView(R.id.txtBadtry)
+    TextView txtBadtry;
+
+    /*
+     * Contains the bad tries
+     * */
+    private int tries = 0;
+
+    /*
+     * Seconds counter
+     * */
+    private int seconds = 15;
+
 
 
 
@@ -112,9 +125,68 @@ public class PatternRequestActivity extends AppCompatActivity {
     private void incorrect(){
 
         /*
+         * One more bad try
+         * */
+        ++tries;
+
+        final Activity activity = this;
+
+        /*
+         * User can not go more up to 5 bad tries
+         * */
+        if(tries==4) {
+            tries = 0;
+
+            patternLockView.setEnabled(false);
+            txtBadtry.setVisibility(View.VISIBLE);
+            txtBadtry.setText(txtBadtry.getText().toString().replace("%%",String.valueOf(seconds)));
+
+            final Timer t = new Timer();
+            //Set the schedule function and rate
+            t.scheduleAtFixedRate(new TimerTask() {
+
+                                      @Override
+                                      public void run() {
+
+                                          --seconds;
+
+                                          if(seconds==0){
+                                              t.cancel();
+
+                                              seconds = 15;
+
+                                              activity.runOnUiThread(new Runnable() {
+                                                  @Override
+                                                  public void run() {
+                                                      patternLockView.setEnabled(true);
+                                                      txtBadtry.setVisibility(View.INVISIBLE);
+                                                      patternLockView.clearPattern();
+                                                      patternLockView.requestFocus();
+                                                  }
+                                              });
+                                          }
+                                          else{
+                                              activity.runOnUiThread(new Runnable() {
+                                                  @Override
+                                                  public void run() {
+                                                      txtBadtry.setText(activity.getResources().getString(R.string.wrong_pin_wait).replace("%%",String.valueOf(seconds)));
+                                                  }
+                                              });
+                                          }
+                                      }
+
+                                  },
+                    //Set how long before to start calling the TimerTask (in milliseconds)
+                    1000,
+                    //Set the amount of time between each execution (in milliseconds)
+                    1000);
+
+            return;
+        }
+
+        /*
          * Show error
          * */
-        final Activity activity = this;
         tvPatternText.setText(activity.getResources().getString(R.string.Incorrect_pattern));
         tvPatternText.setTextColor(Color.RED);
         tvPatternText.setVisibility(View.VISIBLE);

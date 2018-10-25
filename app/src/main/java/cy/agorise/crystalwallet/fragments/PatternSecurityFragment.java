@@ -28,6 +28,7 @@ import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.models.GeneralSetting;
+import cy.agorise.crystalwallet.util.ChildViewPager;
 import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
 import cy.agorise.crystalwallet.viewmodels.validators.PinSecurityValidator;
@@ -45,8 +46,16 @@ public class PatternSecurityFragment extends Fragment {
     @BindView(R.id.tvPatternText)
     TextView tvPatternText;
 
+    /*
+    * Contains the ChildViewPager to block the viewpager when the user is using the pattern control
+    * */
+    private ChildViewPager childViewPager;
+
     private PatternLockViewListener actualPatternListener;
     private String patternEntered;
+
+
+
 
     public PatternSecurityFragment() {
         // Required empty public constructor
@@ -80,6 +89,11 @@ public class PatternSecurityFragment extends Fragment {
         return patternString;
     }
 
+    public void setChildViewPager(ChildViewPager childViewPager) {
+        this.childViewPager = childViewPager;
+    }
+
+
     public void removePatternListener(){
         if (actualPatternListener != null){
             patternLockView.removePatternLockListener(actualPatternListener);
@@ -96,7 +110,6 @@ public class PatternSecurityFragment extends Fragment {
         actualPatternListener = new PatternLockViewListener() {
             @Override
             public void onStarted() {
-
             }
 
             @Override
@@ -193,8 +206,8 @@ public class PatternSecurityFragment extends Fragment {
          * */
         tvPatternText.setText(getActivity().getResources().getString(R.string.Pattern_set_correctly));
         tvPatternText.setTextColor(Color.GREEN);
-        final Timer t = new Timer();
-        t.scheduleAtFixedRate(new TimerTask() {
+        final Timer t_ = new Timer();
+        t_.scheduleAtFixedRate(new TimerTask() {
 
                                   @Override
                                   public void run() {
@@ -203,7 +216,7 @@ public class PatternSecurityFragment extends Fragment {
                                           @Override
                                           public void run() {
 
-                                              t.cancel();
+                                              t_.cancel();
                                               showNewPatternUI();
                                           }
                                       });

@@ -259,52 +259,7 @@ class CreateSeedActivity : CustomActivity() {
         * */
         if (result) {
 
-            /*
-             * Show the dialog for connection with the server
-             * */
-            val creatingAccountMaterialDialog = CrystalDialog(globalActivity)
-            creatingAccountMaterialDialog.setText(globalActivity.resources.getString(R.string.window_create_seed_Server_validation))
-            creatingAccountMaterialDialog.progress()
-            creatingAccountMaterialDialog.show()
-
-            /*
-            * Validate the account does not exists
-            * */
-            val request = ValidateExistBitsharesAccountRequest(tietAccountName?.text.toString())
-            request.setListener {
-
-                /*
-                * Dismiss the dialog of loading
-                * */
-                creatingAccountMaterialDialog.dismiss()
-
-                if (request.accountExists) {
-
-                    /*
-                     *   The account exists and is not valid
-                     * */
-                    tietAccountName.fieldValidatorModel.setInvalid()
-                    tietAccountName.fieldValidatorModel.message = tietAccountName.resources.getString(R.string.account_name_already_exist)
-
-                    /*
-                   * Disaible button create
-                   * */
-                    disableCreate()
-
-                } else {
-
-                    /*
-                    * Passed all validations
-                    * */
-                    tietAccountName.fieldValidatorModel.setValid()
-
-                    /*
-                    * Enable button create
-                    * */
-                    enableCreate()
-                }
-            }
-            CryptoNetInfoRequests.getInstance().addRequest(request)
+            enableCreate()
 
         } else {
 

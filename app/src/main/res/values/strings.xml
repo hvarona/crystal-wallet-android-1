@@ -91,6 +91,12 @@
     <string name="save">SAVE</string>
     <string name="next">NEXT</string>
 
+    <string name="ERROR_UNRECOGNIZABLE">An error ocurred attempting to import the account</string>
+    <string name="NO_ACCOUNT_DATA">The account does not have any data</string>
+    <string name="BAD_SEED">The seed is not valid</string>
+    <string name="ACCOUNT_DOESNT_EXIST">The account does not exists</string>
+    <string name="NO_SERVER_CONNECTION">There was an error with the connection. Try again later</string>
+
     <string name="ASK_PERMISSION">A permission need to be granted before to continue</string>
 
     <string name="please_enter_brainkey">Please enter brainkey</string>
@@ -214,7 +220,7 @@
     <string name="fee_capital">Fee</string>
     <string name="ok">OK</string>
 
-    <string name="wrong_pin_wait">Wrong PIN you have to wait %% seconds ...</string>
+    <string name="wrong_pin_wait">Wrong match you have to wait %% seconds ...</string>
 
     <string name="loading">Loading...</string>
     <string name="pay_to">Pay to</string>

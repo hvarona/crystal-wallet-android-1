@@ -18,11 +18,9 @@ public class InsightApiGenerator {
      * Fecth all the transaciton for a giving address
      * @param cryptoCoin the crypto net of the address
      * @param address The address String
-     * @param request the request api to response
      * @param subscribe If needs to follow the address (Real time)
      */
-    public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address,
-                                                 ApiRequest request, boolean subscribe){
+    public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address, boolean subscribe){
         if(!transactionGetters.containsKey(cryptoCoin)){
             transactionGetters.put(cryptoCoin,new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet())));
         }

@@ -101,6 +101,7 @@ class BitsharesAccountNameValidation : CustomValidationField, UIValidator {
                     result = false
                     accountNameField.fieldValidatorModel.setInvalid()
                     accountNameField.fieldValidatorModel.message = this.accountNameField.resources.getString(R.string.create_account_window_err_at_least_one_character)
+
                 } else {
 
                     /*

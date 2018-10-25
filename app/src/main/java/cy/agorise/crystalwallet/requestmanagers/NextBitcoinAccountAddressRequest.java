@@ -19,6 +19,8 @@ public class NextBitcoinAccountAddressRequest extends CryptoNetInfoRequest {
     private CryptoCoin cryptoCoin;
     private Context context;
 
+    private String address = null;
+
     /**
      * The status code of this request
      */
@@ -61,5 +63,13 @@ public class NextBitcoinAccountAddressRequest extends CryptoNetInfoRequest {
 
     public StatusCode getStatus() {
         return status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

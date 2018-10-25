@@ -83,6 +83,11 @@ public class SecuritySettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_security_settings, container, false);
         ButterKnife.bind(this, v);
 
+        /*
+        * For now this will not be implemented
+        * */
+        sPocketSecurity.setEnabled(false);
+
         securityPagerAdapter = new SecurityPagerAdapter(getChildFragmentManager());
         mPager.setAdapter(securityPagerAdapter);
 
@@ -96,7 +101,6 @@ public class SecuritySettingsFragment extends Fragment {
             default:
                 mPager.setCurrentItem(0);
         }
-        mPager.setSwipeLocked(true);
 
         TabLayout tabLayout = v.findViewById(R.id.tabs);
 
@@ -134,7 +138,9 @@ public class SecuritySettingsFragment extends Fragment {
                 case 1:
                     return new PinSecurityFragment();
                 case 2:
-                    return new PatternSecurityFragment();
+                    final PatternSecurityFragment patternSecurityFragment = new PatternSecurityFragment();
+                    patternSecurityFragment.setChildViewPager(mPager);
+                    return patternSecurityFragment;
             }
 
             return null; //new OnConstructionFragment();
