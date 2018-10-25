@@ -358,7 +358,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                     /*
                      * Validate mnemonic with the server
                      * */
-                    final ImportBitsharesAccountRequest request = new ImportBitsharesAccountRequest(etSeedWords.getText().toString().trim(),activity);
+                    /*final ImportBitsharesAccountRequest request = new ImportBitsharesAccountRequest(etSeedWords.getText().toString().trim(),activity);
                     request.setListener(new CryptoNetInfoRequestListener() {
                         @Override
                         public void onCarryOut() {
@@ -378,7 +378,7 @@ public class ImportSeedActivity extends AppCompatActivity implements UIValidator
                             }
                         }
                     });
-                    CryptoNetInfoRequests.getInstance().addRequest(request);
+                    CryptoNetInfoRequests.getInstance().addRequest(request);*/
 
                 }
             });
