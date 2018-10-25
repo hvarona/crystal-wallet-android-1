@@ -1,5 +1,6 @@
 package cy.agorise.crystalwallet.fragments;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +29,10 @@ import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
+import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.GeneralSetting;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.util.ChildViewPager;
 import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
@@ -199,7 +204,20 @@ public class PatternSecurityFragment extends Fragment {
     public void savePattern(String pattern){
         String patternEncripted = PasswordManager.encriptPassword(pattern);
         CrystalSecurityMonitor.getInstance(null).setPatternEncrypted(patternEncripted);
-        //CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity());
+        /*CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
+            @Override
+            public void onSuccess() {
+
+                Log.i("onSuccess","onSuccess");
+                Toast.makeText(getActivity(), "onSuccess", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailed() {
+                Log.i("onFailed","onFailed");
+                Toast.makeText(getActivity(), "onFailed", Toast.LENGTH_LONG).show();
+            }
+        });*/
 
         /*
          * Show success

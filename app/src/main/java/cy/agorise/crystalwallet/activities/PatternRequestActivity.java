@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
@@ -72,6 +73,8 @@ public class PatternRequestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pattern_request);
         ButterKnife.bind(this);
 
+        //onResponse = null;
+
         GeneralSettingListViewModel generalSettingListViewModel = ViewModelProviders.of(this).get(GeneralSettingListViewModel.class);
         LiveData<List<GeneralSetting>> generalSettingsLiveData = generalSettingListViewModel.getGeneralSettingList();
 
@@ -108,7 +111,6 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                                 if(onResponse != null){
                                                     onResponse.onSuccess();
-                                                    onResponse = null;
                                                 }
 
                                             } else {
@@ -116,7 +118,6 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                                 if(onResponse != null){
                                                     onResponse.onSuccess();
-                                                    onResponse = null;
                                                 }
                                             }
                                         } else {
@@ -124,7 +125,6 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                             if(onResponse != null){
                                                 onResponse.onFailed();
-                                                onResponse = null;
                                             }
                                         }
                                     }
@@ -144,7 +144,7 @@ public class PatternRequestActivity extends AppCompatActivity {
     }
 
     public static void setOnResponse(OnResponse onResponse) {
-        onResponse = onResponse;
+        PatternRequestActivity.onResponse = onResponse;
     }
 
     private void incorrect(){
@@ -248,14 +248,6 @@ public class PatternRequestActivity extends AppCompatActivity {
         }
 
         return patternString;
-    }
-
-    /*
-    * Listener events for success and fail
-    * */
-    public interface OnResponse{
-        void onSuccess();
-        void onFailed();
     }
 }
 

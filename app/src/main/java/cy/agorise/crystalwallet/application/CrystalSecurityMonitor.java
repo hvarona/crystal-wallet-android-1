@@ -151,7 +151,10 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
         if ((!activity.getIntent().hasExtra("ACTIVITY_TYPE")) || (!activity.getIntent().getStringExtra("ACTIVITY_TYPE").equals("PASSWORD_REQUEST"))) {
             Intent intent = null;
             if ((this.passwordEncrypted != null) && (!this.passwordEncrypted.equals(""))) {
+
                 intent = new Intent(activity, PinRequestActivity.class);
+
+                PinRequestActivity.setOnResponse(null);
 
                 /*
                 * Connect error and success listeners
@@ -162,14 +165,16 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
 
             } else if ((this.patternEncrypted != null) && (!this.patternEncrypted.equals(""))) {
 
+                intent = new Intent(activity, PatternRequestActivity.class);
+
+                PatternRequestActivity.setOnResponse(null);
+
                 /*
                  * Connect error and success listeners
                  * */
                 if(onResponsePattern != null){
                     PatternRequestActivity.setOnResponse(onResponsePattern);
                 }
-
-                intent = new Intent(activity, PatternRequestActivity.class);
             }
             if (intent != null) {
                 intent.putExtra("ACTIVITY_TYPE", "PASSWORD_REQUEST");

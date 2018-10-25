@@ -58,8 +58,10 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
 import cy.agorise.crystalwallet.dialogs.material.ToastIt;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -180,52 +182,9 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         View view = inflater.inflate(R.layout.send_transaction, null);
         ButterKnife.bind(this, view);
 
-
-        /*
-         * Detet scroll changes
-         * */
-        /*scrollMain.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-
-                View view = scrollMain.getChildAt(scrollMain.getChildCount() - 1);
-
-                int diff = (view.getBottom() - (scrollMain.getHeight() + scrollMain.getScrollY()));
-
-                float traslationY = btnSend.getTranslationY();
-
-                if(diff<=266 && diff>128){
-                    //btnSend.setTranslationY(0);
-                    //viewSend.setTranslationY(0);
-
-                    btnSend.animate().y(880);
-                    viewSend.animate().y(800);
-                }
-                else if(diff<=128 && diff>10){
-                    //btnSend.setTranslationY(-130);
-                    //viewSend.setTranslationY(-130);
-
-                    btnSend.animate().y(880);
-                    viewSend.animate().y(800);
-                }
-                else if(diff<=10 && diff>0){
-                    //btnSend.setTranslationY(-170);
-                    //viewSend.setTranslationY(-170);
-
-                    btnSend.animate().y(680);
-                    viewSend.animate().y(600);
-                }
-                else if(diff==0){
-                    //btnSend.setTranslationY(-190);
-                    //viewSend.setTranslationY(-190);
-
-                    btnSend.animate().y(680);
-                    viewSend.animate().y(600);
-                }
-            }
-        });*/
-
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
+
+        final Activity activity = getActivity();
 
         /*
          *   Add style to the spinner android
@@ -252,6 +211,15 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                         assetIds.add(nextBalance.getCryptoCurrencyId());
                     }
                     List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
+
+                    /*
+                    * Test
+                    * */
+                    /*CryptoCurrency crypto1 = new CryptoCurrency();
+                    crypto1.setId(1);
+                    crypto1.setName("BITCOIN");
+                    crypto1.setPrecision(1);
+                    cryptoCurrencyList.add(crypto1);*/
 
                     assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
                     spAsset.setAdapter(assetAdapter);
@@ -653,14 +621,28 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             });
 
             /*
-             * Show loading dialog
-             * */
-            crystalDialog = new CrystalDialog((Activity) getContext());
-            crystalDialog.setText("Sending");
-            crystalDialog.progress();
-            crystalDialog.show();
+            * If exists mode scurity show it and valide events in case of success or fail
+            * */
+            CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
+                @Override
+                public void onSuccess() {
 
-            CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
+                    /*
+                     * Show loading dialog
+                     * */
+                    crystalDialog = new CrystalDialog((Activity) getContext());
+                    crystalDialog.setText("Sending");
+                    crystalDialog.progress();
+                    crystalDialog.show();
+
+                    CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
+                }
+
+                @Override
+                public void onFailed() {
+
+                }
+            });
         }
     }
 

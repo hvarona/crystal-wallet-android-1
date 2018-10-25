@@ -77,6 +77,8 @@ public class PinRequestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pin_request);
         ButterKnife.bind(this);
 
+        //onResponse = null;
+
         /*
         * Initially the button is disabled till the user type a valid PIN
         * */
@@ -113,7 +115,6 @@ public class PinRequestActivity extends AppCompatActivity {
 
                 if(onResponse != null){
                     onResponse.onSuccess();
-                    onResponse = null;
                 }
 
             } else {
@@ -121,7 +122,6 @@ public class PinRequestActivity extends AppCompatActivity {
 
                 if(onResponse != null){
                     onResponse.onFailed();
-                    onResponse = null;
                 }
             }
         }
