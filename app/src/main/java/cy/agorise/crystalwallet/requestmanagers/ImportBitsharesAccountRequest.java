@@ -29,19 +29,9 @@ public class ImportBitsharesAccountRequest extends CryptoNetInfoRequest {
     }
 
     /**
-     * The name of the account
-     */
-    private String accountName;
-
-    /**
      * The mnemonic words
      */
     private final String mnemonic;
-
-    /**
-     * True - the account must be added if the accountName and mnemonic are correct
-     */
-    private boolean addAccountIfValid = false;
 
     /**
      * If this seed is BIP39 or Brainkey
@@ -57,16 +47,13 @@ public class ImportBitsharesAccountRequest extends CryptoNetInfoRequest {
 
     public ImportBitsharesAccountRequest(String mnemonic, Context context){
         super(CryptoCoin.BITSHARES);
-        this.accountName = "";
         this.mnemonic = mnemonic;
         this.context = context;
     }
 
     public ImportBitsharesAccountRequest(String mnemonic, Context context, boolean addAccountIfValid){
         super(CryptoCoin.BITSHARES);
-        this.accountName = "";
         this.mnemonic = mnemonic;
-        this.addAccountIfValid = addAccountIfValid;
         this.context = context;
     }
 
@@ -74,10 +61,6 @@ public class ImportBitsharesAccountRequest extends CryptoNetInfoRequest {
         if (!(this.status.equals(StatusCode.NOT_STARTED))){
             this._fireOnCarryOutEvent();
         }
-    }
-
-    public String getAccountName() {
-        return accountName;
     }
 
     public String getMnemonic() {
@@ -90,14 +73,6 @@ public class ImportBitsharesAccountRequest extends CryptoNetInfoRequest {
 
     public Context getContext() {
         return context;
-    }
-
-    public boolean addAccountIfValid(){
-        return this.addAccountIfValid;
-    }
-
-    public void setAccountName(String accountName){
-        this.accountName = accountName;
     }
 
     public void setSeedType(SeedType seedType) {
