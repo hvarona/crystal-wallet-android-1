@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
-import cy.agorise.crystalwallet.interfaces.OnResponse;
+//import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.util.PasswordManager;
 import cy.agorise.crystalwallet.viewmodels.GeneralSettingListViewModel;
@@ -43,7 +43,7 @@ public class PatternRequestActivity extends AppCompatActivity {
     /*
     * External listener for success or fail
     * */
-    private static OnResponse onResponse;
+    //private static OnResponse onResponse;
 
     /*
      * Contains the bad tries
@@ -109,23 +109,23 @@ public class PatternRequestActivity extends AppCompatActivity {
                                                 //CrystalSecurityMonitor.getInstance(null).call2ndFactor(thisActivity);
                                                 thisActivity.finish();
 
-                                                if(onResponse != null){
+                                                /*if(onResponse != null){
                                                     onResponse.onSuccess();
-                                                }
+                                                }*/
 
                                             } else {
                                                 thisActivity.finish();
 
-                                                if(onResponse != null){
+                                                /*if(onResponse != null){
                                                     onResponse.onSuccess();
-                                                }
+                                                }*/
                                             }
                                         } else {
                                             incorrect();
 
-                                            if(onResponse != null){
+                                            /*if(onResponse != null){
                                                 onResponse.onFailed();
-                                            }
+                                            }*/
                                         }
                                     }
 
@@ -143,9 +143,9 @@ public class PatternRequestActivity extends AppCompatActivity {
         });
     }
 
-    public static void setOnResponse(OnResponse onResponse) {
+    /*public static void setOnResponse(OnResponse onResponse) {
         PatternRequestActivity.onResponse = onResponse;
-    }
+    }*/
 
     private void incorrect(){
 

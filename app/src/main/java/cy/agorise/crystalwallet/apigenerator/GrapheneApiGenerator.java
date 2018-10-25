@@ -124,16 +124,23 @@ public abstract class GrapheneApiGenerator {
                 new WitnessResponseListener() {
                     @Override
                     public void onSuccess(WitnessResponse response) {
-                        final List<List<UserAccount>> resp = (List<List<UserAccount>>) response.result;
-                        if(resp.size() > 0){
-                            List<UserAccount> accounts = resp.get(0);
-                            if(accounts.size() > 0){
-                                for(UserAccount account : accounts) {
+                        try {
+                            final List<List<UserAccount>> resp = (List<List<UserAccount>>) response.result;
+                            if (resp.size() > 0) {
+                                List<UserAccount> accounts = resp.get(0);
+                                if (accounts.size() > 0) {
+                                    for (UserAccount account : accounts) {
                                         request.getListener().success(account, request.getId());
                                         break;
+                                    }
+                                }else{
+                                    request.getListener().fail(request.getId());
                                 }
+                            } else {
+                                request.getListener().fail(request.getId());
                             }
-                        }else{
+                        }catch(Exception e){
+                            e.printStackTrace();
                             request.getListener().fail(request.getId());
                         }
                     }

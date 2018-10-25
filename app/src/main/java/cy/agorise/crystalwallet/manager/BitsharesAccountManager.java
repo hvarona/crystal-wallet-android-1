@@ -303,7 +303,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
 
                     @Override
                     public void fail(int idPetition) {
-                        importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.PETITION_FAILED);
+                        importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.BAD_SEED);
                     }
                 });
                 GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
