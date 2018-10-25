@@ -42,7 +42,7 @@ public class PatternRequestActivity extends AppCompatActivity {
     /*
     * External listener for success or fail
     * */
-    private OnResponse onResponse;
+    private static OnResponse onResponse;
 
     /*
      * Contains the bad tries
@@ -108,6 +108,7 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                                 if(onResponse != null){
                                                     onResponse.onSuccess();
+                                                    onResponse = null;
                                                 }
 
                                             } else {
@@ -115,6 +116,7 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                                 if(onResponse != null){
                                                     onResponse.onSuccess();
+                                                    onResponse = null;
                                                 }
                                             }
                                         } else {
@@ -122,6 +124,7 @@ public class PatternRequestActivity extends AppCompatActivity {
 
                                             if(onResponse != null){
                                                 onResponse.onFailed();
+                                                onResponse = null;
                                             }
                                         }
                                     }
@@ -140,8 +143,8 @@ public class PatternRequestActivity extends AppCompatActivity {
         });
     }
 
-    public void setOnResponse(OnResponse onResponse) {
-        this.onResponse = onResponse;
+    public static void setOnResponse(OnResponse onResponse) {
+        onResponse = onResponse;
     }
 
     private void incorrect(){
