@@ -31,6 +31,7 @@ import cy.agorise.crystalwallet.dialogs.material.DialogMaterial;
 import cy.agorise.crystalwallet.dialogs.material.NegativeResponse;
 import cy.agorise.crystalwallet.dialogs.material.PositiveResponse;
 import cy.agorise.crystalwallet.dialogs.material.QuestionDialog;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.GeneralSetting;
 import cy.agorise.crystalwallet.util.PasswordManager;
@@ -55,6 +56,10 @@ public class PinRequestActivity extends AppCompatActivity {
     * */
     private int seconds = 15;
 
+    /*
+     * External listener for success or fail
+     * */
+    private static OnResponse onResponse;
 
 
 
@@ -105,8 +110,19 @@ public class PinRequestActivity extends AppCompatActivity {
         if (PasswordManager.checkPassword(passwordEncrypted, etPassword.getText().toString())) {
             if (CrystalSecurityMonitor.getInstance(null).is2ndFactorSet()) {
                 CrystalSecurityMonitor.getInstance(null).call2ndFactor(this);
+
+                if(onResponse != null){
+                    onResponse.onSuccess();
+                    onResponse = null;
+                }
+
             } else {
                 this.finish();
+
+                if(onResponse != null){
+                    onResponse.onFailed();
+                    onResponse = null;
+                }
             }
         }
         else{
@@ -202,6 +218,11 @@ public class PinRequestActivity extends AppCompatActivity {
             //Set the amount of time between each execution (in milliseconds)
                     500);
         }
+    }
+
+
+    public static void setOnResponse(OnResponse onResponse) {
+        PinRequestActivity.onResponse = onResponse;
     }
 
 
