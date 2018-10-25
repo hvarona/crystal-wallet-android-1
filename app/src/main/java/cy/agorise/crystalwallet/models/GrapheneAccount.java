@@ -31,9 +31,16 @@ public class GrapheneAccount extends CryptoNetAccount {
     }
 
     public void loadInfo(GrapheneAccountInfo info){
-        this.name = info.getName();
-        this.accountId = info.getAccountId();
-        this.upgradedToLtm = info.getUpgradedToLtm();
+        if(info != null){
+            this.name = info.getName();
+            this.accountId = info.getAccountId();
+            this.upgradedToLtm = info.getUpgradedToLtm();
+        }
+        else{
+            this.name = "";
+            this.accountId = "-1";
+            this.upgradedToLtm = false;
+        }
     }
 
     public String getName() {
