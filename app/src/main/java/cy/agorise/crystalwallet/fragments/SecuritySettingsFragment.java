@@ -83,6 +83,11 @@ public class SecuritySettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_security_settings, container, false);
         ButterKnife.bind(this, v);
 
+        /*
+        * For now this will not be implemented
+        * */
+        sPocketSecurity.setEnabled(false);
+
         securityPagerAdapter = new SecurityPagerAdapter(getChildFragmentManager());
         mPager.setAdapter(securityPagerAdapter);
 

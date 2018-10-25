@@ -84,8 +84,9 @@
             android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etSeedWordsLayout"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
-            android:layout_centerHorizontal="true">
+            android:visibility="gone">
 
             <cy.agorise.crystalwallet.views.natives.CustomTextInputEditText
                 android:id="@+id/etAccountName"
@@ -95,7 +96,8 @@
                 android:hint="@string/txt_account_name"
                 android:inputType="textMultiLine"
                 android:maxLength="255"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:visibility="gone" />
 
         </android.support.design.widget.TextInputLayout>
 

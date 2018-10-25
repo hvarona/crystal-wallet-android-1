@@ -58,8 +58,10 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
 import cy.agorise.crystalwallet.dialogs.material.ToastIt;
+import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -132,8 +134,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     View viewCamera;
 
     /*
-    * Flag to control when the camera is visible and when is hide
-    * */
+     * Flag to control when the camera is visible and when is hide
+     * */
     private boolean cameraVisible = true;
 
     Button btnScanQrCode;
@@ -180,52 +182,9 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         View view = inflater.inflate(R.layout.send_transaction, null);
         ButterKnife.bind(this, view);
 
-
-        /*
-         * Detet scroll changes
-         * */
-        /*scrollMain.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-
-                View view = scrollMain.getChildAt(scrollMain.getChildCount() - 1);
-
-                int diff = (view.getBottom() - (scrollMain.getHeight() + scrollMain.getScrollY()));
-
-                float traslationY = btnSend.getTranslationY();
-
-                if(diff<=266 && diff>128){
-                    //btnSend.setTranslationY(0);
-                    //viewSend.setTranslationY(0);
-
-                    btnSend.animate().y(880);
-                    viewSend.animate().y(800);
-                }
-                else if(diff<=128 && diff>10){
-                    //btnSend.setTranslationY(-130);
-                    //viewSend.setTranslationY(-130);
-
-                    btnSend.animate().y(880);
-                    viewSend.animate().y(800);
-                }
-                else if(diff<=10 && diff>0){
-                    //btnSend.setTranslationY(-170);
-                    //viewSend.setTranslationY(-170);
-
-                    btnSend.animate().y(680);
-                    viewSend.animate().y(600);
-                }
-                else if(diff==0){
-                    //btnSend.setTranslationY(-190);
-                    //viewSend.setTranslationY(-190);
-
-                    btnSend.animate().y(680);
-                    viewSend.animate().y(600);
-                }
-            }
-        });*/
-
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
+
+        final Activity activity = getActivity();
 
         /*
          *   Add style to the spinner android
@@ -237,9 +196,9 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             this.cryptoNetAccount = db.cryptoNetAccountDao().getById(this.cryptoNetAccountId);
 
             /*
-            * this is only for graphene accounts.
-            *
-            **/
+             * this is only for graphene accounts.
+             *
+             **/
             this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
             this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
 
@@ -252,6 +211,15 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                         assetIds.add(nextBalance.getCryptoCurrencyId());
                     }
                     List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
+
+                    /*
+                     * Test
+                     * */
+                    /*CryptoCurrency crypto1 = new CryptoCurrency();
+                    crypto1.setId(1);
+                    crypto1.setName("BITCOIN");
+                    crypto1.setPrecision(1);
+                    cryptoCurrencyList.add(crypto1);*/
 
                     assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
                     spAsset.setAdapter(assetAdapter);
@@ -266,8 +234,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             CryptoNetAccountAdapter fromSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
 
             /*
-            *   If only one account block the control
-            * */
+             *   If only one account block the control
+             * */
             if(cryptoNetAccounts.size()==1){
                 spFrom.setEnabled(false);
             }
@@ -276,8 +244,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             //spFrom.setSelection(0);
 
             /*
-            * Custom material spinner implementation
-            * */
+             * Custom material spinner implementation
+             * */
             spFrom.setItems(cryptoNetAccounts);
             //spFrom.setSelectedIndex(0);
             spFrom.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<CryptoNetAccount>() {
@@ -307,8 +275,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 // Your Permission granted already .Do next code
 
                 /*
-                * Init the camera
-                * */
+                 * Init the camera
+                 * */
                 try {
                     beginScanQrCode();
                 }catch(Exception e){
@@ -344,8 +312,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
 
             /*
-            * Disable the button of the camera visibility
-            * */
+             * Disable the button of the camera visibility
+             * */
             disableVisibilityCamera();
 
         } else {
@@ -490,8 +458,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         mScannerView.stopCamera();
 
         /*
-        * Hide the camera or show it
-        * */
+         * Hide the camera or show it
+         * */
         if(cameraVisible){
             hideCamera();
         }
@@ -522,31 +490,31 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         cameraVisible = true;
 
         /*
-        * Star the camera again
-        * */
+         * Star the camera again
+         * */
         beginScanQrCode();
     }
 
 
     /*
-    * Hide the camera and show the black background
-    * */
+     * Hide the camera and show the black background
+     * */
     private void hideCamera(){
 
         /*
-        * Change visibilities of views
-        * */
+         * Change visibilities of views
+         * */
         viewCamera.setVisibility(View.VISIBLE);
         mScannerView.setVisibility(View.INVISIBLE);
 
         /*
-        * Change icon
-        * */
+         * Change icon
+         * */
         btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ok));
 
         /*
-        * Reset variable
-        * */
+         * Reset variable
+         * */
         cameraVisible = false;
     }
 
@@ -627,12 +595,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             Long amount = (long)Math.floor(amountFromEditText*Math.round(Math.pow(10,((CryptoCurrency)spAsset.getSelectedItem()).getPrecision())));
 
             final ValidateBitsharesSendRequest sendRequest = new ValidateBitsharesSendRequest(
-                this.getContext(),
-                grapheneAccountSelected,
-                this.etTo.getText().toString(),
-                amount,
-                ((CryptoCurrency)spAsset.getSelectedItem()).getName(),
-                etMemo.getText().toString()
+                    this.getContext(),
+                    grapheneAccountSelected,
+                    this.etTo.getText().toString(),
+                    amount,
+                    ((CryptoCurrency)spAsset.getSelectedItem()).getName(),
+                    etMemo.getText().toString()
             );
 
             sendRequest.setListener(new CryptoNetInfoRequestListener() {
@@ -653,14 +621,28 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             });
 
             /*
-             * Show loading dialog
+             * If exists mode scurity show it and valide events in case of success or fail
              * */
-            crystalDialog = new CrystalDialog((Activity) getContext());
-            crystalDialog.setText("Sending");
-            crystalDialog.progress();
-            crystalDialog.show();
+            CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
+                @Override
+                public void onSuccess() {
 
-            CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
+                    /*
+                     * Show loading dialog
+                     * */
+                    crystalDialog = new CrystalDialog((Activity) getContext());
+                    crystalDialog.setText("Sending");
+                    crystalDialog.progress();
+                    crystalDialog.show();
+
+                    CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
+                }
+
+                @Override
+                public void onFailed() {
+
+                }
+            });
         }
     }
 

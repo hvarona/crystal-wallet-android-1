@@ -152,6 +152,16 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
                     }
                     List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
 
+                    /*
+                     * Test
+                     * */
+                    CryptoCurrency crypto1 = new CryptoCurrency();
+                    crypto1.setId(1);
+                    crypto1.setName("BITCOIN");
+                    crypto1.setPrecision(1);
+                    cryptoCurrencyList.add(crypto1);
+
+
                     CryptoCurrencyAdapter assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
                     spAsset.setAdapter(assetAdapter);
                 }

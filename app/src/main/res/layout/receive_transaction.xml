@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="24dp">
@@ -18,11 +18,10 @@
             android:layout_marginEnd="0dp"
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_alignParentTop="true"/>
 
         <TextView
+            android:id="@+id/txtTittle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -31,89 +30,78 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_alignParentTop="true" />
 
         <cy.agorise.crystalwallet.util.CircularImageView
             android:id="@+id/gravatar"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_below="@+id/txtTittle"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="90dp"
-            android:src="@drawable/avatar_placeholder"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="30dp"
+            android:src="@drawable/avatar_placeholder" />
 
         <Spinner
             android:id="@+id/spTo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/gravatar"
-            app:layout_constraintTop_toTopOf="@id/gravatar" />
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/txtTittle"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"/>
 
         <TextView
             android:id="@+id/tvFromError"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/red"
-            app:layout_constraintEnd_toEndOf="@+id/spTo"
-            app:layout_constraintStart_toStartOf="@+id/spTo"
-            app:layout_constraintTop_toBottomOf="@+id/topView" />
+            android:layout_below="@+id/gravatar"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:id="@+id/etAmount"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_below="@+id/tvFromError"
             android:layout_marginStart="24dp"
-            android:inputType="numberDecimal"
-            android:textSize="20sp"
+            android:layout_marginTop="10dp"
             android:hint="@string/amount"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gravatar" />
+            android:inputType="numberDecimal"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tvAmountError"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/red"
-            app:layout_constraintEnd_toEndOf="@+id/etAmount"
-            app:layout_constraintStart_toStartOf="@+id/etAmount"
-            app:layout_constraintTop_toBottomOf="@+id/etAmount" />
+            android:layout_below="@+id/etAmount"/>
 
         <Spinner
             android:id="@+id/spAsset"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="25dp"
             android:gravity="top"
             android:inputType="textMultiLine"
+            android:layout_below="@+id/tvFromError"
             android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/etAmount" />
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"/>
 
         <View
             android:id="@+id/viewSpinner"
             android:layout_width="0dp"
             android:layout_height="3dp"
             android:layout_marginTop="5dp"
-            android:background="@color/gray"
-            app:layout_constraintEnd_toEndOf="@+id/spAsset"
-            app:layout_constraintStart_toStartOf="@+id/spAsset"
-            app:layout_constraintTop_toBottomOf="@id/spAsset" />
+            android:background="@color/gray" />
 
         <TextView
             android:id="@+id/tvAssetError"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/red"
-            app:layout_constraintBottom_toBottomOf="@+id/tvAmountError"
-            app:layout_constraintEnd_toEndOf="@+id/spAsset"
-            app:layout_constraintStart_toStartOf="@+id/spAsset" />
+            android:layout_below="@+id/spAsset"/>
 
         <cy.agorise.crystalwallet.util.SquaredImageView
             android:id="@+id/ivQrCode"
@@ -121,13 +109,12 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/qr_code"
             android:src="@color/gray"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAmountError"/>
+            android:layout_below="@+id/tvAmountError"
+            android:layout_centerHorizontal="true"/>
 
         <TextView
             android:id="@+id/tvShare"
@@ -139,20 +126,20 @@
             android:text="@string/share_this_qr"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/ivQrCode"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:layout_below="@+id/ivQrCode" />
 
         <TextView
             android:id="@+id/tvCancel"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="24dp"
             android:text="@string/close"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/tvShare"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_below="@+id/ivQrCode"
+            android:layout_alignParentRight="true"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
 
 </ScrollView>
