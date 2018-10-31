@@ -20,6 +20,8 @@ import retrofit2.Response;
 
 public abstract class GetEstimateFee {
 
+    private static String PATH = "api";
+
     /**
      * The funciton to get the rate for the transaction be included in the next 2 blocks
      * @param serverUrl The url of the insight server
@@ -29,12 +31,11 @@ public abstract class GetEstimateFee {
         try {
             InsightApiServiceGenerator serviceGenerator = new InsightApiServiceGenerator(serverUrl);
             InsightApiService service = serviceGenerator.getService(InsightApiService.class);
-            Call<JsonObject> call = service.estimateFee(serverUrl);
-            final JsonObject answer = new JsonObject();
+            Call<JsonObject> call = service.estimateFee(PATH);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    listener.estimateFee((long) (answer.get("answer").getAsDouble()));
+                    listener.estimateFee((long) (response.body().get("2").getAsDouble()));
 
                 }
 

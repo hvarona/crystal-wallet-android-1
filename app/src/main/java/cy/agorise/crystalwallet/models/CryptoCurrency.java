@@ -45,6 +45,15 @@ public class CryptoCurrency {
     @ColumnInfo(name = "precision")
     private int mPrecision;
 
+    public CryptoCurrency() {
+    }
+
+    public CryptoCurrency(String name, CryptoNet cryptoNet, int precision) {
+        this.mName = name;
+        this.mCryptoNet = cryptoNet;
+        this.mPrecision = precision;
+    }
+
     public long getId() {
         return mId;
     }

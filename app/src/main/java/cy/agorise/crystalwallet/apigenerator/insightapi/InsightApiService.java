@@ -49,4 +49,7 @@ interface InsightApiService {
     @GET("{path}/utils/estimatefee?nbBlocks=2")
     Call<JsonObject> estimateFee(@Path(value = "path", encoded = true) String path);
 
+    @GET("{path}/block-index/0")
+    Call<JsonObject> genesisBlock(@Path(value = "path", encoded = true) String path);
+
 }

@@ -38,6 +38,7 @@ public class AddressesActivityWatcher {
     private Socket mSocket;
 
     private final String mServerUrl;
+    private final String mPath;
 
     /**
      * Handles the address/transaction notification.
@@ -49,7 +50,7 @@ public class AddressesActivityWatcher {
             try {
                 System.out.println("Receive accountActivtyWatcher " + os[0].toString() );
                 String txid = ((JSONObject) os[0]).getString(InsightApiConstants.sTxTag);
-                new GetTransactionData(txid, mServerUrl, cryptoCoin).start();
+                new GetTransactionData(txid, mServerUrl, mPath, cryptoCoin).start();
             } catch (JSONException ex) {
                 Logger.getLogger(AddressesActivityWatcher.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -106,7 +107,8 @@ public class AddressesActivityWatcher {
      * Basic constructor
      *
      */
-    public AddressesActivityWatcher(String serverUrl, CryptoCoin cryptoCoin) {
+    public AddressesActivityWatcher(String serverUrl, String path, CryptoCoin cryptoCoin) {
+        this.mPath = path;
         this.mServerUrl = serverUrl;
         this.cryptoCoin = cryptoCoin;
         try {

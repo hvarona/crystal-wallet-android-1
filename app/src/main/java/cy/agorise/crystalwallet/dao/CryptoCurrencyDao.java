@@ -35,8 +35,8 @@ public interface CryptoCurrencyDao {
     @Query("SELECT * FROM crypto_currency WHERE name = :name")
     LiveData<CryptoCurrency> getLiveDataByName(String name);
 
-    @Query("SELECT * FROM crypto_currency WHERE name = :name")
-    CryptoCurrency getByName(String name);
+    @Query("SELECT * FROM crypto_currency WHERE name = :name and crypto_net = :cryptoNet")
+    CryptoCurrency getByName(String name, String cryptoNet);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertCryptoCurrency(CryptoCurrency... currencies);

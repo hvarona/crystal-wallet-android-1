@@ -32,6 +32,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
     private InsightApiServiceGenerator mServiceGenerator;
 
     private String mServerUrl;
+
+    private String mPath;
     /**
      * If has to wait for another confirmation
      */
@@ -43,8 +45,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
      * Constructor used to query for a transaction with unknown confirmations
      * @param txid The txid of the transaciton to be query
      */
-    public GetTransactionData(String txid, String serverUrl, CryptoCoin cryptoCoin) {
-        this(txid, serverUrl,  cryptoCoin, false);
+    public GetTransactionData(String txid, String serverUrl, String path, CryptoCoin cryptoCoin) {
+        this(txid, serverUrl, path, cryptoCoin, false);
 
     }
 
@@ -53,7 +55,8 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
      * @param txid The txid of the transaciton to be query
      * @param mustWait If there is less confirmation that needed
      */
-    public GetTransactionData(String txid, String serverUrl, CryptoCoin cryptoCoin, boolean mustWait) {
+    public GetTransactionData(String txid, String serverUrl, String path, CryptoCoin cryptoCoin, boolean mustWait) {
+        this.mPath = path;
         this.mServerUrl = serverUrl;
         this.mTxId= txid;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
@@ -76,7 +79,7 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
         }
 
         InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
-        Call<Txi> txiCall = service.getTransaction(this.mServerUrl,this.mTxId);
+        Call<Txi> txiCall = service.getTransaction(this.mPath,this.mTxId);
         txiCall.enqueue(this);
     }
 
@@ -88,7 +91,7 @@ public class GetTransactionData extends Thread implements Callback<Txi> {
             GeneralAccountManager.getAccountManager(this.cryptoCoin).processTxi(txi);
             if (txi.confirmations < this.cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
                 //If transaction weren't confirmed, add the transaction to watch for change on the confirmations
-                new GetTransactionData(this.mTxId, this.mServerUrl, this.cryptoCoin, true).start();
+                new GetTransactionData(this.mTxId, this.mServerUrl, this.mPath, this.cryptoCoin, true).start();
             }
         }
     }

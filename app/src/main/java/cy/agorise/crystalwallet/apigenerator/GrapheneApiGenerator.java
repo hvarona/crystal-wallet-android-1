@@ -637,7 +637,7 @@ public abstract class GrapheneApiGenerator {
         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
         final CryptoCurrencyDao cryptoCurrencyDao = db.cryptoCurrencyDao();
         final BitsharesAssetDao bitsharesAssetDao = db.bitsharesAssetDao();
-        CryptoCurrency baseCurrency = cryptoCurrencyDao.getByName(baseAssetName);
+        CryptoCurrency baseCurrency = cryptoCurrencyDao.getByName(baseAssetName,CryptoNet.BITSHARES.name());
         BitsharesAssetInfo info = null;
         if(baseCurrency != null){
             info = db.bitsharesAssetDao().getBitsharesAssetInfo(baseCurrency.getId());

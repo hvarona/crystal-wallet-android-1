@@ -74,10 +74,10 @@ public abstract class BitsharesConstant {
     public static void addSmartCoins(Context context){
         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
         for(BitsharesAsset smartcoin : SMARTCOINS){
-            if(db.cryptoCurrencyDao().getByName(smartcoin.getName())== null){
+            if(db.cryptoCurrencyDao().getByName(smartcoin.getName(),CryptoNet.BITSHARES.name())== null){
                 db.cryptoCurrencyDao().insertCryptoCurrency(smartcoin);
             }
-            long idCurrency = db.cryptoCurrencyDao().getByName(smartcoin.getName()).getId();
+            long idCurrency = db.cryptoCurrencyDao().getByName(smartcoin.getName(),CryptoNet.BITSHARES.name()).getId();
             BitsharesAssetInfo info = new BitsharesAssetInfo(smartcoin);
             info.setCryptoCurrencyId(idCurrency);
             db.bitsharesAssetDao().insertBitsharesAssetInfo(info);

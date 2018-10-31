@@ -1,27 +1,14 @@
 package cy.agorise.crystalwallet.apigenerator.insightapi;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.idescout.sql.SqlScoutServer;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import cy.agorise.crystalwallet.apigenerator.InsightApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.AddressTxi;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Txi;
-import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vin;
-import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vout;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
-import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.manager.GeneralAccountManager;
-import cy.agorise.crystalwallet.models.CryptoCurrency;
-import cy.agorise.crystalwallet.models.GTxIO;
-import cy.agorise.crystalwallet.models.GeneralCoinAccount;
-import cy.agorise.crystalwallet.models.GeneralCoinAddress;
-import cy.agorise.crystalwallet.models.GeneralTransaction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,7 +28,9 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
      */
     private InsightApiServiceGenerator mServiceGenerator;
 
-    private String serverUrl;
+    private String mServerUrl;
+
+    private String mPath;
     private CryptoCoin cryptoNet;
 
     private boolean inProcess = false;
@@ -49,9 +38,10 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
     /**
      * Basic consturcotr
      */
-    public GetTransactionByAddress(CryptoCoin cryptoNet, String serverUrl) {
+    public GetTransactionByAddress(CryptoCoin cryptoNet, String serverUrl,String path) {
+        this.mPath = path;
         this.cryptoNet = cryptoNet;
-        this.serverUrl = serverUrl;
+        this.mServerUrl = serverUrl;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
     }
 
@@ -107,7 +97,7 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
             }
             addressToQuery.deleteCharAt(addressToQuery.length() - 1);
             InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
-            Call<AddressTxi> addressTxiCall = service.getTransactionByAddress(this.serverUrl,addressToQuery.toString());
+            Call<AddressTxi> addressTxiCall = service.getTransactionByAddress(this.mPath,addressToQuery.toString());
             addressTxiCall.enqueue(this);
         }
     }

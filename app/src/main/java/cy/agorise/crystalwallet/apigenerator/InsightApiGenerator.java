@@ -14,6 +14,8 @@ public class InsightApiGenerator {
     private static HashMap<CryptoCoin,GetTransactionByAddress> transactionGetters = new HashMap();
     private static HashMap<CryptoCoin,AddressesActivityWatcher> transactionFollowers = new HashMap();
 
+    private static final String PATH = "api";
+
     /**
      * Fecth all the transaciton for a giving address
      * @param cryptoCoin the crypto net of the address
@@ -22,13 +24,13 @@ public class InsightApiGenerator {
      */
     public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address, boolean subscribe){
         if(!transactionGetters.containsKey(cryptoCoin)){
-            transactionGetters.put(cryptoCoin,new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet())));
+            transactionGetters.put(cryptoCoin,new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH));
         }
         transactionGetters.get(cryptoCoin).addAddress(address);
         transactionGetters.get(cryptoCoin).start();
         if(subscribe){
             if(!transactionFollowers.containsKey(cryptoCoin)){
-                transactionFollowers.put(cryptoCoin,new AddressesActivityWatcher(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),cryptoCoin));
+                transactionFollowers.put(cryptoCoin,new AddressesActivityWatcher(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH,cryptoCoin));
             }
             transactionFollowers.get(cryptoCoin).addAddress(address);
             transactionFollowers.get(cryptoCoin).connect();
@@ -42,7 +44,7 @@ public class InsightApiGenerator {
      */
     public static void broadcastTransaction(CryptoCoin cryptoCoin, String rawtx, final ApiRequest request){
         BroadcastTransaction bTransaction = new BroadcastTransaction(rawtx,
-                CryptoNetManager.getURL(cryptoCoin.getCryptoNet()), "api", new BroadcastTransaction.BroadCastTransactionListener() {
+                CryptoNetManager.getURL(cryptoCoin.getCryptoNet()), PATH, new BroadcastTransaction.BroadCastTransactionListener() {
             @Override
             public void onSuccess() {
                 request.getListener().success(true,request.getId());

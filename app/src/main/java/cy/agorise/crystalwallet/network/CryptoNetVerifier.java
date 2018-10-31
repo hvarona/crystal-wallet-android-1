@@ -1,5 +1,6 @@
 package cy.agorise.crystalwallet.network;
 
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 
 /**
@@ -15,6 +16,8 @@ public abstract class CryptoNetVerifier {
     static CryptoNetVerifier getNetworkVerify(CryptoNet cryptoNet){
         if(cryptoNet.getLabel().equals(CryptoNet.BITSHARES.getLabel())){
             return new BitsharesCryptoNetVerifier();
+        }else if(cryptoNet.getLabel().equals(CryptoNet.BITCOIN.getLabel())){
+            return new BitcoinCryptoNetVerifier(CryptoCoin.BITCOIN);
         }
         return null;
     }
