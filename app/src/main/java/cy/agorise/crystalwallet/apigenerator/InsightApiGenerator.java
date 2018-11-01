@@ -29,7 +29,7 @@ public class InsightApiGenerator {
         transactionGetters.get(cryptoCoin).addAddress(address);
         transactionGetters.get(cryptoCoin).start();*/
 
-        GetTransactionByAddress transByAddr = new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH);
+        GetTransactionByAddress transByAddr = new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH,listener);
         transByAddr.addAddress(address);
         transByAddr.start();
 
