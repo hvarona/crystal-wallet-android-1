@@ -25,6 +25,7 @@ import cy.agorise.crystalwallet.apigenerator.InsightApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Txi;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vin;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Vout;
+import cy.agorise.crystalwallet.dao.BitcoinAddressDao;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.models.AccountSeed;
@@ -77,18 +78,69 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     @Override
-    public void loadAccountFromDB(CryptoNetAccount account, Context context) {
+    public void loadAccountFromDB(final CryptoNetAccount account, Context context) {
+        final CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
 
+        AccountSeed seed = db.accountSeedDao().findById(account.getSeedId());
+        DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                new ChildNumber(44, true));
+        DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                new ChildNumber(cryptoCoin.getCoinNumber(), true));
+        DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                new ChildNumber(account.getAccountIndex(), true));
+        final DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                new ChildNumber(0, false));
+        final DeterministicKey changeKey = HDKeyDerivation.deriveChildKey(accountKey,
+                new ChildNumber(1, false));
+
+        long indexExternal = db.bitcoinAddressDao().getLastExternalAddress(account.getId());
+        if(indexExternal > 0){
+            for(int i = 0; i < indexExternal;i++){
+                BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(i);
+                InsightApiGenerator.getTransactionFromAddress(cryptoCoin,address.getAddress(),true,null);
+            }
+        }else {
+            ECKey externalAddrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) 0, true));
+            BitcoinAddress address = new BitcoinAddress();
+            address.setChange(false);
+            address.setAccountId(account.getId());
+            address.setIndex(0);
+            String addressString =externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
+                    new CheckAddressForTransaction(db.bitcoinAddressDao(),account.getId(),externalKey,false,0));
+        }
+
+        long indexChange = db.bitcoinAddressDao().getLastChangeAddress(account.getId());
+        if(indexChange > 0){
+            for(int i = 0; i < indexChange;i++){
+                BitcoinAddress address = db.bitcoinAddressDao().getChangeByIndex(i);
+                InsightApiGenerator.getTransactionFromAddress(cryptoCoin,address.getAddress(),true,null);
+            }
+        }else {
+            ECKey changeAddrKey = HDKeyDerivation.deriveChildKey(changeKey, new ChildNumber((int) 0, true));
+            BitcoinAddress address = new BitcoinAddress();
+            address.setChange(true);
+            address.setAccountId(account.getId());
+            address.setIndex(0);
+            String addressString =changeAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
+                    new CheckAddressForTransaction(db.bitcoinAddressDao(),account.getId(),externalKey,true,0));
+        }
     }
+
+
 
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
         //if(Arrays.asList(SUPPORTED_COINS).contains(request.getCoin())){
         if(request.getCoin().equals(this.cryptoCoin)){
             if(request instanceof BitcoinSendRequest) {
-                this.send((BitcoinSendRequest) request);
             }else if(request instanceof CreateBitcoinAccountRequest){
-
+                this.createGeneralAccount((CreateBitcoinAccountRequest) request);
             }else if(request instanceof NextBitcoinAccountAddressRequest){
                 this.getNextAddress((NextBitcoinAccountAddressRequest) request);
             }else{
@@ -233,6 +285,21 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 updateBalance(ccTransaction,amount,db);
             }
         }
+    }
+
+    private void createGeneralAccount(CreateBitcoinAccountRequest request){
+        CrystalDatabase db = CrystalDatabase.getAppDatabase(this.context);
+        CryptoNetAccount account = new CryptoNetAccount();
+        account.setAccountIndex(0);
+        account.setCryptoNet(this.cryptoCoin.getCryptoNet());
+        account.setName(request.getAccountSeed().getName());
+        account.setSeedId(request.getAccountSeed().getId());
+        long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(account)[0];
+        account.setId(idAccount);
+
+        loadAccountFromDB(account,request.getContext());
+        request.setStatus(CreateBitcoinAccountRequest.StatusCode.SUCCEEDED);
+
     }
 
     private void updateBalance(CryptoCoinTransaction ccTransaction, long amount, CrystalDatabase db){
@@ -392,7 +459,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         String addressString =addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
         address.setAddress(addressString);
         db.bitcoinAddressDao().insertBitcoinAddresses(address);
-        InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin,addressString,true);
+        InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin,addressString,true, null);
 
         request.setAddress(addressString);
         request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
@@ -429,5 +496,38 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         }
 
         return answer;
+    }
+
+    class CheckAddressForTransaction implements InsightApiGenerator.HasTransactionListener{
+        BitcoinAddressDao bitcoinAddressDao;
+        long idAccount;
+        DeterministicKey addressKey;
+        boolean isChange;
+        int lastIndex;
+
+        public CheckAddressForTransaction(BitcoinAddressDao bitcoinAddressDao, long idAccount, DeterministicKey addressKey, boolean isChange, int lastIndex) {
+            this.bitcoinAddressDao = bitcoinAddressDao;
+            this.idAccount = idAccount;
+            this.addressKey = addressKey;
+            this.isChange = isChange;
+            this.lastIndex = lastIndex;
+        }
+
+        @Override
+        public void hasTransaction(boolean value) {
+            if(value){
+
+                ECKey externalAddrKey = HDKeyDerivation.deriveChildKey(addressKey, new ChildNumber(lastIndex+1, true));
+                BitcoinAddress address = new BitcoinAddress();
+                address.setChange(isChange);
+                address.setAccountId(idAccount);
+                address.setIndex(lastIndex+1);
+                String addressString =externalAddrKey.toAddress(cryptoCoin.getParameters()).toString();
+                address.setAddress(addressString);
+                bitcoinAddressDao.insertBitcoinAddresses(address);
+                InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
+                        new CheckAddressForTransaction(bitcoinAddressDao,idAccount,addressKey,isChange,lastIndex+1));
+            }
+        }
     }
 }

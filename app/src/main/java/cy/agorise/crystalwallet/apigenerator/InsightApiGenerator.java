@@ -22,12 +22,17 @@ public class InsightApiGenerator {
      * @param address The address String
      * @param subscribe If needs to follow the address (Real time)
      */
-    public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address, boolean subscribe){
-        if(!transactionGetters.containsKey(cryptoCoin)){
+    public static void getTransactionFromAddress(CryptoCoin cryptoCoin, String address, boolean subscribe, HasTransactionListener listener){
+        /*if(!transactionGetters.containsKey(cryptoCoin)){
             transactionGetters.put(cryptoCoin,new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH));
         }
         transactionGetters.get(cryptoCoin).addAddress(address);
-        transactionGetters.get(cryptoCoin).start();
+        transactionGetters.get(cryptoCoin).start();*/
+
+        GetTransactionByAddress transByAddr = new GetTransactionByAddress(cryptoCoin,CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH);
+        transByAddr.addAddress(address);
+        transByAddr.start();
+
         if(subscribe){
             if(!transactionFollowers.containsKey(cryptoCoin)){
                 transactionFollowers.put(cryptoCoin,new AddressesActivityWatcher(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),PATH,cryptoCoin));
@@ -79,5 +84,9 @@ public class InsightApiGenerator {
                 request.listener.fail(request.getId());
             }
         });
+    }
+
+    public interface HasTransactionListener{
+        public void hasTransaction(boolean value);
     }
 }

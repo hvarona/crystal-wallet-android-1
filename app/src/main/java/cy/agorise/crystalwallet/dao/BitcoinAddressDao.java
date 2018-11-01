@@ -28,6 +28,9 @@ public interface BitcoinAddressDao {
     @Query("SELECT * FROM bitcoin_address ba WHERE ba.address_index = :index and ba.is_change = 'true'")
     BitcoinAddress getChangeByIndex(long index);
 
+    @Query("SELECT * FROM bitcoin_address ba WHERE ba.address_index = :index and ba.is_change = 'false'")
+    BitcoinAddress getExternalByIndex(long index);
+
     @Query("SELECT MAX(ba.address_index) FROM bitcoin_address ba WHERE ba.account_id = :accountId and ba.is_change = 'true' ")
     long getLastChangeAddress(long accountId);
 

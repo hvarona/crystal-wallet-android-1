@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import cy.agorise.crystalwallet.apigenerator.InsightApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.AddressTxi;
 import cy.agorise.crystalwallet.apigenerator.insightapi.models.Txi;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
@@ -35,14 +36,17 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
 
     private boolean inProcess = false;
 
+    private InsightApiGenerator.HasTransactionListener listener;
+
     /**
      * Basic consturcotr
      */
-    public GetTransactionByAddress(CryptoCoin cryptoNet, String serverUrl,String path) {
+    public GetTransactionByAddress(CryptoCoin cryptoNet, String serverUrl, String path, InsightApiGenerator.HasTransactionListener listener) {
         this.mPath = path;
         this.cryptoNet = cryptoNet;
         this.mServerUrl = serverUrl;
         this.mServiceGenerator = new InsightApiServiceGenerator(serverUrl);
+        this.listener = listener;
     }
 
     /**
@@ -63,13 +67,21 @@ public class GetTransactionByAddress extends Thread implements Callback<AddressT
     public void onResponse(Call<AddressTxi> call, Response<AddressTxi> response) {
         inProcess = false;
         if (response.isSuccessful()) {
-            boolean changed = false;
             AddressTxi addressTxi = response.body();
+            if(listener != null) {
+                if (addressTxi.items.length > 0 ) {
+                    listener.hasTransaction(true);
+                }else{
+                    listener.hasTransaction(false);
+                }
+            }
 
             for (Txi txi : addressTxi.items) {
                 GeneralAccountManager.getAccountManager(this.cryptoNet).processTxi(txi);
             }
 
+        }else{
+            listener.hasTransaction(false);
         }
     }
 
