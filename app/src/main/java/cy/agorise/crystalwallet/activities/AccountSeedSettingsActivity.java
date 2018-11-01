@@ -3,7 +3,6 @@ package cy.agorise.crystalwallet.activities;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -13,8 +12,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,21 +22,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
-import cy.agorise.crystalwallet.fragments.BackupsSettingsFragment;
 import cy.agorise.crystalwallet.fragments.BitsharesSettingsFragment;
-import cy.agorise.crystalwallet.fragments.CryptoNetAccountActivationSettingsFragment;
+import cy.agorise.crystalwallet.fragments.GeneralAccountSeedCoinSettingsFragment;
+import cy.agorise.crystalwallet.fragments.GeneralAccountSeedFragment;
 import cy.agorise.crystalwallet.fragments.GeneralCryptoNetAccountSettingsFragment;
-import cy.agorise.crystalwallet.fragments.GeneralSettingsFragment;
-import cy.agorise.crystalwallet.fragments.SecuritySettingsFragment;
+import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
+import cy.agorise.crystalwallet.viewmodels.AccountSeedViewModel;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetAccountViewModel;
 
 /**
- * Created by henry varona on 05/28/18.
+ * Created by henry varona on 10/29/18.
  *
  */
 
-public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
+public class AccountSeedSettingsActivity extends AppCompatActivity{
 
     @BindView(R.id.ivGoBack)
     public ImageView ivGoBack;
@@ -56,7 +53,7 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
     @BindView(R.id.tabs)
     public TabLayout tabs;
 
-    private CryptoNetAccount cryptoNetAccount;
+    private AccountSeed accountSeed;
 
     @BindView(R.id.ivAppBarAnimation)
     ImageView ivAppBarAnimation;
@@ -64,32 +61,27 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.crypto_net_account_activity_settings);
+        setContentView(R.layout.account_seed_activity_settings);
         ButterKnife.bind(this);
-        final CryptoNetAccountSettingsActivity thisActivity = this;
+        final AccountSeedSettingsActivity thisActivity = this;
 
-        long accountId = getIntent().getLongExtra("CRYPTO_NET_ACCOUNT_ID",-1);
+        long accountSeedId = getIntent().getLongExtra("SEED_ID",-1);
 
-        if (accountId > -1) {
-            CryptoNetAccountViewModel cryptoNetAccountViewModel = ViewModelProviders.of(this).get(CryptoNetAccountViewModel.class);
-            cryptoNetAccountViewModel.loadCryptoNetAccount(accountId);
-            LiveData<CryptoNetAccount> cryptoNetAccountLiveData = cryptoNetAccountViewModel.getCryptoNetAccount();
+        if (accountSeedId > -1) {
+            AccountSeedViewModel accountSeedViewModel = ViewModelProviders.of(this).get(AccountSeedViewModel.class);
+            accountSeedViewModel.loadSeed(accountSeedId);
+            LiveData<AccountSeed> accountSeedLiveData = accountSeedViewModel.getAccountSeed();
 
-            cryptoNetAccountLiveData.observe(this, new Observer<CryptoNetAccount>() {
+            accountSeedLiveData.observe(this, new Observer<AccountSeed>() {
                 @Override
-                public void onChanged(@Nullable CryptoNetAccount cryptoNetAccount) {
-                    thisActivity.cryptoNetAccount = cryptoNetAccount;
+                public void onChanged(@Nullable AccountSeed accountSeed) {
+                    thisActivity.accountSeed = accountSeed;
 
                     settingsPagerAdapter = new SettingsPagerAdapter(getSupportFragmentManager());
                     mPager.setAdapter(settingsPagerAdapter);
 
                     TabLayout tabLayout = findViewById(R.id.tabs);
 
-                    switch(cryptoNetAccount.getCryptoNet()){
-                        case BITSHARES:
-                            tabLayout.addTab(tabLayout.newTab().setText("Bitshares"));
-                            break;
-                    }
                     mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mPager));
                 }
@@ -119,19 +111,9 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return GeneralCryptoNetAccountSettingsFragment.newInstance(cryptoNetAccount.getId());
-            }
-
-            if (cryptoNetAccount != null){
-                switch (cryptoNetAccount.getCryptoNet()){
-                    case BITSHARES:
-                        switch(position){
-                            case 1:
-                                return BitsharesSettingsFragment.newInstance(cryptoNetAccount.getId());
-                        }
-
-                        break;
-                }
+                    return GeneralAccountSeedFragment.newInstance(accountSeed.getId());
+                case 1:
+                    return GeneralAccountSeedCoinSettingsFragment.newInstance(accountSeed.getId());
             }
 
             return null;
@@ -139,15 +121,7 @@ public class CryptoNetAccountSettingsActivity extends AppCompatActivity{
 
         @Override
         public int getCount() {
-            int tabCount = 1;
-
-            if (cryptoNetAccount != null){
-                switch (cryptoNetAccount.getCryptoNet()){
-                    case BITSHARES:
-                        tabCount = tabCount+1;
-                        break;
-                }
-            }
+            int tabCount = 2;
 
             return tabCount;
         }

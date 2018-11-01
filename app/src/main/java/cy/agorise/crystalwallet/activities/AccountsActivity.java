@@ -57,8 +57,11 @@ public class AccountsActivity extends AppCompatActivity {
     @BindView(R.id.tvClose)
     TextView tvClose;
 
-    @BindView(R.id.vAccountList)
-    CryptoNetAccountListView vAccountList;
+    //@BindView(R.id.vAccountList)
+    //CryptoNetAccountListView vAccountList;
+
+    @BindView(R.id.vAccountSeedList)
+    AccountSeedListView vAccountSeedList;
 
     @BindView(R.id.user_img)
     CircleImageView userImg;
@@ -88,14 +91,17 @@ public class AccountsActivity extends AppCompatActivity {
 
                 } );
 
-        CryptoNetAccountListViewModel crytpoNetAccountListViewModel = ViewModelProviders.of(this).get(CryptoNetAccountListViewModel.class);
-        LiveData<List<CryptoNetAccount>> accountData = crytpoNetAccountListViewModel.getCryptoNetAccounts();
-        vAccountList.setData(null);
+        AccountSeedListViewModel accountSeedListViewModel = ViewModelProviders.of(this).get(AccountSeedListViewModel.class);
+        LiveData<List<AccountSeed>> accountSeedLD = accountSeedListViewModel.getAccountSeedList();
 
-        accountData.observe(this, new Observer<List<CryptoNetAccount>>() {
+        //CryptoNetAccountListViewModel crytpoNetAccountListViewModel = ViewModelProviders.of(this).get(CryptoNetAccountListViewModel.class);
+        //LiveData<List<CryptoNetAccount>> accountData = crytpoNetAccountListViewModel.getCryptoNetAccounts();
+        vAccountSeedList.setData(null);
+
+        accountSeedLD.observe(this, new Observer<List<AccountSeed>>() {
             @Override
-            public void onChanged(List<CryptoNetAccount> cryptoNetAccounts) {
-                vAccountList.setData(cryptoNetAccounts);
+            public void onChanged(List<AccountSeed> accountsSeeds) {
+                vAccountSeedList.setData(accountsSeeds);
             }
         });
 

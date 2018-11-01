@@ -101,7 +101,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/secondView" />
         -->
-        <cy.agorise.crystalwallet.views.CryptoNetAccountListView
+        <cy.agorise.crystalwallet.views.AccountSeedListView
+            android:id="@+id/vAccountSeedList"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/secondView" />
+        <!--<cy.agorise.crystalwallet.views.CryptoNetAccountListView
             android:id="@+id/vAccountList"
             android:layout_width="match_parent"
             android:layout_height="250dp"
@@ -109,7 +117,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/secondView" />
-
+        -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -119,10 +127,10 @@
             android:textAlignment="center"
             android:textSize="16sp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/vAccountList"
-            app:layout_constraintEnd_toEndOf="@id/vAccountList"
-            app:layout_constraintStart_toStartOf="@id/vAccountList"
-            app:layout_constraintTop_toTopOf="@id/vAccountList" />
+            app:layout_constraintBottom_toBottomOf="@id/vAccountSeedList"
+            app:layout_constraintEnd_toEndOf="@id/vAccountSeedList"
+            app:layout_constraintStart_toStartOf="@id/vAccountSeedList"
+            app:layout_constraintTop_toTopOf="@id/vAccountSeedList" />
 
         <View
             android:id="@+id/forthView"
@@ -131,7 +139,7 @@
             android:background="@color/lightGray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vAccountList" />
+            app:layout_constraintTop_toBottomOf="@id/vAccountSeedList" />
 
         <ImageView
             android:id="@+id/ivSettings"

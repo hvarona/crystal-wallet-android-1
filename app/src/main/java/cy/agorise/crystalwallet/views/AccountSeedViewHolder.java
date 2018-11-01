@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.activities.AccountSeedSettingsActivity;
 import cy.agorise.crystalwallet.activities.BackupSeedActivity;
 import cy.agorise.crystalwallet.activities.SettingsActivity;
 import cy.agorise.crystalwallet.models.AccountSeed;
@@ -39,7 +40,7 @@ public class AccountSeedViewHolder extends RecyclerView.ViewHolder {
             tvAccountSeedName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, BackupSeedActivity.class);
+                    Intent intent = new Intent(context, AccountSeedSettingsActivity.class);
                     intent.putExtra("SEED_ID", accountSeed.getId());
                     context.startActivity(intent);
                 }
