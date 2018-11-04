@@ -201,7 +201,7 @@ public class CryptoNetBalanceViewHolder extends RecyclerView.ViewHolder {
         } else {
             final CryptoNetBalanceViewHolder thisViewHolder = this;
             this.cryptoNetAccountId = balance.getAccountId();
-
+            this.cryptoNetIcon.setImageResource(balance.getCryptoNet().getIconImageResource());
             /*
             * The first letter should be in Uppercase
             * */

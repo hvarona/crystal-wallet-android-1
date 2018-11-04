@@ -2,6 +2,8 @@ package cy.agorise.crystalwallet.requestmanagers;
 
 import android.content.Context;
 
+import java.util.List;
+
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.models.AccountSeed;
@@ -32,10 +34,10 @@ public class CreateBitcoinAccountRequest extends CryptoNetInfoRequest {
     // The state of this request
     private StatusCode status = StatusCode.NOT_STARTED;
 
-    public CreateBitcoinAccountRequest(AccountSeed accountSeed, Context context,  CryptoNet cryptoNet){
-        super(CryptoCoin.BITSHARES);
+    public CreateBitcoinAccountRequest(AccountSeed accountSeed, Context context,  CryptoCoin cryptoCoin){
+        super(cryptoCoin);
         this.accountSeed = accountSeed;
-        this.accountCryptoNet = cryptoNet;
+        this.accountCryptoNet = cryptoCoin.getCryptoNet();
         this.context = context;
     }
 

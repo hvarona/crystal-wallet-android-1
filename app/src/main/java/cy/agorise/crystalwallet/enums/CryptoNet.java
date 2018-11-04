@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import cy.agorise.crystalwallet.R;
+
 /**
  * CryptoNet Enumeration, a Crypto Net is define as the net where a CryptoCoin works, iniside the
  * CrypotNet is where the transaction and balance works, using the CryptoCoin Assets
@@ -11,13 +13,22 @@ import java.util.Map;
  * Created by Henry Varona on 12/9/2017.
  */
 public enum CryptoNet implements Serializable {
-    UNKNOWN("UNKNOWN",6,-1), BITCOIN("BITCOIN",6,1), BITCOIN_TEST("BITCOIN(TEST)",6,2), LITECOIN("LITECOIN",6,3), DASH("DASH",6,5), DOGECOIN("DOGECOIN",6,4), BITSHARES("BITSHARES",1,6), STEEM("STEEM",1,7);
+    UNKNOWN("UNKNOWN",6,-1,android.R.drawable .ic_menu_help),
+    BITCOIN("BITCOIN",6,1,R.drawable.coin_icon_bitcoin),
+    BITCOIN_TEST("BITCOIN(TEST)",6,2,R.drawable.coin_icon_bitcoin),
+    LITECOIN("LITECOIN",6,3,R.drawable.coin_icon_litecoin),
+    DASH("DASH",6,5,R.drawable.coin_icon_dash),
+    DOGECOIN("DOGECOIN",6,4,R.drawable.coin_icon_doge),
+    BITSHARES("BITSHARES",1,6,R.drawable.bts),
+    STEEM("STEEM",1,7,R.drawable.coin_icon_steem);
 
     protected String label;
 
     protected int confirmationsNeeded;
 
     protected int bip44Index;
+
+    protected int iconImageResource;
 
     private static Map<Integer, CryptoNet> bip44Map = new HashMap<Integer, CryptoNet>();
     static {
@@ -26,10 +37,11 @@ public enum CryptoNet implements Serializable {
         }
     }
 
-    CryptoNet(String label,int confirmationsNeeded, int bip44Index){
+    CryptoNet(String label,int confirmationsNeeded, int bip44Index, int iconImageResource){
         this.label = label;
         this.confirmationsNeeded = confirmationsNeeded;
         this.bip44Index = bip44Index;
+        this.iconImageResource = iconImageResource;
     }
 
     public String getLabel(){
@@ -42,6 +54,10 @@ public enum CryptoNet implements Serializable {
 
     public int getBip44Index(){
         return this.bip44Index;
+    }
+
+    public int getIconImageResource() {
+        return this.iconImageResource;
     }
 
     public static CryptoNet fromBip44Index(int index){

@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.manager.FileBackupManager;
+import cy.agorise.crystalwallet.manager.GeneralAccountManager;
 import cy.agorise.crystalwallet.models.BitsharesAccountNameCache;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
@@ -43,6 +45,7 @@ public class CrystalWalletService extends LifecycleService {
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private BitsharesAccountManager  bitsharesAccountManager;
+    private GeneralAccountManager generalAccountManager;
     private Thread LoadAccountTransactionsThread;
     private Thread LoadBitsharesAccountNamesThread;
     private EquivalencesThread LoadEquivalencesThread;
@@ -188,11 +191,13 @@ public class CrystalWalletService extends LifecycleService {
         this.cryptoNetInfoRequests = CryptoNetInfoRequests.getInstance();
         this.fileServiceRequests = FileServiceRequests.getInstance();
         this.bitsharesAccountManager = new BitsharesAccountManager();
+        this.generalAccountManager = new GeneralAccountManager(CryptoCoin.BITCOIN,this.getApplicationContext());
         this.fileBackupManager = new FileBackupManager();
 
         //Add the managers as listeners of the CryptoNetInfoRequest so
         //they can carry out the info requests from the ui
         this.cryptoNetInfoRequests.addListener(this.bitsharesAccountManager);
+        this.cryptoNetInfoRequests.addListener(this.generalAccountManager);
 
         this.fileServiceRequests.addListener(this.fileBackupManager);
     }
