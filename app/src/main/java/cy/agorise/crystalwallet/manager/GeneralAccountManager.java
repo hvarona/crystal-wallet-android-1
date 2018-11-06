@@ -93,6 +93,12 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         final DeterministicKey changeKey = HDKeyDerivation.deriveChildKey(accountKey,
                 new ChildNumber(1, false));
 
+        CryptoCoinBalance balance = new CryptoCoinBalance();
+        balance.setBalance(0);
+        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.name(),cryptoCoin.name()).getId());
+        balance.setAccountId(account.getId());
+        db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
+
         long indexExternal = db.bitcoinAddressDao().getLastExternalAddress(account.getId());
         if(indexExternal > 0){
             for(int i = 0; i < indexExternal;i++){
