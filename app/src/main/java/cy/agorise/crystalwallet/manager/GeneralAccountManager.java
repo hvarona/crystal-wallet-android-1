@@ -3,6 +3,7 @@ package cy.agorise.crystalwallet.manager;
 import android.content.Context;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
@@ -41,6 +42,7 @@ import cy.agorise.crystalwallet.requestmanagers.CreateBitcoinAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
 import cy.agorise.crystalwallet.requestmanagers.NextBitcoinAccountAddressRequest;
+import cy.agorise.crystalwallet.requestmanagers.ValidateBitcoinAddressRequest;
 import cy.agorise.graphenej.Util;
 
 public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
@@ -93,6 +95,12 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         final DeterministicKey changeKey = HDKeyDerivation.deriveChildKey(accountKey,
                 new ChildNumber(1, false));
 
+        CryptoCoinBalance balance = new CryptoCoinBalance();
+        balance.setBalance(0);
+        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.name(),cryptoCoin.name()).getId());
+        balance.setAccountId(account.getId());
+        db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
+
         long indexExternal = db.bitcoinAddressDao().getLastExternalAddress(account.getId());
         if(indexExternal > 0){
             for(int i = 0; i < indexExternal;i++){
@@ -143,6 +151,8 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 this.createGeneralAccount((CreateBitcoinAccountRequest) request);
             }else if(request instanceof NextBitcoinAccountAddressRequest){
                 this.getNextAddress((NextBitcoinAccountAddressRequest) request);
+            }else if(request instanceof ValidateBitcoinAddressRequest){
+                this.validateAddress((ValidateBitcoinAddressRequest) request);
             }else{
                 System.out.println("Invalid " +this.cryptoCoin.getLabel() + " request ");
             }
@@ -323,6 +333,16 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         }
         balance.setBalance(balance.getBalance()+amount);
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
+    }
+
+    private void validateAddress(ValidateBitcoinAddressRequest request){
+        try{
+            Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+            request.setAddressValid(true);
+        }catch(AddressFormatException ex){
+            request.setAddressValid(false);
+        }
+        request.validate();
     }
 
     public void send(final BitcoinSendRequest request){
