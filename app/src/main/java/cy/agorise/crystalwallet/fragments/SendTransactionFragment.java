@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,6 +44,8 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.vincent.filepicker.ToastUtil;
+
+import org.bitcoinj.wallet.SendRequest;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -61,7 +64,11 @@ import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
 import cy.agorise.crystalwallet.dialogs.material.ToastIt;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
+import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.interfaces.OnResponse;
+import cy.agorise.crystalwallet.requestmanagers.BitcoinSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
 import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
@@ -90,7 +97,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     SendTransactionValidator sendTransactionValidator;
 
     @BindView(R.id.spFrom)
-    MaterialSpinner spFrom;
+    Spinner spFrom;
     @BindView(R.id.tvFromError)
     TextView tvFromError;
     @BindView(R.id.etTo)
@@ -195,40 +202,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             db = CrystalDatabase.getAppDatabase(this.getContext());
             this.cryptoNetAccount = db.cryptoNetAccountDao().getById(this.cryptoNetAccountId);
 
-            /*
-             * this is only for graphene accounts.
-             *
-             **/
-            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
-            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
-
-            final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
-            balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
-                @Override
-                public void onChanged(@Nullable List<CryptoCoinBalance> cryptoCoinBalances) {
-                    ArrayList<Long> assetIds = new ArrayList<Long>();
-                    for (CryptoCoinBalance nextBalance : balancesList.getValue()) {
-                        assetIds.add(nextBalance.getCryptoCurrencyId());
-                    }
-                    List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
-
-                    /*
-                     * Test
-                     * */
-                    /*CryptoCurrency crypto1 = new CryptoCurrency();
-                    crypto1.setId(1);
-                    crypto1.setName("BITCOIN");
-                    crypto1.setPrecision(1);
-                    cryptoCurrencyList.add(crypto1);*/
-
-                    assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
-                    spAsset.setAdapter(assetAdapter);
-                }
-            });
-            // TODO SendTransactionValidator to accept spFrom
-            sendTransactionValidator = new SendTransactionValidator(this.getContext(), this.cryptoNetAccount, spFrom, etTo, spAsset, etAmount, etMemo);
-            sendTransactionValidator.setListener(this);
-
             CryptoNetAccountListViewModel cryptoNetAccountListViewModel = ViewModelProviders.of(this).get(CryptoNetAccountListViewModel.class);
             List<CryptoNetAccount> cryptoNetAccounts = cryptoNetAccountListViewModel.getCryptoNetAccountList();
             CryptoNetAccountAdapter fromSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
@@ -236,30 +209,31 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             /*
              *   If only one account block the control
              * */
-            if(cryptoNetAccounts.size()==1){
-                spFrom.setEnabled(false);
-            }
+            //if(cryptoNetAccounts.size()==1){
+            //    spFrom.setEnabled(false);
+            //}
 
             spFrom.setAdapter(fromSpinnerAdapter);
-            //spFrom.setSelection(0);
+            spFrom.setSelection(0);
 
+            setAccountUI();
             /*
              * Custom material spinner implementation
              * */
-            spFrom.setItems(cryptoNetAccounts);
+            //spFrom.setItems(cryptoNetAccounts);
             //spFrom.setSelectedIndex(0);
-            spFrom.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<CryptoNetAccount>() {
-                @Override
-                public void onItemSelected(MaterialSpinner view, int position, long id, CryptoNetAccount item) {
-                    sendTransactionValidator.validate();
-                }
-            });
-            spFrom.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
+            //spFrom.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<CryptoNetAccount>() {
+            //    @Override
+             //   public void onItemSelected(MaterialSpinner view, int position, long id, CryptoNetAccount item) {
+            //        sendTransactionValidator.validate();
+            //    }
+            //});
+            //spFrom.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
 
-                @Override public void onNothingSelected(MaterialSpinner spinner) {
+            //    @Override public void onNothingSelected(MaterialSpinner spinner) {
 
-                }
-            });
+            //    }
+            //});
 
             // etFrom.setText(this.grapheneAccount.getName());
         }
@@ -305,6 +279,58 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         return builder.setView(view).create();
     }
 
+    public void setAccountUI(){
+        if (this.cryptoNetAccount.getCryptoNet() == CryptoNet.BITSHARES) {
+            /*
+             * this is only for graphene accounts.
+             *
+             **/
+            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
+            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
+
+            final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
+            balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
+                @Override
+                public void onChanged(@Nullable List<CryptoCoinBalance> cryptoCoinBalances) {
+                    ArrayList<Long> assetIds = new ArrayList<Long>();
+                    for (CryptoCoinBalance nextBalance : balancesList.getValue()) {
+                        assetIds.add(nextBalance.getCryptoCurrencyId());
+                    }
+                    List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
+
+                    /*
+                     * Test
+                     * */
+                    //CryptoCurrency crypto1 = new CryptoCurrency();
+                    //crypto1.setId(1);
+                    //crypto1.setName("BITCOIN");
+                    //crypto1.setPrecision(1);
+                    //cryptoCurrencyList.add(crypto1);
+
+
+                    CryptoCurrencyAdapter assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
+                    spAsset.setAdapter(assetAdapter);
+                }
+            });
+
+            // TODO SendTransactionValidator to accept spFrom
+            sendTransactionValidator = new SendTransactionValidator(this.getContext(), this.cryptoNetAccount, spFrom, etTo, spAsset, etAmount, etMemo);
+            sendTransactionValidator.setListener(this);
+
+        } else {
+            CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+
+            List<String> currencyList = new ArrayList<>();
+            currencyList.add(cryptoCoin.getLabel());
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this.getContext(),android.R.layout.simple_list_item_1,currencyList);
+            spAsset.setAdapter(arrayAdapter);
+
+            // TODO SendTransactionValidator to accept spFrom
+            sendTransactionValidator = new SendTransactionValidator(this.getContext(), this.cryptoNetAccount, spFrom, etTo, spAsset, etAmount, etMemo);
+            sendTransactionValidator.setListener(this);
+
+        }
+    }
 
     private void requestPermission() {
 
@@ -430,10 +456,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
     }
 
-    /*@OnItemSelected(R.id.spFrom)
+    @OnItemSelected(R.id.spFrom)
     public void afterFromSelected(Spinner spinner, int position) {
+        this.cryptoNetAccount = (CryptoNetAccount)spinner.getSelectedItem();
+        setAccountUI();
         this.sendTransactionValidator.validate();
-    }*/
+    }
 
     @OnTextChanged(value = R.id.etTo,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
@@ -576,49 +604,85 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @OnClick(R.id.btnSend)
     public void sendTransaction(){
         final SendTransactionFragment thisFragment = this;
+        final CryptoNetInfoRequest sendRequest;
 
         if (this.sendTransactionValidator.isValid()) {
-            CryptoNetAccount fromAccountSelected = (CryptoNetAccount) spFrom.getItems().get(spFrom.getSelectedIndex());
+            //CryptoNetAccount fromAccountSelected = (CryptoNetAccount) spFrom.getItems().get(spFrom.getSelectedIndex());
+            CryptoNetAccount fromAccountSelected = (CryptoNetAccount) spFrom.getSelectedItem();
 
 
-            /*
-             * this is only for graphene accounts.
-             *
-             **/
-            GrapheneAccount grapheneAccountSelected = new GrapheneAccount(fromAccountSelected);
-            grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(fromAccountSelected.getId()));
+            if (fromAccountSelected.getCryptoNet() == CryptoNet.BITSHARES) {
+                /*
+                 * this is only for graphene accounts.
+                 *
+                 **/
+                GrapheneAccount grapheneAccountSelected = new GrapheneAccount(fromAccountSelected);
+                grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(fromAccountSelected.getId()));
 
 
+                //TODO convert the amount to long type using the precision of the currency
+                Double amountFromEditText = Double.parseDouble(this.etAmount.getText().toString());
+                Long amount = (long) Math.floor(amountFromEditText * Math.round(Math.pow(10, ((CryptoCurrency) spAsset.getSelectedItem()).getPrecision())));
 
-            //TODO convert the amount to long type using the precision of the currency
-            Double amountFromEditText = Double.parseDouble(this.etAmount.getText().toString());
-            Long amount = (long)Math.floor(amountFromEditText*Math.round(Math.pow(10,((CryptoCurrency)spAsset.getSelectedItem()).getPrecision())));
+                /*final ValidateBitsharesSendRequest*/
+                sendRequest = new ValidateBitsharesSendRequest(
+                        this.getContext(),
+                        grapheneAccountSelected,
+                        this.etTo.getText().toString(),
+                        amount,
+                        ((CryptoCurrency) spAsset.getSelectedItem()).getName(),
+                        etMemo.getText().toString()
+                );
 
-            final ValidateBitsharesSendRequest sendRequest = new ValidateBitsharesSendRequest(
-                    this.getContext(),
-                    grapheneAccountSelected,
-                    this.etTo.getText().toString(),
-                    amount,
-                    ((CryptoCurrency)spAsset.getSelectedItem()).getName(),
-                    etMemo.getText().toString()
-            );
-
-            sendRequest.setListener(new CryptoNetInfoRequestListener() {
-                @Override
-                public void onCarryOut() {
-                    if (sendRequest.getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)){
-                        try {
-                            crystalDialog.dismiss();
-                            thisFragment.dismiss();
-                            //thisFragment.finalize();
-                        } catch (Throwable throwable) {
-                            throwable.printStackTrace();
+                sendRequest.setListener(new CryptoNetInfoRequestListener() {
+                    @Override
+                    public void onCarryOut() {
+                        if (((ValidateBitsharesSendRequest)sendRequest).getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)) {
+                            try {
+                                crystalDialog.dismiss();
+                                thisFragment.dismiss();
+                                //thisFragment.finalize();
+                            } catch (Throwable throwable) {
+                                throwable.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                         }
-                    } else {
-                        Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                     }
-                }
-            });
+                });
+            } else {
+                CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+
+                //TODO convert the amount to long type using the precision of the currency
+                Double amountFromEditText = Double.parseDouble(this.etAmount.getText().toString());
+                Long amount = (long) Math.floor(amountFromEditText * (Math.pow(10, cryptoCoin.getPrecision())));
+
+                sendRequest = new BitcoinSendRequest(
+                        this.getContext(),
+                        this.cryptoNetAccount,
+                        this.etTo.getText().toString(),
+                        amount,
+                        cryptoCoin,
+                        etMemo.getText().toString()
+                );
+
+                sendRequest.setListener(new CryptoNetInfoRequestListener() {
+                    @Override
+                    public void onCarryOut() {
+                        if (((BitcoinSendRequest)sendRequest).getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)) {
+                            try {
+                                crystalDialog.dismiss();
+                                thisFragment.dismiss();
+                                //thisFragment.finalize();
+                            } catch (Throwable throwable) {
+                                throwable.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
+                        }
+                    }
+                });
+            }
 
             /*
              * If exists mode scurity show it and valide events in case of success or fail

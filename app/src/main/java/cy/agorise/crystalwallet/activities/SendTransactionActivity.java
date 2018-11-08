@@ -41,7 +41,7 @@ public class SendTransactionActivity extends AppCompatActivity implements UIVali
     SendTransactionValidator sendTransactionValidator;
 
     @BindView(R.id.spFrom)
-    MaterialSpinner spFrom;
+    Spinner spFrom;
     @BindView(R.id.tvFromError)
     TextView tvFromError;
     @BindView(R.id.etTo)
