@@ -18,7 +18,8 @@ public enum CryptoCoin implements Serializable {
     LITECOIN(CryptoNet.LITECOIN,"LTC",8,2,null),
     DASH(CryptoNet.DASH,"DASH",8,5,null),
     DOGECOIN(CryptoNet.DOGECOIN,"DOGE",8,3,null),
-    BITSHARES(CryptoNet.BITSHARES,"BTS",5,0,null);
+    BITSHARES(CryptoNet.BITSHARES,"BTS",5,0,null),
+    STEEM(CryptoNet.STEEM,"BTS",5,0,null);
 
     protected CryptoNet cryptoNet;
     protected String label;
