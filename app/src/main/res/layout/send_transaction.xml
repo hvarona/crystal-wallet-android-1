@@ -46,7 +46,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.jaredrummler.materialspinner.MaterialSpinner
+        <!--<com.jaredrummler.materialspinner.MaterialSpinner-->
+        <Spinner
             android:id="@+id/spFrom"
             android:layout_width="0dp"
             android:layout_height="40dp"

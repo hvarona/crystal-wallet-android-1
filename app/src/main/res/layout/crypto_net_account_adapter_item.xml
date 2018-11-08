@@ -8,9 +8,27 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
-    <TextView
-        android:id="@+id/tvCryptoNetAccountName"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+        <ImageView
+            android:id="@+id/ivCryptoNetIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxHeight="28dp"
+            android:maxWidth="28dp"
+            app:srcCompat="@drawable/bts" />
+        <TextView
+            android:id="@+id/tvCryptoNetAccountName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@id/ivCryptoNetIcon"
+            android:ems="10"
+            android:text="unknown coin" />
+    </RelativeLayout>
 </LinearLayout>
