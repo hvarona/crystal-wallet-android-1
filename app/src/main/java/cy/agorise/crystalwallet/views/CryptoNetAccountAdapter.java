@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -42,9 +43,11 @@ public class CryptoNetAccountAdapter extends ArrayAdapter<CryptoNetAccount> {
         LayoutInflater inflater = (LayoutInflater)this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflater.inflate(R.layout.crypto_net_account_adapter_item, parent, false);
         TextView tvCryptoNetAccountName = v.findViewById(R.id.tvCryptoNetAccountName);
+        ImageView ivCryptoNetIcon = v.findViewById(R.id.ivCryptoNetIcon);
 
         CryptoNetAccount cryptoNetAccount = getItem(position);
         tvCryptoNetAccountName.setText(cryptoNetAccount.getName());
+        ivCryptoNetIcon.setImageResource(cryptoNetAccount.getCryptoNet().getIconImageResource());
 
         return v;
     }

@@ -2,7 +2,6 @@ package cy.agorise.crystalwallet.manager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 
 import com.google.common.primitives.UnsignedLong;
 
@@ -16,29 +15,15 @@ import java.util.TimeZone;
 
 import cy.agorise.crystalwallet.apigenerator.ApiRequest;
 import cy.agorise.crystalwallet.apigenerator.ApiRequestListener;
-import cy.agorise.crystalwallet.apigenerator.BitsharesFaucetApiGenerator;
 import cy.agorise.crystalwallet.apigenerator.GrapheneApiGenerator;
-import cy.agorise.crystalwallet.apigenerator.grapheneoperation.AccountUpgradeOperationBuilder;
-import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.AccountSeedDao;
-import cy.agorise.crystalwallet.enums.CryptoCoin;
-import cy.agorise.crystalwallet.models.BitsharesAccountNameCache;
-import cy.agorise.crystalwallet.models.seed.BIP39;
-import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
-import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
-import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
-import cy.agorise.crystalwallet.requestmanagers.GetBitsharesAccountNameCacheRequest;
-import cy.agorise.crystalwallet.requestmanagers.ImportBitsharesAccountRequest;
-import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesLTMUpgradeRequest;
-import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
-import cy.agorise.crystalwallet.requestmanagers.ValidateCreateBitsharesAccountRequest;
-import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountRequest;
-import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.dao.TransactionDao;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.enums.SeedType;
 import cy.agorise.crystalwallet.models.AccountSeed;
+import cy.agorise.crystalwallet.models.BitsharesAccountNameCache;
 import cy.agorise.crystalwallet.models.BitsharesAsset;
 import cy.agorise.crystalwallet.models.BitsharesAssetInfo;
 import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
@@ -46,7 +31,16 @@ import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.models.GrapheneAccount;
 import cy.agorise.crystalwallet.models.GrapheneAccountInfo;
+import cy.agorise.crystalwallet.models.seed.BIP39;
 import cy.agorise.crystalwallet.network.CryptoNetManager;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
+import cy.agorise.crystalwallet.requestmanagers.GetBitsharesAccountNameCacheRequest;
+import cy.agorise.crystalwallet.requestmanagers.ImportBitsharesAccountRequest;
+import cy.agorise.crystalwallet.requestmanagers.ValidateBitsharesSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountRequest;
+import cy.agorise.crystalwallet.requestmanagers.ValidateImportBitsharesAccountRequest;
 import cy.agorise.graphenej.Address;
 import cy.agorise.graphenej.Asset;
 import cy.agorise.graphenej.AssetAmount;
@@ -65,54 +59,14 @@ import cy.agorise.graphenej.operations.TransferOperationBuilder;
  *
  * Created by henry on 26/9/2017.
  */
-public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
+public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoRequestsListener {
 
     private final static String SIMPLE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private final static String DEFAULT_TIME_ZONE = "GMT";
 
     @Override
     public void createAccountFromSeed(CryptoNetAccount account, final ManagerRequest request, final Context context) {
-        if(account instanceof  GrapheneAccount) {
-
-            final GrapheneAccount grapheneAccount = (GrapheneAccount) account;
-            ApiRequest creationRequest = new ApiRequest(1, new ApiRequestListener() {
-                @Override
-                public void success(Object answer, int idPetition) {
-                    getAccountInfoByName(grapheneAccount.getName(), new ManagerRequest() {
-                        @Override
-                        public void success(Object answer) {
-                            GrapheneAccount fetch = (GrapheneAccount) answer;
-                            fetch.setSeedId(grapheneAccount.getSeedId());
-                            fetch.setCryptoNet(grapheneAccount.getCryptoNet());
-                            fetch.setAccountIndex(grapheneAccount.getAccountIndex());
-
-                            CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                            long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(fetch)[0];
-                            fetch.setId(idAccount);
-                            db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(fetch));
-                            subscribeBitsharesAccount(fetch.getId(),fetch.getAccountId(),context);
-                            request.success(fetch);
-                        }
-
-                        @Override
-                        public void fail() {
-                            request.fail();
-                        }
-                    });
-
-                }
-
-                @Override
-                public void fail(int idPetition) {
-                    request.fail();
-                }
-            });
-            BitsharesFaucetApiGenerator.registerBitsharesAccount(grapheneAccount.getName(),
-                    new Address(ECKey.fromPublicOnly(grapheneAccount.getOwnerKey(context).getPubKey())).toString(),
-                    new Address(ECKey.fromPublicOnly(grapheneAccount.getActiveKey(context).getPubKey())).toString(),
-                    new Address(ECKey.fromPublicOnly(grapheneAccount.getMemoKey(context).getPubKey())).toString(),
-                    BitsharesConstant.FAUCET_URL, creationRequest);
-        }
+        //TODO error, can't create steem accounts
     }
 
     @Override
@@ -130,7 +84,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long[] idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         grapheneAccount.setId(idAccount[0]);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -148,7 +102,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
                         db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -160,7 +114,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
                 db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
-                subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
+                subscribeSteemAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
         }
     }
@@ -180,7 +134,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setAccountId(fetch.getAccountId());
                         grapheneAccount.setAccountId(fetch.getAccountId());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -196,7 +150,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setName(fetch.getName());
                         grapheneAccount.setName(fetch.getName());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
-                        subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                        subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
                     @Override
@@ -205,15 +159,15 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                     }
                 });
             }else{
-                subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
+                subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
             }
         }
     }
 
-    private void subscribeBitsharesAccount(long accountId, String accountBitsharesID, Context context){
-        GrapheneApiGenerator.subscribeBitsharesAccount(accountId,accountBitsharesID,context);
-        BitsharesAccountManager.refreshAccountTransactions(accountId,context);
-        GrapheneApiGenerator.getAccountBalance(accountId,accountBitsharesID,CryptoNet.BITSHARES,context);
+    private void subscribeSteemAccount(long accountId, String accountSteemID, Context context){
+        GrapheneApiGenerator.subscribeSteemAccount(accountId,accountSteemID,context);
+        SteemAccountManager.refreshAccountTransactions(accountId,context);
+        GrapheneApiGenerator.getAccountBalance(accountId,accountSteemID,CryptoNet.STEEM,context);
     }
 
     /**
@@ -222,7 +176,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
      */
     @Override
     public void onNewRequest(CryptoNetInfoRequest request) {
-        if(request.getCoin().equals(CryptoCoin.BITSHARES)) {
+        if(request.getCoin().equals(CryptoCoin.STEEM)) {
             if (request instanceof ImportBitsharesAccountRequest) {
                 this.importAccount((ImportBitsharesAccountRequest) request);
             } else if (request instanceof ValidateImportBitsharesAccountRequest) {
@@ -233,10 +187,6 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 this.validateSendRequest((ValidateBitsharesSendRequest) request);
             } else if (request instanceof CryptoNetEquivalentRequest) {
                 this.getEquivalentValue((CryptoNetEquivalentRequest) request);
-            } else if (request instanceof ValidateCreateBitsharesAccountRequest) {
-                this.validateCreateAccount((ValidateCreateBitsharesAccountRequest) request);
-            } else if (request instanceof ValidateBitsharesLTMUpgradeRequest) {
-                this.validateLTMAccountUpgrade((ValidateBitsharesLTMUpgradeRequest) request);
             } else if (request instanceof GetBitsharesAccountNameCacheRequest) {
                 this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
             } else {
@@ -397,36 +347,6 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         GrapheneApiGenerator.getAccountIdByName(importRequest.getAccountName(),checkAccountName);
     }
 
-    private void validateCreateAccount(final ValidateCreateBitsharesAccountRequest createRequest){
-        //TODO test for internet and server connection
-        // Generate seed or find key
-        Context context = createRequest.getContext();
-        AccountSeed seed = AccountSeed.getAccountSeed(SeedType.BIP39, context);
-        CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-        long idSeed = db.accountSeedDao().insertAccountSeed(seed);
-        assert seed != null;
-        seed.setId(idSeed);
-        seed.setName(createRequest.getAccountName());
-        GrapheneAccount account = new GrapheneAccount();
-        account.setName(createRequest.getAccountName());
-        account.setSeedId(idSeed);
-        account.setAccountIndex(0);
-        account.setCryptoNet(CryptoNet.BITSHARES);
-        this.createAccountFromSeed(account, new ManagerRequest() {
-
-            @Override
-            public void success(Object answer) {
-                createRequest.setAccount((GrapheneAccount) answer);
-                createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.SUCCEEDED);
-            }
-
-            @Override
-            public void fail() {
-                createRequest.setStatus(ValidateCreateBitsharesAccountRequest.StatusCode.ACCOUNT_EXIST);
-            }
-        }, context);
-    }
-
     /**
      * Process the account exist request, it consults the bitshares api for the account name.
      *
@@ -575,43 +495,6 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         GrapheneApiGenerator.broadcastTransaction(transaction, feeAsset, transactionRequest);
     }
 
-    /**
-     * Broadcast a transaction request
-     */
-    private void validateLTMAccountUpgrade(final ValidateBitsharesLTMUpgradeRequest sendRequest) {
-        //TODO check internet, server connection
-        Asset feeAsset = new Asset(sendRequest.getIdAsset());
-        UserAccount fromUserAccount =new UserAccount(sendRequest.getSourceAccount().getAccountId());
-
-        CrystalDatabase db = CrystalDatabase.getAppDatabase(sendRequest.getContext());
-
-        AccountUpgradeOperationBuilder builder = new AccountUpgradeOperationBuilder()
-                .setAccountToUpgrade(fromUserAccount)
-                .setFee(new AssetAmount(UnsignedLong.valueOf(0), feeAsset));
-        ArrayList<BaseOperation> operationList = new ArrayList<>();
-        operationList.add(builder.build());
-
-        ECKey privateKey = sendRequest.getSourceAccount().getActiveKey(sendRequest.getContext());
-
-        Transaction transaction = new Transaction(privateKey, null, operationList);
-        transaction.setChainId(CryptoNetManager.getChaindId(CryptoNet.BITSHARES));
-
-
-        ApiRequest transactionRequest = new ApiRequest(0, new ApiRequestListener() {
-            @Override
-            public void success(Object answer, int idPetition) {
-                sendRequest.setStatus(ValidateBitsharesLTMUpgradeRequest.StatusCode.SUCCEEDED);
-            }
-
-            @Override
-            public void fail(int idPetition) {
-                sendRequest.setStatus(ValidateBitsharesLTMUpgradeRequest.StatusCode.PETITION_FAILED);
-            }
-        });
-
-        GrapheneApiGenerator.broadcastTransaction(transaction,feeAsset, transactionRequest);
-    }
-
     private void getBitsharesAccountNameCacheRequest(final GetBitsharesAccountNameCacheRequest request){
         final CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         BitsharesAccountNameCache cacheAccount = db.bitsharesAccountNameCacheDao().getByAccountId(request.getAccountId());
@@ -683,7 +566,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
         List<CryptoCoinTransaction> transactions = db.transactionDao().getByIdAccount(idAccount);
         CryptoNetAccount account = db.cryptoNetAccountDao().getById(idAccount);
-        if(account.getCryptoNet() == CryptoNet.BITSHARES) {
+        if(account.getCryptoNet() == CryptoNet.STEEM) {
 
             GrapheneAccount grapheneAccount = new GrapheneAccount(account);
             grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(idAccount));
@@ -693,7 +576,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
             int stop = start + limit;
 
             ApiRequest transactionRequest = new ApiRequest(0, new TransactionRequestListener(start, stop, limit, grapheneAccount, db));
-            GrapheneApiGenerator.getAccountTransaction(grapheneAccount.getAccountId(), start, stop, limit, CryptoNet.BITSHARES,transactionRequest);
+            GrapheneApiGenerator.getAccountTransaction(grapheneAccount.getAccountId(), start, stop, limit, CryptoNet.STEEM,transactionRequest);
         }
     }
 
@@ -796,7 +679,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 int newStart= start + limit;
                 int newStop= stop + limit;
                 ApiRequest transactionRequest = new ApiRequest(newStart/limit, new TransactionRequestListener(newStart,newStop,limit,account,db));
-                GrapheneApiGenerator.getAccountTransaction(account.getAccountId(),newStart,newStop,limit,CryptoNet.BITSHARES,transactionRequest);
+                GrapheneApiGenerator.getAccountTransaction(account.getAccountId(),newStart,newStop,limit,CryptoNet.STEEM,transactionRequest);
             }
         }
 

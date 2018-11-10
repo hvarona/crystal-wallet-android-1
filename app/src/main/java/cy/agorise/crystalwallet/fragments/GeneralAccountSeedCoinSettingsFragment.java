@@ -10,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.models.AccountSeed;
 import cy.agorise.crystalwallet.models.CryptoNetSelection;
@@ -98,7 +100,10 @@ public class GeneralAccountSeedCoinSettingsFragment extends Fragment implements 
     @Override
     public void onCryptoNetSelectionChecked(CryptoNetSelection source) {
         //Toast.makeText(this.getContext(),"the coin "+source.getCryptoNet().name()+" was "+(source.getSelected()?"selected":"unselected"),Toast.LENGTH_LONG).show();
-        final CreateBitcoinAccountRequest request = new CreateBitcoinAccountRequest(this.accountSeed,this.getContext(),source.getCryptoNet());
+        List<CryptoCoin> cryptoCoins = CryptoCoin.getByCryptoNet(source.getCryptoNet());
+
+
+        final CreateBitcoinAccountRequest request = new CreateBitcoinAccountRequest(this.accountSeed,this.getContext(),cryptoCoins.get(0));
 
         request.setListener(new CryptoNetInfoRequestListener() {
             @Override

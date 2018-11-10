@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,6 +36,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
 import butterknife.OnClick;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
+import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.util.CircularImageView;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetAccountListViewModel;
 import cy.agorise.crystalwallet.views.CryptoNetAccountAdapter;
@@ -135,46 +138,13 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
             db = CrystalDatabase.getAppDatabase(this.getContext());
             this.cryptoNetAccount = db.cryptoNetAccountDao().getById(this.cryptoNetAccountId);
 
-            /*
-            * this is only for graphene accounts.
-            *
-            **/
-            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
-            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
-
-            final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
-            balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
-                @Override
-                public void onChanged(@Nullable List<CryptoCoinBalance> cryptoCoinBalances) {
-                    ArrayList<Long> assetIds = new ArrayList<Long>();
-                    for (CryptoCoinBalance nextBalance : balancesList.getValue()) {
-                        assetIds.add(nextBalance.getCryptoCurrencyId());
-                    }
-                    List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
-
-                    /*
-                     * Test
-                     * */
-                    CryptoCurrency crypto1 = new CryptoCurrency();
-                    crypto1.setId(1);
-                    crypto1.setName("BITCOIN");
-                    crypto1.setPrecision(1);
-                    cryptoCurrencyList.add(crypto1);
-
-
-                    CryptoCurrencyAdapter assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
-                    spAsset.setAdapter(assetAdapter);
-                }
-            });
-
-            receiveTransactionValidator = new ReceiveTransactionValidator(this.getContext(), this.cryptoNetAccount, spAsset, etAmount);
-            receiveTransactionValidator.setListener(this);
-
             CryptoNetAccountListViewModel cryptoNetAccountListViewModel = ViewModelProviders.of(this).get(CryptoNetAccountListViewModel.class);
             List<CryptoNetAccount> cryptoNetAccounts = cryptoNetAccountListViewModel.getCryptoNetAccountList();
             CryptoNetAccountAdapter toSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
             spTo.setAdapter(toSpinnerAdapter);
             spTo.setSelection(0);
+
+            setAccountUI();
         }
 
         builder.setView(view);
@@ -247,8 +217,59 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
         }
     }
 
+    public void setAccountUI(){
+        if (this.cryptoNetAccount.getCryptoNet() == CryptoNet.BITSHARES) {
+            /*
+             * this is only for graphene accounts.
+             *
+             **/
+            this.grapheneAccount = new GrapheneAccount(this.cryptoNetAccount);
+            this.grapheneAccount.loadInfo(db.grapheneAccountInfoDao().getByAccountId(this.cryptoNetAccountId));
+
+            final LiveData<List<CryptoCoinBalance>> balancesList = db.cryptoCoinBalanceDao().getBalancesFromAccount(cryptoNetAccountId);
+            balancesList.observe(this, new Observer<List<CryptoCoinBalance>>() {
+                @Override
+                public void onChanged(@Nullable List<CryptoCoinBalance> cryptoCoinBalances) {
+                    ArrayList<Long> assetIds = new ArrayList<Long>();
+                    for (CryptoCoinBalance nextBalance : balancesList.getValue()) {
+                        assetIds.add(nextBalance.getCryptoCurrencyId());
+                    }
+                    List<CryptoCurrency> cryptoCurrencyList = db.cryptoCurrencyDao().getByIds(assetIds);
+
+                    /*
+                     * Test
+                     * */
+                    //CryptoCurrency crypto1 = new CryptoCurrency();
+                    //crypto1.setId(1);
+                    //crypto1.setName("BITCOIN");
+                    //crypto1.setPrecision(1);
+                    //cryptoCurrencyList.add(crypto1);
+
+
+                    CryptoCurrencyAdapter assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
+                    spAsset.setAdapter(assetAdapter);
+                }
+            });
+
+            receiveTransactionValidator = new ReceiveTransactionValidator(this.getContext(), this.cryptoNetAccount, spAsset, etAmount);
+            receiveTransactionValidator.setListener(this);
+        } else {
+            CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+
+            List<String> currencyList = new ArrayList<>();
+            currencyList.add(cryptoCoin.getLabel());
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this.getContext(),android.R.layout.simple_list_item_1,currencyList);
+            spAsset.setAdapter(arrayAdapter);
+
+            receiveTransactionValidator = new ReceiveTransactionValidator(this.getContext(), this.cryptoNetAccount, spAsset, etAmount);
+            receiveTransactionValidator.setListener(this);
+        }
+    }
+
     @OnItemSelected(R.id.spTo)
     public void afterToSelected(Spinner spinner, int position) {
+        this.cryptoNetAccount = (CryptoNetAccount)spinner.getSelectedItem();
+        setAccountUI();
         this.receiveTransactionValidator.validate();
     }
 
@@ -260,7 +281,10 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
 
     @OnItemSelected(R.id.spAsset)
     public void afterAssetSelected(Spinner spinner, int position) {
-        this.cryptoCurrency = (CryptoCurrency)spinner.getSelectedItem();
+        if (spinner.getSelectedItem() instanceof CryptoCurrency) {
+            this.cryptoCurrency = (CryptoCurrency) spinner.getSelectedItem();
+        }
+
         this.receiveTransactionValidator.validate();
     }
 

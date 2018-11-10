@@ -82,6 +82,25 @@ public abstract class GrapheneApiGenerator {
      */
     private static HashMap<Long,SubscriptionListener> currentBitsharesListener = new HashMap<>();
 
+
+    // The message broker for Steem
+    private static SubscriptionMessagesHub steemSubscriptionHub = new SubscriptionMessagesHub("", "", true, new NodeErrorListener() {
+        @Override
+        public void onError(BaseResponse.Error error) {
+            //TODO subcription hub error
+            System.out.println("GrapheneAPI error");
+        }
+    });
+
+    /**
+     * The Steem subscription thread for the real time updates
+     */
+    private static WebSocketThread steemSubscriptionThread = new WebSocketThread(steemSubscriptionHub, CryptoNetManager.getURL(CryptoNet.STEEM));
+    /**
+     * This is used for manager each Steem listener in the subscription thread
+     */
+    private static HashMap<Long,SubscriptionListener> currentSteemListener = new HashMap<>();
+
     /**
      * Retrieves the data of an account searching by it's id
      *
@@ -164,7 +183,7 @@ public abstract class GrapheneApiGenerator {
      * @param request The Api request object, to answer this petition
      */
     public static void getAccountTransaction(String accountGrapheneId, int start, int stop,
-                                             int limit, final ApiRequest request){
+                                             int limit, CryptoNet cryptoNet, final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetRelativeAccountHistory(new UserAccount(accountGrapheneId),
                 start, limit, stop, new WitnessResponseListener() {
             @Override
@@ -176,7 +195,7 @@ public abstract class GrapheneApiGenerator {
             public void onError(BaseResponse.Error error) {
                 request.getListener().fail(request.getId());
             }
-        }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+        }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -381,7 +400,7 @@ public abstract class GrapheneApiGenerator {
                                     if(operation instanceof TransferOperation){
                                         final TransferOperation tOperation = (TransferOperation) operation;
                                         if(tOperation.getFrom().getObjectId().equals(accountBitsharesId) || tOperation.getTo().getObjectId().equals(accountBitsharesId)){
-                                            GrapheneApiGenerator.getAccountBalance(accountId,accountBitsharesId,context);
+                                            GrapheneApiGenerator.getAccountBalance(accountId,accountBitsharesId,CryptoNet.BITSHARES,context);
                                             final CryptoCoinTransaction transaction = new CryptoCoinTransaction();
                                             transaction.setAccountId(accountId);
                                             transaction.setAmount(tOperation.getAssetAmount().getAmount().longValue());
@@ -445,6 +464,99 @@ public abstract class GrapheneApiGenerator {
     }
 
     /**
+     * Subscribe a steem account to receive real time updates
+     *
+     * @param accountId The id opf the database of the account
+     * @param accountSteemId  The steem id of the account
+     * @param context The android context of this application
+     */
+    public static void subscribeSteemAccount(final long accountId, final String accountSteemId,
+                                                 final Context context){
+        if(!currentSteemListener.containsKey(accountId)){
+            CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
+            final BitsharesAssetDao bitsharesAssetDao = db.bitsharesAssetDao();
+            final CryptoCurrencyDao cryptoCurrencyDao = db.cryptoCurrencyDao();
+            SubscriptionListener balanceListener = new SubscriptionListener() {
+                @Override
+                public ObjectType getInterestObjectType() {
+                    return ObjectType.TRANSACTION_OBJECT;
+                }
+
+                @Override
+                public void onSubscriptionUpdate(SubscriptionResponse response) {
+                    List<Serializable> updatedObjects = (List<Serializable>) response.params.get(1);
+                    if(updatedObjects.size() > 0){
+                        for(Serializable update : updatedObjects){
+                            if(update instanceof BroadcastedTransaction){
+                                BroadcastedTransaction transactionUpdate = (BroadcastedTransaction) update;
+                                for(BaseOperation operation : transactionUpdate.getTransaction().getOperations()){
+                                    if(operation instanceof TransferOperation){
+                                        final TransferOperation tOperation = (TransferOperation) operation;
+                                        if(tOperation.getFrom().getObjectId().equals(accountSteemId) || tOperation.getTo().getObjectId().equals(accountSteemId)){
+                                            GrapheneApiGenerator.getAccountBalance(accountId,accountSteemId,CryptoNet.STEEM,context);
+                                            final CryptoCoinTransaction transaction = new CryptoCoinTransaction();
+                                            transaction.setAccountId(accountId);
+                                            transaction.setAmount(tOperation.getAssetAmount().getAmount().longValue());
+                                            BitsharesAssetInfo info = bitsharesAssetDao.getBitsharesAssetInfoById(tOperation.getAssetAmount().getAsset().getObjectId());
+                                            if (info == null) {
+                                                //The cryptoCurrency is not in the database, queringfor its data
+                                                ApiRequest assetRequest = new ApiRequest(0, new ApiRequestListener() {
+                                                    @Override
+                                                    public void success(Object answer, int idPetition) {
+                                                        ArrayList<BitsharesAsset> assets = (ArrayList<BitsharesAsset>) answer;
+                                                        for(BitsharesAsset asset : assets){
+
+                                                            long currencyId = -1;
+                                                            CryptoCurrency cryptoCurrencyDb = cryptoCurrencyDao.getByNameAndCryptoNet(((BitsharesAsset) answer).getName(),((BitsharesAsset) answer).getCryptoNet().name());
+
+                                                            if (cryptoCurrencyDb != null){
+                                                                currencyId = cryptoCurrencyDb.getId();
+                                                            } else {
+                                                                long idCryptoCurrency = cryptoCurrencyDao.insertCryptoCurrency(asset)[0];
+                                                                currencyId = idCryptoCurrency;
+                                                            }
+
+                                                            BitsharesAssetInfo info = new BitsharesAssetInfo(asset);
+                                                            info.setCryptoCurrencyId(currencyId);
+                                                            asset.setId((int)currencyId);
+                                                            bitsharesAssetDao.insertBitsharesAssetInfo(info);
+                                                            saveTransaction(transaction,cryptoCurrencyDao.getById(info.getCryptoCurrencyId()),accountSteemId,tOperation,context);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void fail(int idPetition) {
+                                                        //TODO error retrieving asset
+                                                    }
+                                                });
+                                                ArrayList<String> assets = new ArrayList<>();
+                                                assets.add(tOperation.getAssetAmount().getAsset().getObjectId());
+                                                GrapheneApiGenerator.getAssetById(assets,assetRequest);
+                                            }else{
+                                                saveTransaction(transaction,cryptoCurrencyDao.getById(info.getCryptoCurrencyId()),accountSteemId,tOperation,context);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            };
+
+            currentSteemListener.put(accountId,balanceListener);
+            steemSubscriptionHub.addSubscriptionListener(balanceListener);
+
+            if(!steemSubscriptionThread.isConnected()){
+                steemSubscriptionThread.start();
+            }else if(!steemSubscriptionHub.isSubscribed()){
+                steemSubscriptionHub.resubscribe();
+            }
+        }
+    }
+
+    /**
      * Function to save a transaction retrieved from the update
      * @param transaction The transaction db object
      * @param currency The currency of the transaccion
@@ -482,7 +594,7 @@ public abstract class GrapheneApiGenerator {
      * @param context The android context of this application
      */
     public static void getAccountBalance(final long accountId, final String accountGrapheneId,
-                                         final Context context){
+                                         CryptoNet cryptoNet, final Context context){
 
         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
         final CryptoCoinBalanceDao balanceDao = db.cryptoCoinBalanceDao();
@@ -542,7 +654,7 @@ public abstract class GrapheneApiGenerator {
             public void onError(BaseResponse.Error error) {
 
             }
-        }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+        }),CryptoNetManager.getURL(cryptoNet));
 
         thread.start();
 

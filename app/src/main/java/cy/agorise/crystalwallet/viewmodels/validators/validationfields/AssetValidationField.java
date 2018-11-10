@@ -18,16 +18,22 @@ public class AssetValidationField extends ValidationField {
     }
 
     public void validate(){
-        final CryptoCurrency cryptoCurrencySelected = (CryptoCurrency) this.assetField.getSelectedItem();
-        if (cryptoCurrencySelected != null) {
-            final String newValue = "" + cryptoCurrencySelected.getId();
+        if (this.assetField.getSelectedItem() instanceof  CryptoCurrency) {
+            final CryptoCurrency cryptoCurrencySelected = (CryptoCurrency) this.assetField.getSelectedItem();
+            if (cryptoCurrencySelected != null) {
+                final String newValue = "" + cryptoCurrencySelected.getId();
+                this.setLastValue(newValue);
+                setValidForValue(newValue, true);
+            } else {
+                final String newValue = "" + -1;
+                setMessageForValue(newValue, "Select a currency");
+                this.setLastValue(newValue);
+                setValidForValue(newValue, false);
+            }
+        } else {
+            final String newValue = "" + -1;
             this.setLastValue(newValue);
             setValidForValue(newValue, true);
-        } else {
-            final String newValue = ""+-1;
-            setMessageForValue(newValue,"Select a currency");
-            this.setLastValue(newValue);
-            setValidForValue(newValue, false);
         }
     }
 }

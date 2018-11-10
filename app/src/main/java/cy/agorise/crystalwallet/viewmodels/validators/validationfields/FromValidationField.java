@@ -17,9 +17,9 @@ import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountReq
 public class FromValidationField extends ValidationField {
 
     //private EditText fromField;
-    private MaterialSpinner fromField;
+    private Spinner fromField;
 
-    public FromValidationField(MaterialSpinner fromField){
+    public FromValidationField(Spinner fromField){
         super(fromField);
         this.fromField = fromField;
     }
@@ -27,8 +27,8 @@ public class FromValidationField extends ValidationField {
     public void validate(){
         final String newValue;
 
-        if (fromField.getSelectedIndex() != -1) {
-            final CryptoNetAccount cryptoNetAccount = (CryptoNetAccount) fromField.getItems().get(fromField.getSelectedIndex());
+        if (fromField.getSelectedItem() instanceof CryptoNetAccount){
+            final CryptoNetAccount cryptoNetAccount = (CryptoNetAccount) fromField.getSelectedItem();
             newValue = cryptoNetAccount.getName();
         } else {
             newValue = "";
