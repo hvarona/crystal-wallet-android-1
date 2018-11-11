@@ -215,7 +215,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                     long idSeed = accountSeedDao.insertAccountSeed(seed);
                     if (idSeed >= 0) {
                         GrapheneAccount account = new GrapheneAccount();
-                        account.setCryptoNet(CryptoNet.BITSHARES);
+                        account.setCryptoNet(CryptoNet.STEEM);
                         account.setAccountIndex(0);
                         account.setSeedId(idSeed);
                         account.setAccountId(userAccount.getObjectId());
@@ -242,7 +242,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                             long idSeed = accountSeedDao.insertAccountSeed(seed);
                             if (idSeed >= 0) {
                                 GrapheneAccount account = new GrapheneAccount();
-                                account.setCryptoNet(CryptoNet.BITSHARES);
+                                account.setCryptoNet(CryptoNet.STEEM);
                                 account.setAccountIndex(0);
                                 account.setSeedId(idSeed);
                                 account.setAccountId(userAccount.getObjectId());

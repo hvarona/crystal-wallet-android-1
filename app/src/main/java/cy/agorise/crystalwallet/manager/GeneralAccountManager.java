@@ -38,6 +38,7 @@ import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.requestmanagers.BitcoinSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.CalculateBitcoinUriRequest;
 import cy.agorise.crystalwallet.requestmanagers.CreateBitcoinAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
@@ -153,6 +154,8 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 this.getNextAddress((NextBitcoinAccountAddressRequest) request);
             }else if(request instanceof ValidateBitcoinAddressRequest){
                 this.validateAddress((ValidateBitcoinAddressRequest) request);
+            }else if(request instanceof CalculateBitcoinUriRequest){
+                this.calculateUri((CalculateBitcoinUriRequest) request);
             }else{
                 System.out.println("Invalid " +this.cryptoCoin.getLabel() + " request ");
             }
@@ -461,28 +464,74 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     private void getNextAddress(NextBitcoinAccountAddressRequest request){
         CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
-        index++;
-        AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
-        DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
-                new ChildNumber(44, true));
-        DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
-                new ChildNumber(cryptoCoin.getCoinNumber(), true));
-        DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
-                new ChildNumber(request.getAccount().getAccountIndex(), true));
-        DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
-                new ChildNumber(0, false));
-        ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
-        BitcoinAddress address = new BitcoinAddress();
-        address.setChange(false);
-        address.setAccountId(request.getAccount().getId());
-        address.setIndex(index);
-        String addressString =addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
-        address.setAddress(addressString);
-        db.bitcoinAddressDao().insertBitcoinAddresses(address);
-        InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin,addressString,true, null);
+        BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(index);
+        if(db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
+            request.setAddress(address.getAddress());
+            request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+        }else {
+            index++;
+            AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
+            DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                    new ChildNumber(44, true));
+            DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                    new ChildNumber(cryptoCoin.getCoinNumber(), true));
+            DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                    new ChildNumber(request.getAccount().getAccountIndex(), true));
+            DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                    new ChildNumber(0, false));
+            ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
+            address = new BitcoinAddress();
+            address.setChange(false);
+            address.setAccountId(request.getAccount().getId());
+            address.setIndex(index);
+            String addressString = addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin, addressString, true, null);
 
-        request.setAddress(addressString);
-        request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+            request.setAddress(addressString);
+            request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+        }
+    }
+
+    private void calculateUri(CalculateBitcoinUriRequest request) {
+        StringBuilder uri = new StringBuilder(this.cryptoCoin.getLabel()+":");
+
+        CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
+        long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
+        BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(index);
+        if(db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
+            uri.append(address.getAddress());
+        }else {
+            index++;
+            AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
+            DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                    new ChildNumber(44, true));
+            DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                    new ChildNumber(cryptoCoin.getCoinNumber(), true));
+            DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                    new ChildNumber(request.getAccount().getAccountIndex(), true));
+            DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                    new ChildNumber(0, false));
+            ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
+            address = new BitcoinAddress();
+            address.setChange(false);
+            address.setAccountId(request.getAccount().getId());
+            address.setIndex(index);
+            String addressString = addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin, addressString, true, null);
+
+            uri.append(address.getAddress());
+        }
+        if(request.getCurrency()!= null){
+            uri.append("?amount=");
+            uri.append(request.getAmount());
+        }
+
+        request.setUri(uri.toString());
+        request.validate();
     }
 
     private List<BitcoinTransactionGTxIO> getUtxos(long accountId, CrystalDatabase db){
