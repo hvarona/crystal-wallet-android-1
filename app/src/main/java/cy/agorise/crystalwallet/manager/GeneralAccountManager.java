@@ -500,7 +500,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
         BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(index);
-        if(db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
+        if(address != null && db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
             uri.append(address.getAddress());
         }else {
             index++;
