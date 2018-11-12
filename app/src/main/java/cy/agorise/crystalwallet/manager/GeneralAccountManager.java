@@ -495,7 +495,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     private void calculateUri(CalculateBitcoinUriRequest request) {
-        StringBuilder uri = new StringBuilder(this.cryptoCoin.getLabel()+":");
+        StringBuilder uri = new StringBuilder(this.cryptoCoin.getLabel().toLowerCase()+":");
 
         CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());

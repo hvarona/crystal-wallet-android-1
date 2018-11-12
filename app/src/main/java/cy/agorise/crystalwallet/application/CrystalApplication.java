@@ -57,6 +57,17 @@ public class CrystalApplication extends Application {
 
     public static final CryptoCurrency BITCOIN_CURRENCY = new CryptoCurrency("BTC",CryptoNet.BITCOIN,8);
 
+    public static String STEEM_URL[] =
+            {
+                    "https://api.steemit.com",
+                    "https://api.steemitdev.com",
+                    "https://api.steemitstage.com",
+                    "https://api.steem.house",
+                    "https://appbasetest.timcliff.com",
+
+
+            };
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -107,6 +118,8 @@ public class CrystalApplication extends Application {
         if(db.cryptoCurrencyDao().getByName(BITCOIN_CURRENCY.getName(),BITCOIN_CURRENCY.getCryptoNet().name())== null){
             db.cryptoCurrencyDao().insertCryptoCurrency(BITCOIN_CURRENCY);
         }
+
+        CryptoNetManager.addCryptoNetURL(CryptoNet.STEEM,STEEM_URL);
 
 
         GeneralSetting generalSettingPreferredLanguage = db.generalSettingDao().getSettingByName(GeneralSetting.SETTING_NAME_PREFERRED_LANGUAGE);
