@@ -146,7 +146,8 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         GrapheneAccount fetch = (GrapheneAccount) answer;
                         grapheneAccount.setName(fetch.getName());
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                        db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                        long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                        grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
@@ -158,7 +159,8 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 });
             }else {
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                 subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }

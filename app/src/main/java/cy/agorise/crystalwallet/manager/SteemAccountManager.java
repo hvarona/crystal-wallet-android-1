@@ -99,7 +99,8 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                         GrapheneAccount fetch = (GrapheneAccount) answer;
                         grapheneAccount.setName(fetch.getName());
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                        db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                        long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                        grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                         subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
@@ -111,7 +112,8 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                 });
             }else {
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                 subscribeSteemAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
