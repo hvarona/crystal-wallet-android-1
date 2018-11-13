@@ -98,7 +98,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
 
         CryptoCoinBalance balance = new CryptoCoinBalance();
         balance.setBalance(0);
-        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.name(),cryptoCoin.name()).getId());
+        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.getLabel(),cryptoCoin.name()).getId());
         balance.setAccountId(account.getId());
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
 
@@ -495,7 +495,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     private void calculateUri(CalculateBitcoinUriRequest request) {
-        StringBuilder uri = new StringBuilder(this.cryptoCoin.getLabel().toLowerCase()+":");
+        StringBuilder uri = new StringBuilder(this.cryptoCoin.name().toLowerCase()+":");
 
         CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
@@ -529,6 +529,8 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
             uri.append("?amount=");
             uri.append(request.getAmount());
         }
+
+        System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
 
         request.setUri(uri.toString());
         request.validate();

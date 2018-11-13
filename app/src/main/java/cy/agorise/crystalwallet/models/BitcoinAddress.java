@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
  */
 @Entity(
     tableName="bitcoin_address",
-    primaryKeys = {"account_id","address_index"},
+    primaryKeys = {"account_id","address_index","is_change"},
     foreignKeys = {
         @ForeignKey(
                 entity = CryptoNetAccount.class,
