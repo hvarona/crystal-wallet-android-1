@@ -38,6 +38,7 @@ import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.requestmanagers.BitcoinSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.BitcoinUriParseRequest;
 import cy.agorise.crystalwallet.requestmanagers.CalculateBitcoinUriRequest;
 import cy.agorise.crystalwallet.requestmanagers.CreateBitcoinAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
@@ -156,12 +157,13 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 this.validateAddress((ValidateBitcoinAddressRequest) request);
             }else if(request instanceof CalculateBitcoinUriRequest){
                 this.calculateUri((CalculateBitcoinUriRequest) request);
+            }else if(request instanceof BitcoinUriParseRequest){
+                this.parseUri((BitcoinUriParseRequest) request);
             }else{
                 System.out.println("Invalid " +this.cryptoCoin.getLabel() + " request ");
             }
 
         }
-
     }
 
     /**
@@ -533,6 +535,66 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
 
         request.setUri(uri.toString());
+        request.validate();
+    }
+
+    private void parseUri(BitcoinUriParseRequest request){
+        String uri = request.getUri();
+        if(uri.indexOf(":")>0){
+            String cryptoNet = uri.substring(0,uri.indexOf(":"));
+            if(cryptoNet.equalsIgnoreCase(this.cryptoCoin.getLabel())){
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+                    if(uri.indexOf("?")>0){
+                        try {
+                            String[] parameters = uri.substring(uri.indexOf("?") + 1).split("&");
+                            for (String parameter : parameters) {
+                                int idx = parameter.indexOf("=");
+                                if (idx > 0 && parameter.substring(0, idx).equalsIgnoreCase("amount")) {
+                                    request.setAmount(Double.parseDouble(parameter.substring(idx + 1)));
+                                }
+                            }
+                        }catch(Exception ignored){}
+                    }
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+
+            }else{
+                request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+            }
+        }else{
+            if(uri.indexOf("?")>0){
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+                    try{
+                    String[] parameters = uri.substring(uri.indexOf("?")+1).split("&");
+                    for(String parameter : parameters){
+                        int idx = parameter.indexOf("=");
+                        if(idx > 0 && parameter.substring(0,idx).equalsIgnoreCase("amount")){
+                            request.setAmount(Double.parseDouble(parameter.substring(idx+1)));
+                        }
+                    }
+                    }catch(Exception ignored){}
+
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+            }else{
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+            }
+        }
         request.validate();
     }
 

@@ -22,17 +22,22 @@ public class BitcoinUriParseRequest extends CryptoNetInfoRequest {
         NOT_VALID
     }
 
+    private String uri;
+
     private String address;
     private Double amount;
     private String memo;
 
+
+
     private StatusCode status = StatusCode.NOT_STARTED;
 
-    public BitcoinUriParseRequest(String uri) {
-        super(CryptoCoin.BITCOIN);
+    public BitcoinUriParseRequest(String uri, CryptoCoin cryptoCoin) {
+        super(cryptoCoin);
         this.address = "";
         this.amount = -1.0;
         this.memo = "";
+        this.uri = uri;
     }
 
     public String getAddress() {
@@ -72,5 +77,9 @@ public class BitcoinUriParseRequest extends CryptoNetInfoRequest {
 
     public StatusCode getStatus() {
         return status;
+    }
+
+    public String getUri() {
+        return uri;
     }
 }
