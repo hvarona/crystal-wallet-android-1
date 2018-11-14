@@ -68,6 +68,7 @@ import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.interfaces.OnResponse;
 import cy.agorise.crystalwallet.requestmanagers.BitcoinSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.BitcoinUriParseRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
@@ -809,18 +810,21 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
 
         //Is not a bitshares QR
-        /*BitcoinUriParseRequest bitcoinUriParseRequest = new BitcoinUriParseRequest(result.getText());
+        CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+        final BitcoinUriParseRequest bitcoinUriParseRequest = new BitcoinUriParseRequest(result.getText(), cryptoCoin);
 
         bitcoinUriParseRequest.setListener(new CryptoNetInfoRequestListener() {
             @Override
             public void onCarryOut() {
                 if (bitcoinUriParseRequest.getAddress() != null) {
-                    try {
-                        crystalDialog.dismiss();
-                        thisFragment.dismiss();
-                        //thisFragment.finalize();
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
+                    if (!bitcoinUriParseRequest.getAddress().equals("")) {
+                        etTo.setText(bitcoinUriParseRequest.getAddress());
+                    }
+                    if (bitcoinUriParseRequest.getAmount() > 0) {
+                        etAmount.setText(bitcoinUriParseRequest.getAmount().toString());
+                    }
+                    if (!bitcoinUriParseRequest.getMemo().equals("")) {
+                        etMemo.setText(bitcoinUriParseRequest.getMemo());
                     }
                 } else {
                     Toast.makeText(getContext(), "Not a valid QR info", Toast.LENGTH_LONG);
@@ -828,6 +832,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             }
         });
 
-        CryptoNetInfoRequests.getInstance().addRequest(bitcoinUriParseRequest);*/
+        CryptoNetInfoRequests.getInstance().addRequest(bitcoinUriParseRequest);
     }
 }
