@@ -803,8 +803,31 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
             etAmount.setText(df.format(amount));
             Log.i("SendFragment", result.getText());
+            return;
         }catch(Exception e){
             e.printStackTrace();
         }
+
+        //Is not a bitshares QR
+        /*BitcoinUriParseRequest bitcoinUriParseRequest = new BitcoinUriParseRequest(result.getText());
+
+        bitcoinUriParseRequest.setListener(new CryptoNetInfoRequestListener() {
+            @Override
+            public void onCarryOut() {
+                if (bitcoinUriParseRequest.getAddress() != null) {
+                    try {
+                        crystalDialog.dismiss();
+                        thisFragment.dismiss();
+                        //thisFragment.finalize();
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Not a valid QR info", Toast.LENGTH_LONG);
+                }
+            }
+        });
+
+        CryptoNetInfoRequests.getInstance().addRequest(bitcoinUriParseRequest);*/
     }
 }

@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -38,6 +39,10 @@ import com.google.zxing.common.BitMatrix;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
+import cy.agorise.crystalwallet.requestmanagers.CalculateBitcoinUriRequest;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestListener;
+import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests;
+import cy.agorise.crystalwallet.requestmanagers.NextBitcoinAccountAddressRequest;
 import cy.agorise.crystalwallet.util.CircularImageView;
 import cy.agorise.crystalwallet.viewmodels.CryptoNetAccountListViewModel;
 import cy.agorise.crystalwallet.views.CryptoNetAccountAdapter;
@@ -341,52 +346,104 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
 
         CryptoNetAccount toAccountSelected = (CryptoNetAccount) spTo.getSelectedItem();
 
-        /*
-         * this is only for graphene accounts.
-         *
-         **/
-        GrapheneAccount grapheneAccountSelected = new GrapheneAccount(toAccountSelected);
-        grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(toAccountSelected.getId()));
+        if (this.cryptoNetAccount.getCryptoNet() == CryptoNet.BITSHARES) {
+            /*
+             * this is only for graphene accounts.
+             *
+             **/
+            GrapheneAccount grapheneAccountSelected = new GrapheneAccount(toAccountSelected);
+            grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(toAccountSelected.getId()));
 
 
-        this.invoiceItems.clear();
-        this.invoiceItems.add(
-            new LineItem("transfer", 1, amount)
-        );
+            this.invoiceItems.clear();
+            this.invoiceItems.add(
+                    new LineItem("transfer", 1, amount)
+            );
 
-        LineItem items[] = new LineItem[this.invoiceItems.size()];
-        items = this.invoiceItems.toArray(items);
-        this.invoice.setLineItems(items);
-        this.invoice.setTo(grapheneAccountSelected.getName());
-        this.invoice.setCurrency(this.cryptoCurrency.getName());
+            LineItem items[] = new LineItem[this.invoiceItems.size()];
+            items = this.invoiceItems.toArray(items);
+            this.invoice.setLineItems(items);
+            this.invoice.setTo(grapheneAccountSelected.getName());
+            this.invoice.setCurrency(this.cryptoCurrency.getName());
 
-        if (this.qrCodeTask != null){
-            this.qrCodeTask.cancel(true);
-        }
+            if (this.qrCodeTask != null) {
+                this.qrCodeTask.cancel(true);
+            }
 
-        this.qrCodeTask = new AsyncTask<Object, Void, Void>(){
+            this.qrCodeTask = new AsyncTask<Object, Void, Void>() {
 
-            @Override
-            protected Void doInBackground(Object... voids) {
-                try {
-                    final Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
+                @Override
+                protected Void doInBackground(Object... voids) {
+                    try {
+                        final Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
 
-                    if (!this.isCancelled()) {
-                        ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                        if (!this.isCancelled()) {
+                            ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ivQrCode.setImageBitmap(bitmap);
+                                }
+                            });
+                        }
+                    } catch (WriterException e) {
+                        Log.e("ReceiveFragment", "Error creating QrCode");
+                    }
+                    return null;
+                }
+            };
+
+            this.qrCodeTask.execute(null, null, null);
+        } else {
+            final CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+
+            //final NextBitcoinAccountAddressRequest addressRequest = new NextBitcoinAccountAddressRequest(this.cryptoNetAccount, cryptoCoin, getContext());
+
+            //addressRequest.setListener(new CryptoNetInfoRequestListener() {
+            //    @Override
+            //    public void onCarryOut() {
+            //        if (addressRequest.getStatus() == NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED){
+                        final CalculateBitcoinUriRequest uriRequest = new CalculateBitcoinUriRequest(cryptoCoin, cryptoNetAccount, getContext());
+
+                        uriRequest.setListener(new CryptoNetInfoRequestListener(){
                             @Override
-                            public void run() {
-                                ivQrCode.setImageBitmap(bitmap);
+                            public void onCarryOut(){
+                                if (uriRequest.getUri() != null){
+                                    qrCodeTask = new AsyncTask<Object, Void, Void>() {
+
+                                        @Override
+                                        protected Void doInBackground(Object... voids) {
+                                            try {
+                                                final Bitmap bitmap = textToImageEncode(uriRequest.getUri());
+
+                                                if (!this.isCancelled()) {
+                                                    ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            ivQrCode.setImageBitmap(bitmap);
+                                                        }
+                                                    });
+                                                }
+                                            } catch (WriterException e) {
+                                                Log.e("ReceiveFragment", "Error creating QrCode");
+                                            }
+                                            return null;
+                                        }
+                                    };
+
+                                    qrCodeTask.execute(null, null, null);
+                                } else {
+                                    Log.e("ReceiveFragment", "Error obtaining the uri");
+                                }
                             }
                         });
-                    }
-                } catch (WriterException e) {
-                    Log.e("ReceiveFragment", "Error creating QrCode");
-                }
-                return null;
-            }
-        };
 
-        this.qrCodeTask.execute(null,null,null);
+                        CryptoNetInfoRequests.getInstance().addRequest(uriRequest);
+            //        } else {
+            //            Toast.makeText(getContext(),"Error creating address",Toast.LENGTH_SHORT);
+            //        }
+            //    }
+            //});
+        }
     }
 
     Bitmap textToImageEncode(String Value) throws WriterException {
