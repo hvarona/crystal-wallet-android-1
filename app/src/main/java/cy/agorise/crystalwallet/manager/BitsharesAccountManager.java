@@ -198,6 +198,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setName(fetch.getName());
                         grapheneAccount.setName(fetch.getName());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
