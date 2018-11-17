@@ -146,7 +146,8 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         GrapheneAccount fetch = (GrapheneAccount) answer;
                         grapheneAccount.setName(fetch.getName());
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                        db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                        long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                        grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
@@ -158,7 +159,8 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 });
             }else {
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                 subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
@@ -196,6 +198,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setName(fetch.getName());
                         grapheneAccount.setName(fetch.getName());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -306,7 +313,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.BAD_SEED);
                     }
                 });
-                GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
+                GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),CryptoNet.BITSHARES,getAccountNamesBP39);
             }
         });
 
@@ -314,7 +321,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
 
         BrainKey bk = new BrainKey(importRequest.getMnemonic(), 0);
 
-        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("BTS"),getAccountNamesBK);
+        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("BTS"),CryptoNet.BITSHARES,getAccountNamesBK);
 
 
     }
@@ -384,7 +391,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         importRequest.setStatus(ValidateImportBitsharesAccountRequest.StatusCode.NO_ACCOUNT_DATA);
                     }
                 });
-                GrapheneApiGenerator.getAccountById((String)answer,getAccountInfo);
+                GrapheneApiGenerator.getAccountById((String)answer,CryptoNet.BITSHARES,getAccountInfo);
             }
 
             @Override
@@ -394,7 +401,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
             }
         });
 
-        GrapheneApiGenerator.getAccountIdByName(importRequest.getAccountName(),checkAccountName);
+        GrapheneApiGenerator.getAccountIdByName(importRequest.getAccountName(),CryptoNet.BITSHARES,checkAccountName);
     }
 
     private void validateCreateAccount(final ValidateCreateBitsharesAccountRequest createRequest){
@@ -449,7 +456,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 validateRequest.setAccountExists(false);
             }
         });
-        GrapheneApiGenerator.getAccountIdByName(validateRequest.getAccountName(),checkAccountName);
+        GrapheneApiGenerator.getAccountIdByName(validateRequest.getAccountName(),CryptoNet.BITSHARES,checkAccountName);
     }
 
     /**
@@ -647,7 +654,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         AccountIdOrNameListener listener = new AccountIdOrNameListener(request);
 
         ApiRequest accountRequest = new ApiRequest(0, listener);
-        GrapheneApiGenerator.getAccountById(grapheneId,accountRequest);
+        GrapheneApiGenerator.getAccountById(grapheneId,CryptoNet.BITSHARES,accountRequest);
     }
 
     /**
@@ -659,7 +666,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         AccountIdOrNameListener listener = new AccountIdOrNameListener(request);
 
         ApiRequest accountRequest = new ApiRequest(0, listener);
-        GrapheneApiGenerator.getAccountByName(grapheneName,accountRequest);
+        GrapheneApiGenerator.getAccountByName(grapheneName,CryptoNet.BITSHARES,accountRequest);
 
     }
 
@@ -670,7 +677,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
         ApiRequest assetRequest = new ApiRequest(0, nameListener);
         ArrayList<String> assetNames = new ArrayList<>();
         assetNames.add(assetName);
-        GrapheneApiGenerator.getAssetByName(assetNames, assetRequest);
+        GrapheneApiGenerator.getAssetByName(assetNames, CryptoNet.BITSHARES,assetRequest);
 
     }
 
@@ -783,7 +790,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                     });
                     ArrayList<String> assets = new ArrayList<>();
                     assets.add(transfer.getOperation().getAssetAmount().getAsset().getObjectId());
-                    GrapheneApiGenerator.getAssetById(assets,assetRequest);
+                    GrapheneApiGenerator.getAssetById(assets,CryptoNet.BITSHARES,assetRequest);
 
                 }else{
                     saveTransaction(transaction,info,transfer);
@@ -812,7 +819,7 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
             transaction.setInput(!transfer.getOperation().getFrom().getObjectId().equals(account.getAccountId()));
             transaction.setTo(transfer.getOperation().getTo().getObjectId());
 
-            GrapheneApiGenerator.getBlockHeaderTime(transfer.getBlockNum(), new ApiRequest(0, new GetTransactionDate(transaction, db.transactionDao())));
+            GrapheneApiGenerator.getBlockHeaderTime(transfer.getBlockNum(),CryptoNet.BITSHARES, new ApiRequest(0, new GetTransactionDate(transaction, db.transactionDao())));
         }
     }
 

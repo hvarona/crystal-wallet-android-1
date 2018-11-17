@@ -118,6 +118,9 @@ public abstract class CrystalDatabase extends RoomDatabase {
                     +"io_index INTEGER NOT NULL,"
                     +"address TEXT,"
                     +"is_output INTEGER NOT NULL,"
+                    +"amount INTEGER NOT NULL,"
+                    +"script_hex TEXT,"
+                    +"original_txid TEXT,"
                     +"PRIMARY KEY (bitcoin_transaction_id, io_index, is_output),"
                     +"FOREIGN KEY (bitcoin_transaction_id) REFERENCES bitcoin_transaction(crypto_coin_transaction_id) ON DELETE CASCADE)");
         }
@@ -131,7 +134,7 @@ public abstract class CrystalDatabase extends RoomDatabase {
                     +"address_index INTEGER NOT NULL,"
                     +"is_change INTEGER NOT NULL,"
                     +"address TEXT NOT NULL,"
-                    +"PRIMARY KEY (account_id, address_index),"
+                    +"PRIMARY KEY (account_id, address_index, is_change),"
                     +"FOREIGN KEY (account_id) REFERENCES crypto_net_account(id) ON DELETE CASCADE)");
         }
     };

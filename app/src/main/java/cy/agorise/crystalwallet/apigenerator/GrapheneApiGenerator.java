@@ -1,7 +1,6 @@
 package cy.agorise.crystalwallet.apigenerator;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import cy.agorise.crystalwallet.application.constant.BitsharesConstant;
 import cy.agorise.crystalwallet.dao.BitsharesAssetDao;
 import cy.agorise.crystalwallet.dao.CryptoCoinBalanceDao;
 import cy.agorise.crystalwallet.dao.CryptoCurrencyDao;
@@ -107,7 +105,7 @@ public abstract class GrapheneApiGenerator {
      * @param accountId The accountId to retrieve
      * @param request The Api request object, to answer this petition
      */
-    public static void getAccountById(String accountId, final ApiRequest request){
+    public static void getAccountById(String accountId, CryptoNet cryptoNet, final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetAccounts(accountId,
                 new WitnessResponseListener() {
                     @Override
@@ -128,7 +126,7 @@ public abstract class GrapheneApiGenerator {
                     public void onError(BaseResponse.Error error) {
                         request.getListener().fail(request.getId());
                     }
-                }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+                }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -138,7 +136,7 @@ public abstract class GrapheneApiGenerator {
      * @param address The address to retrieve
      * @param request The Api request object, to answer this petition
      */
-    public static void getAccountByOwnerOrActiveAddress(Address address, final ApiRequest request){
+    public static void getAccountByOwnerOrActiveAddress(Address address, CryptoNet cryptoNet, final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetKeyReferences(address, true,
                 new WitnessResponseListener() {
                     @Override
@@ -168,7 +166,7 @@ public abstract class GrapheneApiGenerator {
                     public void onError(BaseResponse.Error error) {
                         request.getListener().fail(request.getId());
                     }
-                }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+                }),CryptoNetManager.getURL(cryptoNet));
 
         thread.start();
     }
@@ -205,7 +203,7 @@ public abstract class GrapheneApiGenerator {
      * @param accountName The account Name to find
      * @param request The Api request object, to answer this petition
      */
-    public static void getAccountByName(String accountName, final ApiRequest request){
+    public static void getAccountByName(String accountName, CryptoNet cryptoNet,final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetAccountByName(accountName,
                 new WitnessResponseListener() {
                     @Override
@@ -222,7 +220,7 @@ public abstract class GrapheneApiGenerator {
                     public void onError(BaseResponse.Error error) {
                         request.getListener().fail(request.getId());
                     }
-                }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+                }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -232,7 +230,7 @@ public abstract class GrapheneApiGenerator {
      * @param accountName The account Name to find
      * @param request The Api request object, to answer this petition
      */
-    public static void getAccountIdByName(String accountName, final ApiRequest request){
+    public static void getAccountIdByName(String accountName, CryptoNet cryptoNet, final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetAccountByName(accountName,
                 new WitnessResponseListener() {
                     @Override
@@ -249,7 +247,7 @@ public abstract class GrapheneApiGenerator {
                     public void onError(BaseResponse.Error error) {
                         request.getListener().fail(request.getId());
                     }
-                }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+                }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -283,7 +281,7 @@ public abstract class GrapheneApiGenerator {
      * @param assetNames The list of the names of the assets to be retrieve
      * @param request the api request object, to answer this petition
      */
-    public static void getAssetByName(ArrayList<String> assetNames, final ApiRequest request){
+    public static void getAssetByName(ArrayList<String> assetNames, CryptoNet cryptoNet,final ApiRequest request){
 
         WebSocketThread thread = new WebSocketThread(new LookupAssetSymbols(assetNames,true,
                 new WitnessResponseListener() {
@@ -318,7 +316,7 @@ public abstract class GrapheneApiGenerator {
                     public void onError(BaseResponse.Error error) {
                         request.getListener().fail(request.getId());
                     }
-                }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+                }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -327,7 +325,7 @@ public abstract class GrapheneApiGenerator {
      * @param assetIds The list of the ids to retrieve
      * @param request the api request object, to answer this petition
      */
-    public static void getAssetById(ArrayList<String> assetIds, final ApiRequest request){
+    public static void getAssetById(ArrayList<String> assetIds, CryptoNet cryptoNet, final ApiRequest request){
         ArrayList<Asset> assets = new ArrayList<>();
         for(String assetId : assetIds){
             Asset asset = new Asset(assetId);
@@ -366,7 +364,7 @@ public abstract class GrapheneApiGenerator {
             public void onError(BaseResponse.Error error) {
                 request.getListener().fail(request.getId());
             }
-        }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+        }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
     }
 
@@ -438,7 +436,7 @@ public abstract class GrapheneApiGenerator {
                                                 });
                                                 ArrayList<String> assets = new ArrayList<>();
                                                 assets.add(tOperation.getAssetAmount().getAsset().getObjectId());
-                                                GrapheneApiGenerator.getAssetById(assets,assetRequest);
+                                                GrapheneApiGenerator.getAssetById(assets,CryptoNet.BITSHARES,assetRequest);
                                             }else{
                                                 saveTransaction(transaction,cryptoCurrencyDao.getById(info.getCryptoCurrencyId()),accountBitsharesId,tOperation,context);
                                             }
@@ -531,7 +529,7 @@ public abstract class GrapheneApiGenerator {
                                                 });
                                                 ArrayList<String> assets = new ArrayList<>();
                                                 assets.add(tOperation.getAssetAmount().getAsset().getObjectId());
-                                                GrapheneApiGenerator.getAssetById(assets,assetRequest);
+                                                GrapheneApiGenerator.getAssetById(assets,CryptoNet.STEEM,assetRequest);
                                             }else{
                                                 saveTransaction(transaction,cryptoCurrencyDao.getById(info.getCryptoCurrencyId()),accountSteemId,tOperation,context);
                                             }
@@ -594,7 +592,7 @@ public abstract class GrapheneApiGenerator {
      * @param context The android context of this application
      */
     public static void getAccountBalance(final long accountId, final String accountGrapheneId,
-                                         CryptoNet cryptoNet, final Context context){
+                                         final CryptoNet cryptoNet, final Context context){
 
         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
         final CryptoCoinBalanceDao balanceDao = db.cryptoCoinBalanceDao();
@@ -640,7 +638,7 @@ public abstract class GrapheneApiGenerator {
                             public void fail(int idPetition) {
                             }
                         });
-                        getAssetById(idAssets,getAssetRequest);
+                        getAssetById(idAssets,cryptoNet,getAssetRequest);
 
                     }else {
 
@@ -666,7 +664,7 @@ public abstract class GrapheneApiGenerator {
      * @param blockHeader The block header to retrieve the date time
      * @param request the api request object, to answer this petition
      */
-    public static void getBlockHeaderTime(long blockHeader, final ApiRequest request){
+    public static void getBlockHeaderTime(long blockHeader, CryptoNet cryptoNet,final ApiRequest request){
         WebSocketThread thread = new WebSocketThread(new GetBlockHeader(blockHeader, new WitnessResponseListener() {
             @Override
             public void onSuccess(WitnessResponse response) {
@@ -681,7 +679,7 @@ public abstract class GrapheneApiGenerator {
             public void onError(BaseResponse.Error error) {
                 request.getListener().fail(request.getId());
             }
-        }),CryptoNetManager.getURL(CryptoNet.BITSHARES));
+        }),CryptoNetManager.getURL(cryptoNet));
         thread.start();
 
     }
@@ -784,7 +782,7 @@ public abstract class GrapheneApiGenerator {
             });
             ArrayList<String> names = new ArrayList<>();
             names.add(baseAssetName);
-            GrapheneApiGenerator.getAssetByName(names,getAssetRequest);
+            GrapheneApiGenerator.getAssetByName(names,CryptoNet.BITSHARES,getAssetRequest);
 
         }else {
             BitsharesAsset baseAsset = new BitsharesAsset(baseCurrency);

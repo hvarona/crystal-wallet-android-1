@@ -38,6 +38,8 @@ import cy.agorise.crystalwallet.models.CryptoCoinTransaction;
 import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
 import cy.agorise.crystalwallet.requestmanagers.BitcoinSendRequest;
+import cy.agorise.crystalwallet.requestmanagers.BitcoinUriParseRequest;
+import cy.agorise.crystalwallet.requestmanagers.CalculateBitcoinUriRequest;
 import cy.agorise.crystalwallet.requestmanagers.CreateBitcoinAccountRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
@@ -97,7 +99,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
 
         CryptoCoinBalance balance = new CryptoCoinBalance();
         balance.setBalance(0);
-        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.name(),cryptoCoin.name()).getId());
+        balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.getLabel(),cryptoCoin.name()).getId());
         balance.setAccountId(account.getId());
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
 
@@ -153,12 +155,15 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 this.getNextAddress((NextBitcoinAccountAddressRequest) request);
             }else if(request instanceof ValidateBitcoinAddressRequest){
                 this.validateAddress((ValidateBitcoinAddressRequest) request);
+            }else if(request instanceof CalculateBitcoinUriRequest){
+                this.calculateUri((CalculateBitcoinUriRequest) request);
+            }else if(request instanceof BitcoinUriParseRequest){
+                this.parseUri((BitcoinUriParseRequest) request);
             }else{
                 System.out.println("Invalid " +this.cryptoCoin.getLabel() + " request ");
             }
 
         }
-
     }
 
     /**
@@ -461,28 +466,136 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     private void getNextAddress(NextBitcoinAccountAddressRequest request){
         CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
         long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
-        index++;
-        AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
-        DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
-                new ChildNumber(44, true));
-        DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
-                new ChildNumber(cryptoCoin.getCoinNumber(), true));
-        DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
-                new ChildNumber(request.getAccount().getAccountIndex(), true));
-        DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
-                new ChildNumber(0, false));
-        ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
-        BitcoinAddress address = new BitcoinAddress();
-        address.setChange(false);
-        address.setAccountId(request.getAccount().getId());
-        address.setIndex(index);
-        String addressString =addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
-        address.setAddress(addressString);
-        db.bitcoinAddressDao().insertBitcoinAddresses(address);
-        InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin,addressString,true, null);
+        BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(index);
+        if(address != null && db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
+            request.setAddress(address.getAddress());
+            request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+        }else {
+            index++;
+            AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
+            DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                    new ChildNumber(44, true));
+            DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                    new ChildNumber(cryptoCoin.getCoinNumber(), true));
+            DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                    new ChildNumber(request.getAccount().getAccountIndex(), true));
+            DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                    new ChildNumber(0, false));
+            ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
+            address = new BitcoinAddress();
+            address.setChange(false);
+            address.setAccountId(request.getAccount().getId());
+            address.setIndex(index);
+            String addressString = addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin, addressString, true, null);
 
-        request.setAddress(addressString);
-        request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+            request.setAddress(addressString);
+            request.setStatus(NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED);
+        }
+    }
+
+    private void calculateUri(CalculateBitcoinUriRequest request) {
+        StringBuilder uri = new StringBuilder(this.cryptoCoin.name().toLowerCase()+":");
+
+        CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
+        long index = db.bitcoinAddressDao().getLastExternalAddress(request.getAccount().getId());
+        BitcoinAddress address = db.bitcoinAddressDao().getExternalByIndex(index);
+        if(address != null && db.bitcoinTransactionDao().getGtxIOByAddress(address.getAddress()).size()<=0){
+            uri.append(address.getAddress());
+        }else {
+            index++;
+            AccountSeed seed = db.accountSeedDao().findById(request.getAccount().getSeedId());
+            DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                    new ChildNumber(44, true));
+            DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                    new ChildNumber(cryptoCoin.getCoinNumber(), true));
+            DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                    new ChildNumber(request.getAccount().getAccountIndex(), true));
+            DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                    new ChildNumber(0, false));
+            ECKey addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) index, true));
+            address = new BitcoinAddress();
+            address.setChange(false);
+            address.setAccountId(request.getAccount().getId());
+            address.setIndex(index);
+            String addressString = addrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            address.setAddress(addressString);
+            db.bitcoinAddressDao().insertBitcoinAddresses(address);
+            InsightApiGenerator.getTransactionFromAddress(this.cryptoCoin, addressString, true, null);
+
+            uri.append(address.getAddress());
+        }
+        if(request.getCurrency()!= null){
+            uri.append("?amount=");
+            uri.append(request.getAmount());
+        }
+
+        System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
+
+        request.setUri(uri.toString());
+        request.validate();
+    }
+
+    private void parseUri(BitcoinUriParseRequest request){
+        String uri = request.getUri();
+        if(uri.indexOf(":")>0){
+            String cryptoNet = uri.substring(0,uri.indexOf(":"));
+            if(cryptoNet.equalsIgnoreCase(this.cryptoCoin.getLabel())){
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+                    if(uri.indexOf("?")>0){
+                        try {
+                            String[] parameters = uri.substring(uri.indexOf("?") + 1).split("&");
+                            for (String parameter : parameters) {
+                                int idx = parameter.indexOf("=");
+                                if (idx > 0 && parameter.substring(0, idx).equalsIgnoreCase("amount")) {
+                                    request.setAmount(Double.parseDouble(parameter.substring(idx + 1)));
+                                }
+                            }
+                        }catch(Exception ignored){}
+                    }
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+
+            }else{
+                request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+            }
+        }else{
+            if(uri.indexOf("?")>0){
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+                    try{
+                    String[] parameters = uri.substring(uri.indexOf("?")+1).split("&");
+                    for(String parameter : parameters){
+                        int idx = parameter.indexOf("=");
+                        if(idx > 0 && parameter.substring(0,idx).equalsIgnoreCase("amount")){
+                            request.setAmount(Double.parseDouble(parameter.substring(idx+1)));
+                        }
+                    }
+                    }catch(Exception ignored){}
+
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+            }else{
+                try{
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    request.setAddress(address.toString());
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
+
+                }catch(AddressFormatException ex){
+                    request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
+                }
+            }
+        }
+        request.validate();
     }
 
     private List<BitcoinTransactionGTxIO> getUtxos(long accountId, CrystalDatabase db){

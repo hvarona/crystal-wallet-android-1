@@ -33,7 +33,6 @@ import cy.agorise.crystalwallet.models.GrapheneAccount;
 import cy.agorise.crystalwallet.models.GrapheneAccountInfo;
 import cy.agorise.crystalwallet.models.seed.BIP39;
 import cy.agorise.crystalwallet.network.CryptoNetManager;
-import cy.agorise.crystalwallet.requestmanagers.CryptoNetEquivalentRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequest;
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequestsListener;
 import cy.agorise.crystalwallet.requestmanagers.GetBitsharesAccountNameCacheRequest;
@@ -100,7 +99,8 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                         GrapheneAccount fetch = (GrapheneAccount) answer;
                         grapheneAccount.setName(fetch.getName());
                         CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                        db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                        long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                        grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                         subscribeSteemAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
@@ -112,7 +112,8 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                 });
             }else {
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(context);
-                db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
+                long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
+                grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
                 subscribeSteemAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
@@ -185,8 +186,6 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                 this.validateExistAcccount((ValidateExistBitsharesAccountRequest) request);
             } else if (request instanceof ValidateBitsharesSendRequest) {
                 this.validateSendRequest((ValidateBitsharesSendRequest) request);
-            } else if (request instanceof CryptoNetEquivalentRequest) {
-                this.getEquivalentValue((CryptoNetEquivalentRequest) request);
             } else if (request instanceof GetBitsharesAccountNameCacheRequest) {
                 this.getBitsharesAccountNameCacheRequest((GetBitsharesAccountNameCacheRequest) request);
             } else {
@@ -215,7 +214,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                     long idSeed = accountSeedDao.insertAccountSeed(seed);
                     if (idSeed >= 0) {
                         GrapheneAccount account = new GrapheneAccount();
-                        account.setCryptoNet(CryptoNet.BITSHARES);
+                        account.setCryptoNet(CryptoNet.STEEM);
                         account.setAccountIndex(0);
                         account.setSeedId(idSeed);
                         account.setAccountId(userAccount.getObjectId());
@@ -226,47 +225,12 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
 
             @Override
             public void fail(int idPetition) {
-                BIP39 bip39 = new BIP39(-1, importRequest.getMnemonic());
-                ApiRequest getAccountNamesBP39 = new ApiRequest(0, new ApiRequestListener() {
-                    @Override
-                    public void success(Object answer, int idPetition) {
-                        if(answer != null && importRequest.getStatus().equals(ImportBitsharesAccountRequest.StatusCode.NOT_STARTED)) {
-                            UserAccount userAccount = (UserAccount) answer;
-                            importRequest.setSeedType(SeedType.BIP39);
-                            importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
-
-                            AccountSeed seed = new AccountSeed();
-                            seed.setName(userAccount.getName());
-                            seed.setType(importRequest.getSeedType());
-                            seed.setMasterSeed(importRequest.getMnemonic());
-                            long idSeed = accountSeedDao.insertAccountSeed(seed);
-                            if (idSeed >= 0) {
-                                GrapheneAccount account = new GrapheneAccount();
-                                account.setCryptoNet(CryptoNet.BITSHARES);
-                                account.setAccountIndex(0);
-                                account.setSeedId(idSeed);
-                                account.setAccountId(userAccount.getObjectId());
-                                importAccountFromSeed(account, importRequest.getContext());
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void fail(int idPetition) {
-                        importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.BAD_SEED);
-                    }
-                });
-                GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())),getAccountNamesBP39);
+                importRequest.setStatus(ImportBitsharesAccountRequest.StatusCode.BAD_SEED);
             }
         });
 
-
-
         BrainKey bk = new BrainKey(importRequest.getMnemonic(), 0);
-
-        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("BTS"),getAccountNamesBK);
-
-
+        GrapheneApiGenerator.getAccountByOwnerOrActiveAddress(bk.getPublicAddress("STM"),CryptoNet.STEEM,getAccountNamesBK);
     }
 
     /**
@@ -287,18 +251,10 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                             AccountProperties prop = (AccountProperties) answer;
                             BrainKey bk = new BrainKey(importRequest.getMnemonic(), 0);
                             for(PublicKey activeKey : prop.owner.getKeyAuthList()){
-                                if((new Address(activeKey.getKey(),"BTS")).toString().equals(bk.getPublicAddress("BTS").toString())){
+                                if((new Address(activeKey.getKey(),"STM")).toString().equals(bk.getPublicAddress("STM").toString())){
                                     importRequest.setSeedType(SeedType.BRAINKEY);
                                     importRequest.setStatus(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
 
-                                    break;
-                                }
-                            }
-                            BIP39 bip39 = new BIP39(-1, importRequest.getMnemonic());
-                            for(PublicKey activeKey : prop.active.getKeyAuthList()){
-                                if((new Address(activeKey.getKey(),"BTS")).toString().equals(new Address(ECKey.fromPublicOnly(bip39.getBitsharesActiveKey(0).getPubKey())).toString())){
-                                    importRequest.setSeedType(SeedType.BIP39);
-                                    importRequest.setStatus(ValidateImportBitsharesAccountRequest.StatusCode.SUCCEEDED);
                                     break;
                                 }
                             }
@@ -312,7 +268,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                                     long idSeed = accountSeedDao.insertAccountSeed(seed);
                                     if (idSeed >= 0) {
                                         GrapheneAccount account = new GrapheneAccount();
-                                        account.setCryptoNet(CryptoNet.BITSHARES);
+                                        account.setCryptoNet(CryptoNet.STEEM);
                                         account.setAccountIndex(0);
                                         account.setSeedId(idSeed);
                                         account.setName(importRequest.getAccountName());
@@ -334,7 +290,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                         importRequest.setStatus(ValidateImportBitsharesAccountRequest.StatusCode.NO_ACCOUNT_DATA);
                     }
                 });
-                GrapheneApiGenerator.getAccountById((String)answer,getAccountInfo);
+                GrapheneApiGenerator.getAccountById((String)answer,CryptoNet.STEEM,getAccountInfo);
             }
 
             @Override
@@ -344,7 +300,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
             }
         });
 
-        GrapheneApiGenerator.getAccountIdByName(importRequest.getAccountName(),checkAccountName);
+        GrapheneApiGenerator.getAccountIdByName(importRequest.getAccountName(),CryptoNet.STEEM,checkAccountName);
     }
 
     /**
@@ -369,7 +325,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                 validateRequest.setAccountExists(false);
             }
         });
-        GrapheneApiGenerator.getAccountIdByName(validateRequest.getAccountName(),checkAccountName);
+        GrapheneApiGenerator.getAccountIdByName(validateRequest.getAccountName(),CryptoNet.STEEM,checkAccountName);
     }
 
     /**
@@ -379,7 +335,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
         //TODO check internet, server connection
         //TODO feeAsset
         CrystalDatabase db = CrystalDatabase.getAppDatabase(sendRequest.getContext());
-        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(sendRequest.getAsset(), CryptoNet.BITSHARES.name());
+        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(sendRequest.getAsset(), CryptoNet.STEEM.name());
         if (currency == null){
             getAssetInfoByName(sendRequest.getAsset(), new ManagerRequest() {
                 @Override
@@ -478,7 +434,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
         ECKey privateKey = sendRequest.getSourceAccount().getActiveKey(sendRequest.getContext());
 
         Transaction transaction = new Transaction(privateKey, null, operationList);
-        transaction.setChainId(CryptoNetManager.getChaindId(CryptoNet.BITSHARES));
+        transaction.setChainId(CryptoNetManager.getChaindId(CryptoNet.STEEM));
 
         ApiRequest transactionRequest = new ApiRequest(0, new ApiRequestListener() {
             @Override
@@ -530,7 +486,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
         AccountIdOrNameListener listener = new AccountIdOrNameListener(request);
 
         ApiRequest accountRequest = new ApiRequest(0, listener);
-        GrapheneApiGenerator.getAccountById(grapheneId,accountRequest);
+        GrapheneApiGenerator.getAccountById(grapheneId,CryptoNet.STEEM,accountRequest);
     }
 
     /**
@@ -542,7 +498,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
         AccountIdOrNameListener listener = new AccountIdOrNameListener(request);
 
         ApiRequest accountRequest = new ApiRequest(0, listener);
-        GrapheneApiGenerator.getAccountByName(grapheneName,accountRequest);
+        GrapheneApiGenerator.getAccountByName(grapheneName,CryptoNet.STEEM,accountRequest);
 
     }
 
@@ -553,7 +509,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
         ApiRequest assetRequest = new ApiRequest(0, nameListener);
         ArrayList<String> assetNames = new ArrayList<>();
         assetNames.add(assetName);
-        GrapheneApiGenerator.getAssetByName(assetNames, assetRequest);
+        GrapheneApiGenerator.getAssetByName(assetNames, CryptoNet.STEEM, assetRequest);
 
     }
 
@@ -666,7 +622,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
                     });
                     ArrayList<String> assets = new ArrayList<>();
                     assets.add(transfer.getOperation().getAssetAmount().getAsset().getObjectId());
-                    GrapheneApiGenerator.getAssetById(assets,assetRequest);
+                    GrapheneApiGenerator.getAssetById(assets,CryptoNet.STEEM,assetRequest);
 
                 }else{
                     saveTransaction(transaction,info,transfer);
@@ -695,32 +651,7 @@ public class SteemAccountManager implements CryptoAccountManager, CryptoNetInfoR
             transaction.setInput(!transfer.getOperation().getFrom().getObjectId().equals(account.getAccountId()));
             transaction.setTo(transfer.getOperation().getTo().getObjectId());
 
-            GrapheneApiGenerator.getBlockHeaderTime(transfer.getBlockNum(), new ApiRequest(0, new GetTransactionDate(transaction, db.transactionDao())));
-        }
-    }
-
-    /**
-     * Gets the current change from two assets
-     */
-    private void getEquivalentValue(final CryptoNetEquivalentRequest request){
-        if(request.getFromCurrency() instanceof  BitsharesAsset && request.getToCurrency() instanceof  BitsharesAsset) {
-            BitsharesAsset fromAsset = (BitsharesAsset) request.getFromCurrency();
-            BitsharesAsset toAsset = (BitsharesAsset) request.getToCurrency();
-            ApiRequest getEquivalentRequest = new ApiRequest(0, new ApiRequestListener() {
-                @Override
-                public void success(Object answer, int idPetition) {
-                    request.setPrice((Long)answer);
-                }
-
-                @Override
-                public void fail(int idPetition) {
-                    //TODO error
-                }
-            });
-            GrapheneApiGenerator.getEquivalentValue(fromAsset.getBitsharesId(),toAsset.getBitsharesId(), getEquivalentRequest);
-        }else{
-            //TODO error
-            System.out.println("Equivalent Value error ");
+            GrapheneApiGenerator.getBlockHeaderTime(transfer.getBlockNum(), CryptoNet.STEEM,new ApiRequest(0, new GetTransactionDate(transaction, db.transactionDao())));
         }
     }
 

@@ -18,6 +18,8 @@ public abstract class CryptoNetVerifier {
             return new BitsharesCryptoNetVerifier();
         }else if(cryptoNet.getLabel().equals(CryptoNet.BITCOIN.getLabel())){
             return new BitcoinCryptoNetVerifier(CryptoCoin.BITCOIN);
+        }else if(cryptoNet.getLabel().equals(CryptoNet.STEEM.getLabel())){
+            return new SteemCryptoNetVerifier();
         }
         return null;
     }
