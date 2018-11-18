@@ -6,5 +6,6 @@ package cy.agorise.crystalwallet.enums;
 
 public enum SeedType {
     BIP39,
-    BRAINKEY
+    BRAINKEY,
+    WIF
 }

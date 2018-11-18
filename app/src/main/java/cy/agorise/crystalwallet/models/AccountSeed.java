@@ -9,12 +9,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 
+import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import cy.agorise.crystalwallet.enums.SeedType;
 import cy.agorise.crystalwallet.models.seed.BIP39;
@@ -115,8 +117,6 @@ public class AccountSeed {
         BufferedReader reader = null;
         switch (type) {
             case BRAINKEY:
-
-
                 try {
                     reader = new BufferedReader(new InputStreamReader(context.getAssets().open("brainkeydict.txt"), "UTF-8"));
 
@@ -130,6 +130,7 @@ public class AccountSeed {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
             case BIP39:
                 try {
                     reader = new BufferedReader(new InputStreamReader(context.getAssets().open("bip39dict.txt"), "UTF-8"));
@@ -139,6 +140,7 @@ public class AccountSeed {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
         }
         return null;
     }
@@ -149,6 +151,15 @@ public class AccountSeed {
                 return new BrainKey(this.mMasterSeed,0).getPrivateKey();
             case BIP39:
                 return HDKeyDerivation.createMasterPrivateKey(new BIP39(mId, mMasterSeed).getSeed());
+            case WIF:
+                byte[] decoded = Base58.decode(this.mMasterSeed);
+                byte[] privKey = Arrays.copyOfRange(decoded, 1, decoded.length - 4);
+                byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
+                //TODO calculate chekcsum
+                while(privKey.length>32){
+                    privKey = Arrays.copyOfRange(privKey,0,privKey.length-1);
+                }
+                return ECKey.fromPrivate(privKey);
         }
         return null;
     }
