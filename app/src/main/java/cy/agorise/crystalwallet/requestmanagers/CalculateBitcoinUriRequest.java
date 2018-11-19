@@ -27,6 +27,13 @@ public class CalculateBitcoinUriRequest extends CryptoNetInfoRequest {
         this.context = context;
     }
 
+    public CalculateBitcoinUriRequest(CryptoCoin coin, CryptoNetAccount account, Context context, double amount) {
+        super(coin);
+        this.account = account;
+        this.context = context;
+        this.amount = amount;
+    }
+
     public CalculateBitcoinUriRequest(CryptoCoin coin, CryptoNetAccount account, CryptoCurrency currency, double amount, Context context) {
         super(coin);
         this.account = account;
