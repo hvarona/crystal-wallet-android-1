@@ -527,9 +527,9 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
 
             uri.append(address.getAddress());
         }
-        if(request.getCurrency()!= null){
+        if(request.getAmount() > 0 ){
             uri.append("?amount=");
-            uri.append(request.getAmount());
+            uri.append(Double.toString(request.getAmount()));
         }
 
         System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
