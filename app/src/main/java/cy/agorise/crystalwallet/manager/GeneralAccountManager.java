@@ -544,12 +544,13 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
             String cryptoNet = uri.substring(0,uri.indexOf(":"));
             if(cryptoNet.equalsIgnoreCase(this.cryptoCoin.name().toLowerCase())){
                 try{
-                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    int parameterIndex =uri.indexOf("?");
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), uri.substring(uri.indexOf(":")+1,parameterIndex>0?parameterIndex:uri.length()));
                     request.setAddress(address.toString());
                     request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
-                    if(uri.indexOf("?")>0){
+                    if(parameterIndex>0){
                         try {
-                            String[] parameters = uri.substring(uri.indexOf("?") + 1).split("&");
+                            String[] parameters = uri.substring(parameterIndex + 1).split("&");
                             for (String parameter : parameters) {
                                 int idx = parameter.indexOf("=");
                                 if (idx > 0 && parameter.substring(0, idx).equalsIgnoreCase("amount")) {
@@ -566,13 +567,14 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 request.setStatus(BitcoinUriParseRequest.StatusCode.NOT_VALID);
             }
         }else{
-            if(uri.indexOf("?")>0){
+            int parameterIndex =uri.indexOf("?");
+            if(parameterIndex>0){
                 try{
-                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), uri.substring(uri.indexOf(":")+1,parameterIndex>0?parameterIndex:uri.length()));
                     request.setAddress(address.toString());
                     request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
                     try{
-                    String[] parameters = uri.substring(uri.indexOf("?")+1).split("&");
+                    String[] parameters = uri.substring(parameterIndex+1).split("&");
                     for(String parameter : parameters){
                         int idx = parameter.indexOf("=");
                         if(idx > 0 && parameter.substring(0,idx).equalsIgnoreCase("amount")){
@@ -586,7 +588,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 }
             }else{
                 try{
-                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
+                    Address address = Address.fromBase58(this.cryptoCoin.getParameters(), uri);
                     request.setAddress(address.toString());
                     request.setStatus(BitcoinUriParseRequest.StatusCode.VALID);
 
