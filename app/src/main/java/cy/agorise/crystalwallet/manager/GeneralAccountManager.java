@@ -542,7 +542,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         String uri = request.getUri();
         if(uri.indexOf(":")>0){
             String cryptoNet = uri.substring(0,uri.indexOf(":"));
-            if(cryptoNet.equalsIgnoreCase(this.cryptoCoin.getLabel().toLowerCase())){
+            if(cryptoNet.equalsIgnoreCase(this.cryptoCoin.name().toLowerCase())){
                 try{
                     Address address = Address.fromBase58(this.cryptoCoin.getParameters(), request.getAddress());
                     request.setAddress(address.toString());
