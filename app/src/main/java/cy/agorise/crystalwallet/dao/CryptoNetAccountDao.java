@@ -29,6 +29,9 @@ public interface CryptoNetAccountDao {
     @Query("SELECT cna.* FROM crypto_net_account cna WHERE seed_id = :seedId")
     List<CryptoNetAccount> getAllCryptoNetAccountBySeed( long seedId);
 
+    @Query("SELECT cna.* FROM crypto_net_account cna WHERE crypto_net == 'BITCOIN'")
+    LiveData<List<CryptoNetAccount>>  getAllBitcoins();
+
     @Query("SELECT * FROM crypto_net_account WHERE id = :accountId")
     LiveData<CryptoNetAccount> getByIdLiveData( long accountId);
 
