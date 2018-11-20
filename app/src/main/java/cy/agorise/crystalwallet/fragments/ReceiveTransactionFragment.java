@@ -402,7 +402,7 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
             //    @Override
             //    public void onCarryOut() {
             //        if (addressRequest.getStatus() == NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED){
-                        final CalculateBitcoinUriRequest uriRequest = new CalculateBitcoinUriRequest(cryptoCoin, cryptoNetAccount, getContext());
+                        final CalculateBitcoinUriRequest uriRequest = new CalculateBitcoinUriRequest(cryptoCoin, cryptoNetAccount, getContext(), amount);
 
                         uriRequest.setListener(new CryptoNetInfoRequestListener(){
                             @Override
