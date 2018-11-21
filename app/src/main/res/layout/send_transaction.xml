@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white">
@@ -11,6 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="24dp">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/centeredVerticalGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
 
         <View
             android:id="@+id/topView"
@@ -35,6 +41,16 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btnCancel"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/ic_close"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <cy.agorise.crystalwallet.util.CircularImageView
             android:id="@+id/gravatar"
@@ -188,43 +204,43 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvMemoError" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCloseCamera"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:backgroundTint="@color/send_strong_orange"
+            app:fabSize="mini"
+            app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
+            app:layout_constraintTop_toBottomOf="@+id/tvScan"
+            app:srcCompat="@drawable/ic_close" />
+
+        <me.dm7.barcodescanner.zxing.ZXingScannerView
+            android:id="@+id/ivCamera"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/camera_feed_to_scan_qr"
+            android:src="#666"
+            app:layout_constraintDimensionRatio="h,3:4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"
+            app:layout_constraintTop_toTopOf="@+id/fabCloseCamera" />
+
         <View
             android:id="@+id/viewCamera"
             android:background="@color/black"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginBottom="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:visibility="gone"
             android:src="#666"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvScan">
-
-        </View>
-
-        <me.dm7.barcodescanner.zxing.ZXingScannerView
-            android:id="@+id/ivCamera"
-            android:layout_width="183dp"
-            android:layout_height="176dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/camera_feed_to_scan_qr"
-            android:src="#666"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvScan" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabCloseCamera"
-            android:layout_width="32dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="165dp"
-            android:layout_marginBottom="165dp"
-            app:backgroundTint="@color/send_strong_orange"
-            app:fabSize="mini"
-            app:layout_constraintBottom_toBottomOf="@+id/ivCamera"
-            app:layout_constraintStart_toStartOf="@+id/ivCamera"
-            app:srcCompat="@drawable/ic_close" />
+            app:layout_constraintTop_toTopOf="@id/ivCamera"
+            app:layout_constraintStart_toStartOf="@id/ivCamera"
+            app:layout_constraintEnd_toEndOf="@id/ivCamera"
+            app:layout_constraintBottom_toBottomOf="@+id/ivCamera"/>
 
         <View
             android:id="@+id/viewSend"
@@ -244,27 +260,6 @@
             app:srcCompat="@drawable/ic_arrow_forward"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/viewSend" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="600dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="5dp">
-
-            <TextView
-                android:id="@+id/btnCancel"
-                android:layout_width="20dp"
-                android:layout_height="26dp"
-                android:background="@drawable/ic_close"
-                android:text=""
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 

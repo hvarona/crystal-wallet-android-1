@@ -86,7 +86,6 @@ dependencies {
     implementation 'org.tukaani:xz:1.6'
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.github.bilthon:graphenej:0.4.6'
-    implementation 'com.google.zxing:core:3.3.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
     implementation 'com.github.sjaramillo10:AnimatedTabLayout:1.0.3'
 
