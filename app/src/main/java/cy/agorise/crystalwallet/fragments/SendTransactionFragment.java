@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -133,12 +132,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @BindView(R.id.viewCamera)
     View viewCamera;
 
-    /*
-     * Flag to control when the camera is visible and when is hide
-     * */
-    private boolean cameraVisible = true;
-
-    Button btnScanQrCode;
+    /* Flag to control when the camera is visible and when is hidden */
+    private boolean cameraVisible = false;
 
     private long cryptoNetAccountId;
     private CryptoNetAccount cryptoNetAccount;
@@ -233,41 +228,9 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
         loadUserImage();
 
-        /*
-         * Check for CAMERA permission
-         * */
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkPermission()) {
-                // Code for above or equal 23 API Oriented Device
-                // Your Permission granted already .Do next code
-
-                /*
-                 * Init the camera
-                 * */
-                try {
-                    beginScanQrCode();
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-
-            } else {
-                requestPermission(); // Code for permission
-            }
-        }
-        else {
-
-            // Code for Below 23 API Oriented Device
-            // Do next code
-
-            /*
-             * Init the camera
-             * */
-            try {
-                beginScanQrCode();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
+        /* Check for CAMERA permission */
+        if (Build.VERSION.SDK_INT >= 23 && !checkCameraPermission())
+            requestCameraPermission();
 
         return builder.setView(view).create();
     }
@@ -325,35 +288,21 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
     }
 
-    private void requestPermission() {
+    private boolean checkCameraPermission() {
+        int result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestCameraPermission() {
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
             Toast.makeText(getActivity(), getActivity().getString(R.string.permission_denied_camera), Toast.LENGTH_LONG).show();
 
-            /*
-             * Disable the button of the camera visibility
-             * */
-            disableVisibilityCamera();
+            /* Disable the button of the camera visibility */
+            btnCloseCamera.setVisibility(View.INVISIBLE);
 
         } else {
             requestPermissions(new String[] {android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        }
-    }
-
-    private void disableVisibilityCamera(){
-
-        /*
-         * Hide the button, the user can not modify the visibility
-         * */
-        btnCloseCamera.setVisibility(View.INVISIBLE);
-    }
-
-    private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -374,15 +323,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                         }
                     });
 
-                    /*
-                     * Init the camera
-                     * */
-                    try {
-                        beginScanQrCode();
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-
                 } else {
                     Log.e("value", "Permission Denied, You cannot use the camera.");
 
@@ -401,12 +341,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         super.onResume();
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
-        /*builder.setNeutralButton("Scan QR Code", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                beginScanQrCode();
-            }
-        });*/
 
         // Force dialog fragment to use the full width of the screen
         Window dialogWindow = getDialog().getWindow();
@@ -475,67 +409,44 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
 
     @OnClick(R.id.fabCloseCamera)
-    public void onClicCloseCamera(){
-        mScannerView.stopCamera();
-
-        /*
-         * Hide the camera or show it
-         * */
-        if(cameraVisible){
+    public void onClickCloseCamera(){
+        if(cameraVisible)
             hideCamera();
-        }
-        else{
+        else
             showCamera();
-        }
     }
 
-    /*
-     * Show the camera and hide the black background
+    /**
+     * Shows the camera and hide the black background
      * */
     private void showCamera(){
-
-        /*
-         * Change visibilities of views
-         * */
+        /* Change visibilities of views */
         viewCamera.setVisibility(View.GONE);
         mScannerView.setVisibility(View.VISIBLE);
 
-        /*
-         * Change icon
-         * */
+        /* Change icon */
         btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ic_close));
 
-        /*
-         * Reset variable
-         * */
+        /* Reset variable */
         cameraVisible = true;
 
-        /*
-         * Star the camera again
-         * */
+        /* Star the camera again */
         beginScanQrCode();
     }
 
 
-    /*
-     * Hide the camera and show the black background
+    /**
+     * Hides the camera and show the black background
      * */
     private void hideCamera(){
-
-        /*
-         * Change visibilities of views
-         * */
+        /* Change visibilities of views */
         viewCamera.setVisibility(View.VISIBLE);
         mScannerView.setVisibility(View.INVISIBLE);
 
-        /*
-         * Change icon
-         * */
+        /* Change icon */
         btnCloseCamera.setImageDrawable(getResources().getDrawable(R.drawable.ok));
 
-        /*
-         * Reset variable
-         * */
+        /* Reset variable */
         cameraVisible = false;
     }
 
