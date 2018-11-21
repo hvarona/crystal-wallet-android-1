@@ -327,7 +327,6 @@ public class FileBackupManager implements FileServiceRequestsListener {
     public static byte[] decompress(byte[] inputBytes, int which) {
         InputStream in = null;
         try {
-            System.out.println("Bytes: "+Util.bytesToHex(inputBytes));
             ByteArrayInputStream input = new ByteArrayInputStream(inputBytes);
             ByteArrayOutputStream output = new ByteArrayOutputStream(16*2048);
             if(which == Util.XZ) {
