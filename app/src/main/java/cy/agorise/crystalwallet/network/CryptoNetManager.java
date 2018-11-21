@@ -32,7 +32,6 @@ public abstract class CryptoNetManager {
 
     public static String getURL(CryptoNet crypto, int index){
         if(TestedURLs.containsKey(crypto) && TestedURLs.get(crypto).size()>index){
-            System.out.println("Servers url list " + Arrays.toString(TestedURLs.get(crypto).toArray()));
             return TestedURLs.get(crypto).get(index).getUrl();
         }
         System.out.println("Servers " + crypto.getLabel()+" dioesn't have testedurl");

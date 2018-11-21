@@ -23,7 +23,7 @@ public class BitcoinCryptoNetVerifier extends CryptoNetVerifier{
 
                         CryptoNetManager.verifiedCryptoNetURL(cryptoCoin.getCryptoNet(), url, System.currentTimeMillis() - startTime);
                     }else{
-                        System.out.println("BitcoinCryptoNetVerifier bad genesis block " + value);
+                        System.out.println("BitcoinCryptoNetVerifier bad genesis block " + value + " " + url);
                     }
                     //TODO bad genesis block
                 }else{
