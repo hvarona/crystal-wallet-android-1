@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 public enum CryptoCoin implements Serializable {
-    BITCOIN(CryptoNet.BITCOIN,"BTC",8,0,NetworkParameters.fromID(NetworkParameters.ID_MAINNET)),
+    BITCOIN(CryptoNet.BITCOIN,"BTC",8,0,NetworkParameters.fromID(NetworkParameters.ID_TESTNET)),
     BITCOIN_TEST(CryptoNet.BITCOIN_TEST,"BTC",8,1,NetworkParameters.fromID(NetworkParameters.ID_TESTNET)),
     LITECOIN(CryptoNet.LITECOIN,"LTC",8,2,null),
     DASH(CryptoNet.DASH,"DASH",8,5,null),
