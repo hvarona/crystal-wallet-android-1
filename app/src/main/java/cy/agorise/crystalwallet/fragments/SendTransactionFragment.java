@@ -810,8 +810,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
         }
 
         //Is not a bitshares QR
-        CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
-        final BitcoinUriParseRequest bitcoinUriParseRequest = new BitcoinUriParseRequest(result.getText(), cryptoCoin);
+        //CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+        final BitcoinUriParseRequest bitcoinUriParseRequest = new BitcoinUriParseRequest(result.getText(), CryptoCoin.BITCOIN);
 
         bitcoinUriParseRequest.setListener(new CryptoNetInfoRequestListener() {
             @Override

@@ -170,7 +170,15 @@ public class CrystalWalletService extends LifecycleService {
             }
         });
 
-
+        final LiveData<List<CryptoNetAccount>> cryptoNetAccountList = db.cryptoNetAccountDao().getAllBitcoins();
+        cryptoNetAccountList.observe(this, new Observer<List<CryptoNetAccount>>() {
+            @Override
+            public void onChanged(@Nullable List<CryptoNetAccount> cryptoNetAccounts) {
+                for(CryptoNetAccount nextCryptoNetAccount : cryptoNetAccounts) {
+                    generalAccountManager.loadAccountFromDB(nextCryptoNetAccount,thisService);
+                }
+            }
+        });
 
         /*while(this.keepLoadingAccountTransactions){
             try{

@@ -52,7 +52,8 @@ public class CrystalApplication extends Application {
 
 
     public static final String BITCOIN_SERVER_URLS[] ={
-            "https://insight.bitpay.com/"
+            "https://insight.bitpay.com/",
+            "https://testnet.blockexplorer.com/"
     };
 
     public static final CryptoCurrency BITCOIN_CURRENCY = new CryptoCurrency("BTC",CryptoNet.BITCOIN,8);
