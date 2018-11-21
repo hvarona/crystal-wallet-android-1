@@ -12,8 +12,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,10 +40,6 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
-import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.vincent.filepicker.ToastUtil;
-
-import org.bitcoinj.wallet.SendRequest;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -63,7 +57,6 @@ import butterknife.OnTextChanged;
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.dialogs.material.CrystalDialog;
-import cy.agorise.crystalwallet.dialogs.material.ToastIt;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
 import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.interfaces.OnResponse;
@@ -95,6 +88,8 @@ import static butterknife.internal.Utils.listOf;
 
 public class SendTransactionFragment extends DialogFragment implements UIValidatorListener, ZXingScannerView.ResultHandler {
 
+    private final String TAG = getClass().getName();
+
     SendTransactionValidator sendTransactionValidator;
 
     @BindView(R.id.spFrom)
@@ -125,11 +120,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     TextView tvMemoError;
     @BindView(R.id.btnSend)
     FloatingActionButton btnSend;
-    @BindView(R.id.btnCancel)
-    TextView btnCancel;
     @BindView(R.id.ivPeople)
     ImageView ivPeople;
-
     @BindView(R.id.ivCamera)
     ZXingScannerView mScannerView;
 
@@ -714,7 +706,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void beginScanQrCode(){
         //mScannerView = new ZXingScannerView(getContext());
         mScannerView.setFormats(listOf(BarcodeFormat.QR_CODE));
-        mScannerView.setAspectTolerance(20f);
+        mScannerView.setAspectTolerance(0.5f);
         mScannerView.setAutoFocus(true);
         mScannerView.setLaserColor(R.color.colorAccent);
         mScannerView.setMaskColor(R.color.colorAccent);
@@ -783,6 +775,8 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void handleResult(Result result) {
         try {
             Invoice invoice = Invoice.fromQrCode(result.getText());
+
+            Log.d(TAG, "QR Code read: " + invoice.toJsonString());
 
             etTo.setText(invoice.getTo());
 
