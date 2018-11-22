@@ -175,6 +175,8 @@ public class CrystalSecurityMonitor implements Application.ActivityLifecycleCall
                 if(onResponsePattern != null){
                     PatternRequestActivity.setOnResponse(onResponsePattern);
                 }
+            } else {
+                onResponsePattern.onSuccess();
             }
             if (intent != null) {
                 intent.putExtra("ACTIVITY_TYPE", "PASSWORD_REQUEST");
