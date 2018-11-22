@@ -280,11 +280,11 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 }
 
                 ccTransaction.setAmount(amount);
-                CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
+                CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
                 if (currency == null) {
                     currency = new CryptoCurrency();
                     currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-                    currency.setName(this.cryptoCoin.name());
+                    currency.setName(this.cryptoCoin.getLabel());
                     currency.setPrecision(this.cryptoCoin.getPrecision());
                     long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
                     currency.setId(idCurrency);
@@ -325,11 +325,11 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     private void updateBalance(CryptoCoinTransaction ccTransaction, long amount, CrystalDatabase db){
-        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
+        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
         if (currency == null) {
             currency = new CryptoCurrency();
             currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-            currency.setName(this.cryptoCoin.name());
+            currency.setName(this.cryptoCoin.getLabel());
             currency.setPrecision(this.cryptoCoin.getPrecision());
             long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
             currency.setId(idCurrency);
