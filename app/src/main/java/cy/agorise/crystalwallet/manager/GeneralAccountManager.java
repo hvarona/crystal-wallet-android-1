@@ -542,7 +542,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
 
         request.setUri(uri.toString());
-        request.validate();
+        //request.validate();
     }
 
     private void parseUri(BitcoinUriParseRequest request){
