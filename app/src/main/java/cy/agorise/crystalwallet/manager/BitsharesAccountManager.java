@@ -90,6 +90,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                             long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(fetch)[0];
                             fetch.setId(idAccount);
                             db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(fetch));
+                            AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                            if(seed.getName() == null || seed.getName().isEmpty()){
+                                seed.setName(grapheneAccount.getName());
+                                db.accountSeedDao().insertAccountSeed(seed);
+                            }
                             subscribeBitsharesAccount(fetch.getId(),fetch.getAccountId(),context);
                             request.success(fetch);
                         }
@@ -130,6 +135,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long[] idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         grapheneAccount.setId(idAccount[0]);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -149,6 +159,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
                         grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -162,6 +177,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
                 grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                if(seed.getName() == null || seed.getName().isEmpty()){
+                    seed.setName(grapheneAccount.getName());
+                    db.accountSeedDao().insertAccountSeed(seed);
+                }
                 subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
         }
@@ -182,6 +202,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setAccountId(fetch.getAccountId());
                         grapheneAccount.setAccountId(fetch.getAccountId());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -212,6 +237,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                     }
                 });
             }else{
+                AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                if(seed.getName() == null || seed.getName().isEmpty()){
+                    seed.setName(grapheneAccount.getName());
+                    db.accountSeedDao().insertAccountSeed(seed);
+                }
                 subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
             }
         }
