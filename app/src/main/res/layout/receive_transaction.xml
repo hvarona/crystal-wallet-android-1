@@ -103,6 +103,8 @@
             android:textColor="@color/red"
             android:layout_below="@+id/spAsset"/>
 
+
+
         <cy.agorise.crystalwallet.util.SquaredImageView
             android:id="@+id/ivQrCode"
             android:layout_width="match_parent"
@@ -115,6 +117,22 @@
             android:src="@color/gray"
             android:layout_below="@+id/tvAmountError"
             android:layout_centerHorizontal="true"/>
+
+        <ProgressBar
+            android:id="@+id/pbQrCode"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvAmountError"
+            android:layout_alignBottom="@+id/ivQrCode"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="24dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/qr_code"
+            android:src="@color/gray"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvShare"
