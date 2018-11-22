@@ -46,6 +46,7 @@ public abstract class GetEstimateFee {
                 }
             });
         }catch(Exception e){
+            e.printStackTrace();
             listener.fail();
         }
     }

@@ -360,10 +360,12 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     public void send(final BitcoinSendRequest request){
         //TODO check server connection
         //TODO validate to address
+        System.out.println("GeneralAccountManager sending " + request.getAmount());
 
         InsightApiGenerator.getEstimateFee(this.cryptoCoin,new ApiRequest(1, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
+                System.out.println("GeneralAccountManager estimateFee response " + answer);
                 Transaction tx = new Transaction(cryptoCoin.getParameters());
                 long currentAmount = 0;
                 long fee = -1;

@@ -53,7 +53,7 @@ public class CrystalApplication extends Application {
 
     public static final String BITCOIN_SERVER_URLS[] ={
             "https://test-insight.bitpay.com",
-            "https://testnet.blockexplorer.com/",
+            //"https://testnet.blockexplorer.com/",
             //"https://insight.bitpay.com/"
 
     };
@@ -135,6 +135,11 @@ public class CrystalApplication extends Application {
             Configuration configuration = resources.getConfiguration();
             configuration.locale = locale;
             resources.updateConfiguration(configuration, dm);
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
 
         Intent intent = new Intent(getApplicationContext(), CrystalWalletService.class);
