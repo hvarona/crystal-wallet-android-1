@@ -98,7 +98,19 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 new ChildNumber(1, false));
 
         CryptoCoinBalance balance = new CryptoCoinBalance();
-        balance.setBalance(0);
+        long amount = 0;
+        List<CryptoCoinTransaction> trransactions = db.transactionDao().getByIdAccount(account.getId());
+        for(CryptoCoinTransaction transaction : trransactions){
+            if(transaction.isConfirmed()){
+                if(transaction.getInput()){
+                    amount += transaction.getAmount();
+                }else{
+                    amount -= transaction.getAmount();
+                }
+
+            }
+        }
+        balance.setBalance(amount);
         balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.getLabel(),cryptoCoin.name()).getId());
         balance.setAccountId(account.getId());
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
@@ -115,7 +127,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
             address.setChange(false);
             address.setAccountId(account.getId());
             address.setIndex(0);
-            String addressString =externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            String addressString = externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
             address.setAddress(addressString);
             db.bitcoinAddressDao().insertBitcoinAddresses(address);
             InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
@@ -149,6 +161,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         //if(Arrays.asList(SUPPORTED_COINS).contains(request.getCoin())){
         if(request.getCoin().equals(this.cryptoCoin)){
             if(request instanceof BitcoinSendRequest) {
+                this.send((BitcoinSendRequest) request);
             }else if(request instanceof CreateBitcoinAccountRequest){
                 this.createGeneralAccount((CreateBitcoinAccountRequest) request);
             }else if(request instanceof NextBitcoinAccountAddressRequest){
@@ -360,12 +373,10 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     public void send(final BitcoinSendRequest request){
         //TODO check server connection
         //TODO validate to address
-        System.out.println("GeneralAccountManager sending " + request.getAmount());
 
         InsightApiGenerator.getEstimateFee(this.cryptoCoin,new ApiRequest(1, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
-                System.out.println("GeneralAccountManager estimateFee response " + answer);
                 Transaction tx = new Transaction(cryptoCoin.getParameters());
                 long currentAmount = 0;
                 long fee = -1;
