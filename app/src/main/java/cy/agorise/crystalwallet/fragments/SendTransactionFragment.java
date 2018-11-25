@@ -632,7 +632,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                     public void onCarryOut() {
                         if (((ValidateBitsharesSendRequest)sendRequest).getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)) {
                             try {
-//                                crystalDialog.dismiss();
+                                crystalDialog.dismiss();
                                 thisFragment.dismiss();
                                 //thisFragment.finalize();
                             } catch (Throwable throwable) {
@@ -664,7 +664,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                     public void onCarryOut() {
                         if (((BitcoinSendRequest)sendRequest).getStatus().equals(ValidateBitsharesSendRequest.StatusCode.SUCCEEDED)) {
                             try {
-//                                crystalDialog.dismiss();
+                                crystalDialog.dismiss();
                                 thisFragment.dismiss();
                                 //thisFragment.finalize();
                             } catch (Throwable throwable) {
