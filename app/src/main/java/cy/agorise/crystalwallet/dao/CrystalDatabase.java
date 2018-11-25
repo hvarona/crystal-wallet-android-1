@@ -72,10 +72,10 @@ public abstract class CrystalDatabase extends RoomDatabase {
                     Room.databaseBuilder(context,
                             CrystalDatabase.class, "CrystalWallet.db")
                             .allowMainThreadQueries()
-                            .addMigrations(MIGRATION_2_3)
-                            .addMigrations(MIGRATION_3_4)
-                            .addMigrations(MIGRATION_4_5)
-                            .addMigrations(MIGRATION_5_6)
+                            //.addMigrations(MIGRATION_2_3)
+                            //.addMigrations(MIGRATION_3_4)
+                            //.addMigrations(MIGRATION_4_5)
+                            //.addMigrations(MIGRATION_5_6)
                             .build();
         }
         return instance;
