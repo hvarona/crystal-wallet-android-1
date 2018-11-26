@@ -380,7 +380,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 Transaction tx = new Transaction(cryptoCoin.getParameters());
                 long currentAmount = 0;
                 long fee = -1;
-                long feeRate = (Long) answer;
+                long feeRate =  (long)(((double)answer) * Math.pow(10,cryptoCoin.getPrecision()));
                 fee = 226 * feeRate;
 
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
