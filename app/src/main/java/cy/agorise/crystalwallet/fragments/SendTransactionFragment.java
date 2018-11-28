@@ -591,7 +591,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             /*
              * If exists mode scurity show it and valide events in case of success or fail
              * */
-            CrystalSecurityMonitor.getInstance(null).callPasswordRequest(this.getActivity(), new OnResponse() {
+            CrystalSecurityMonitor.getInstance(this.getActivity()).callPasswordRequest(this.getActivity(), new OnResponse() {
                 @Override
                 public void onSuccess() {
 
@@ -611,6 +611,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
                 }
             });
+            //CryptoNetInfoRequests.getInstance().addRequest(sendRequest);
         }
     }
 

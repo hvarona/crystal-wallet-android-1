@@ -98,7 +98,19 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 new ChildNumber(1, false));
 
         CryptoCoinBalance balance = new CryptoCoinBalance();
-        balance.setBalance(0);
+        long amount = 0;
+        List<CryptoCoinTransaction> trransactions = db.transactionDao().getByIdAccount(account.getId());
+        for(CryptoCoinTransaction transaction : trransactions){
+            if(transaction.isConfirmed()){
+                if(transaction.getInput()){
+                    amount += transaction.getAmount();
+                }else{
+                    amount -= transaction.getAmount();
+                }
+
+            }
+        }
+        balance.setBalance(amount);
         balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.getLabel(),cryptoCoin.name()).getId());
         balance.setAccountId(account.getId());
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
@@ -115,7 +127,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
             address.setChange(false);
             address.setAccountId(account.getId());
             address.setIndex(0);
-            String addressString =externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            String addressString = externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
             address.setAddress(addressString);
             db.bitcoinAddressDao().insertBitcoinAddresses(address);
             InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
@@ -149,6 +161,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         //if(Arrays.asList(SUPPORTED_COINS).contains(request.getCoin())){
         if(request.getCoin().equals(this.cryptoCoin)){
             if(request instanceof BitcoinSendRequest) {
+                this.send((BitcoinSendRequest) request);
             }else if(request instanceof CreateBitcoinAccountRequest){
                 this.createGeneralAccount((CreateBitcoinAccountRequest) request);
             }else if(request instanceof NextBitcoinAccountAddressRequest){
@@ -171,134 +184,141 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
      * @param txi
      */
     public void processTxi(Txi txi){
-        CrystalDatabase db = CrystalDatabase.getAppDatabase(this.context);
-        List<BitcoinTransaction> btTransactions = db.bitcoinTransactionDao().getTransactionsByTxid(txi.txid);
-        if(!btTransactions.isEmpty()){
-            for(BitcoinTransaction btTransaction : btTransactions) {
-                btTransaction.setConfirmations(txi.confirmations);
-                CryptoCoinTransaction ccTransaction = db.transactionDao().getById(btTransaction.getCryptoCoinTransactionId());
-                if (!ccTransaction.isConfirmed() && btTransaction.getConfirmations() >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
-                    ccTransaction.setConfirmed(true);
-                    db.transactionDao().insertTransaction(ccTransaction);
-                    updateBalance(ccTransaction,(ccTransaction.getInput()?1:-1)*ccTransaction.getAmount(),db);
-                }
+        try {
+            System.out.println("GeneralAccountManager processingTxi " + txi.txid);
+            CrystalDatabase db = CrystalDatabase.getAppDatabase(this.context);
+            List<BitcoinTransaction> btTransactions = db.bitcoinTransactionDao().getTransactionsByTxid(txi.txid);
+            if (!btTransactions.isEmpty()) {
+                System.out.println("GeneralAccountManager Transaction not null " + txi.txid);
+                for (BitcoinTransaction btTransaction : btTransactions) {
+                    btTransaction.setConfirmations(txi.confirmations);
+                    CryptoCoinTransaction ccTransaction = db.transactionDao().getById(btTransaction.getCryptoCoinTransactionId());
+                    if (!ccTransaction.isConfirmed() && btTransaction.getConfirmations() >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
+                        ccTransaction.setConfirmed(true);
+                        db.transactionDao().insertTransaction(ccTransaction);
+                        updateBalance(ccTransaction, (ccTransaction.getInput() ? 1 : -1) * ccTransaction.getAmount(), db);
+                    }
 
-                db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction);
-            }
-        }else {
+                    db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction);
+                }
+            } else {
             /*List<CryptoCoinTransaction> ccTransactions = new ArrayList();
             btTransactions = new ArrayList();*/ //TODO transactions involving multiples accounts
-            CryptoCoinTransaction ccTransaction = new CryptoCoinTransaction();
-            BitcoinTransaction btTransaction = new BitcoinTransaction();
-            btTransaction.setTxId(txi.txid);
-            btTransaction.setBlock(txi.blockheight);
-            btTransaction.setFee((long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision())));
-            btTransaction.setConfirmations(txi.confirmations);
-            ccTransaction.setDate(new Date(txi.time * 1000));
-            if(txi.txlock || txi.confirmations >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
-                ccTransaction.setConfirmed(true);
-            }else{
-                ccTransaction.setConfirmed(false);
-            }
-
-            ccTransaction.setInput(false);
-
-            long amount = 0;
-
-
-            //transaction.setAccount(this.mAccount);
-            //transaction.setType(cryptoCoin);
-            List<BitcoinTransactionGTxIO> gtxios = new ArrayList();
-            for (Vin vin : txi.vin) {
-                BitcoinTransactionGTxIO input = new BitcoinTransactionGTxIO();
-                String addr = vin.addr;
-                input.setAddress(addr);
-                input.setIndex(vin.n);
-                input.setOutput(true);
-                input.setAmount((long) (vin.value * Math.pow(10, cryptoCoin.getPrecision())));
-                input.setOriginalTxId(vin.txid);
-                input.setScriptHex(vin.scriptSig.hex);
-
-                BitcoinAddress address = db.bitcoinAddressDao().getdadress(addr);
-                if(address != null){
-                    if(ccTransaction.getAccountId() < 0){
-                        ccTransaction.setAccountId(address.getAccountId());
-                        ccTransaction.setFrom(addr);
-                        ccTransaction.setInput(false);
-                    }
-
-                    if(ccTransaction.getAccountId()== address.getAccountId()){
-                        amount -= vin.value;
-                    }
-                }
-
-                if(ccTransaction.getFrom() == null || ccTransaction.getFrom().isEmpty()){
-                    ccTransaction.setFrom(addr);
-                }
-
-                gtxios.add(input);
-
-
-            }
-
-            for (Vout vout : txi.vout) {
-                if (vout.scriptPubKey.addresses == null || vout.scriptPubKey.addresses.length <= 0) {
-
+                CryptoCoinTransaction ccTransaction = new CryptoCoinTransaction();
+                BitcoinTransaction btTransaction = new BitcoinTransaction();
+                btTransaction.setTxId(txi.txid);
+                btTransaction.setBlock(txi.blockheight);
+                btTransaction.setFee((long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision())));
+                btTransaction.setConfirmations(txi.confirmations);
+                ccTransaction.setDate(new Date(txi.time * 1000));
+                if (txi.txlock || txi.confirmations >= cryptoCoin.getCryptoNet().getConfirmationsNeeded()) {
+                    ccTransaction.setConfirmed(true);
                 } else {
-                    BitcoinTransactionGTxIO output = new BitcoinTransactionGTxIO();
-                    String addr = vout.scriptPubKey.addresses[0];
-                    output.setAddress(addr);
-                    output.setIndex(vout.n);
-                    output.setOutput(false);
-                    output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
-                    output.setScriptHex(vout.scriptPubKey.hex);
-                    output.setOriginalTxId(txi.txid);
+                    ccTransaction.setConfirmed(false);
+                }
 
-                    gtxios.add(output);
+                ccTransaction.setInput(false);
+
+                long amount = 0;
+
+
+                //transaction.setAccount(this.mAccount);
+                //transaction.setType(cryptoCoin);
+                List<BitcoinTransactionGTxIO> gtxios = new ArrayList();
+                for (Vin vin : txi.vin) {
+                    BitcoinTransactionGTxIO input = new BitcoinTransactionGTxIO();
+                    String addr = vin.addr;
+                    input.setAddress(addr);
+                    input.setIndex(vin.n);
+                    input.setOutput(true);
+                    input.setAmount((long) (vin.value * Math.pow(10, cryptoCoin.getPrecision())));
+                    input.setOriginalTxId(vin.txid);
+                    input.setScriptHex(vin.scriptSig.hex);
+
                     BitcoinAddress address = db.bitcoinAddressDao().getdadress(addr);
-                    if(address != null){
-                        if(ccTransaction.getAccountId() < 0){
+                    if (address != null) {
+                        if (ccTransaction.getAccountId() < 0) {
                             ccTransaction.setAccountId(address.getAccountId());
-                            ccTransaction.setInput(true);
-                            ccTransaction.setTo(addr);
+                            ccTransaction.setFrom(addr);
+                            ccTransaction.setInput(false);
                         }
 
-                        if(ccTransaction.getAccountId()== address.getAccountId()){
-                            amount += vout.value;
+                        if (ccTransaction.getAccountId() == address.getAccountId()) {
+                            amount -= (long) (vin.value * Math.pow(10, cryptoCoin.getPrecision()));
                         }
-                    }else{
-                        //TOOD multiple send address
-                        if(ccTransaction.getTo() == null || ccTransaction.getTo().isEmpty()){
-                            ccTransaction.setTo(addr);
+                    }
+
+                    if (ccTransaction.getFrom() == null || ccTransaction.getFrom().isEmpty()) {
+                        ccTransaction.setFrom(addr);
+                    }
+
+                    gtxios.add(input);
+
+
+                }
+
+                for (Vout vout : txi.vout) {
+                    if (vout.scriptPubKey.addresses == null || vout.scriptPubKey.addresses.length <= 0) {
+
+                    } else {
+                        BitcoinTransactionGTxIO output = new BitcoinTransactionGTxIO();
+                        String addr = vout.scriptPubKey.addresses[0];
+                        output.setAddress(addr);
+                        output.setIndex(vout.n);
+                        output.setOutput(false);
+                        output.setAmount((long) (vout.value * Math.pow(10, cryptoCoin.getPrecision())));
+                        output.setScriptHex(vout.scriptPubKey.hex);
+                        output.setOriginalTxId(txi.txid);
+
+                        gtxios.add(output);
+
+                        BitcoinAddress address = db.bitcoinAddressDao().getdadress(addr);
+                        if (address != null) {
+                            if (ccTransaction.getAccountId() < 0) {
+                                ccTransaction.setAccountId(address.getAccountId());
+                                ccTransaction.setInput(true);
+                                ccTransaction.setTo(addr);
+                            }
+
+                            if (ccTransaction.getAccountId() == address.getAccountId()) {
+                                amount += (long) (vout.value * Math.pow(10, cryptoCoin.getPrecision()));
+                            }
+                        } else {
+                            //TOOD multiple send address
+                            if (ccTransaction.getTo() == null || ccTransaction.getTo().isEmpty()) {
+                                ccTransaction.setTo(addr);
+                            }
                         }
                     }
                 }
-            }
 
-            ccTransaction.setAmount(amount);
-            CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
-            if (currency == null) {
-                currency = new CryptoCurrency();
-                currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-                currency.setName(this.cryptoCoin.name());
-                currency.setPrecision(this.cryptoCoin.getPrecision());
-                long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
-                currency.setId(idCurrency);
-            }
+                ccTransaction.setAmount(amount);
+                CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
+                if (currency == null) {
+                    currency = new CryptoCurrency();
+                    currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
+                    currency.setName(this.cryptoCoin.getLabel());
+                    currency.setPrecision(this.cryptoCoin.getPrecision());
+                    long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
+                    currency.setId(idCurrency);
+                }
 
-            ccTransaction.setIdCurrency((int)currency.getId());
+                ccTransaction.setIdCurrency((int) currency.getId());
 
-            long ccId = db.transactionDao().insertTransaction(ccTransaction)[0];
-            btTransaction.setCryptoCoinTransactionId(ccId);
-            long btId = db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction)[0];
-            for(BitcoinTransactionGTxIO gtxio : gtxios){
-                gtxio.setBitcoinTransactionId(btId);
-                db.bitcoinTransactionDao().insertBitcoinTransactionGTxIO(gtxio);
-            }
+                long ccId = db.transactionDao().insertTransaction(ccTransaction)[0];
+                btTransaction.setCryptoCoinTransactionId(ccId);
+                long btId = db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction)[0];
+                for (BitcoinTransactionGTxIO gtxio : gtxios) {
+                    gtxio.setBitcoinTransactionId(btId);
+                    db.bitcoinTransactionDao().insertBitcoinTransactionGTxIO(gtxio);
+                }
 
-            if(ccTransaction.isConfirmed()) {
-                updateBalance(ccTransaction,amount,db);
+                if (ccTransaction.isConfirmed()) {
+                    updateBalance(ccTransaction, amount, db);
+                }
             }
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -318,11 +338,11 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     private void updateBalance(CryptoCoinTransaction ccTransaction, long amount, CrystalDatabase db){
-        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
+        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
         if (currency == null) {
             currency = new CryptoCurrency();
             currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-            currency.setName(this.cryptoCoin.name());
+            currency.setName(this.cryptoCoin.getLabel());
             currency.setPrecision(this.cryptoCoin.getPrecision());
             long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
             currency.setId(idCurrency);
@@ -360,7 +380,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 Transaction tx = new Transaction(cryptoCoin.getParameters());
                 long currentAmount = 0;
                 long fee = -1;
-                long feeRate = (Long) answer;
+                long feeRate =  (long)(((double)answer) * Math.pow(10,cryptoCoin.getPrecision()));
                 fee = 226 * feeRate;
 
                 CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
@@ -535,7 +555,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
 
         request.setUri(uri.toString());
-        request.validate();
+        //request.validate();
     }
 
     private void parseUri(BitcoinUriParseRequest request){

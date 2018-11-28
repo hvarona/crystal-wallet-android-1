@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.codec.binary.StringUtils;
+
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -113,7 +116,12 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
             CryptoNetAccountViewModel cryptoNetAccountViewModel = ViewModelProviders.of(this.fragment).get(CryptoNetAccountViewModel.class);
             cryptoNetAccountViewModel.loadCryptoNetAccount(transaction.getAccountId());
 
-            String amountString = String.format("%.2f",transaction.getAmount()/Math.pow(10,cryptoCurrency.getPrecision()));
+            String pattern = new String(new char[cryptoCurrency.getPrecision()]).replace('\0', '#');
+            pattern = "#."+pattern;
+
+            DecimalFormat df = new DecimalFormat(pattern);
+            //String amountString = String.format("%.2f",transaction.getAmount()/Math.pow(10,cryptoCurrency.getPrecision()));
+            String amountString = df.format(transaction.getAmount()/Math.pow(10,cryptoCurrency.getPrecision()));
 
             GeneralSettingListViewModel generalSettingListViewModel = ViewModelProviders.of(this.fragment).get(GeneralSettingListViewModel.class);
             GeneralSetting timeZoneSetting = generalSettingListViewModel.getGeneralSettingByName(GeneralSetting.SETTING_NAME_TIME_ZONE);

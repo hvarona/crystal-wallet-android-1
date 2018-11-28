@@ -38,7 +38,6 @@ public class GetChainId extends BaseGrapheneHandler {
 
     @Override
     public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-        System.out.println("<<< "+frame.getPayloadText());
         String response = frame.getPayloadText();
 
         Type GetChainIdResponse = new TypeToken<WitnessResponse<String>>(){}.getType();
@@ -55,7 +54,5 @@ public class GetChainId extends BaseGrapheneHandler {
 
     @Override
     public void onFrameSent(WebSocket websocket, WebSocketFrame frame) throws Exception {
-        if(frame.isTextFrame())
-            System.out.println(">>> "+frame.getPayloadText());
     }
 }

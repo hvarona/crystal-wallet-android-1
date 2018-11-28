@@ -20,9 +20,13 @@ import cy.agorise.crystalwallet.enums.CryptoCoin;
  */
 @Entity(
     tableName="crypto_coin_transaction",
+    primaryKeys = {
+
+    },
     indices={
         @Index(value={"account_id"}),
-        @Index(value={"id_currency"})
+        @Index(value={"id_currency"}),
+        @Index(value={"date", "account_id", "id_currency", "from", "to"},unique=true)
     },
     foreignKeys = {
         @ForeignKey(

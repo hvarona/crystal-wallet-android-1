@@ -35,7 +35,7 @@ public abstract class GetEstimateFee {
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    listener.estimateFee((long) (response.body().get("2").getAsDouble()));
+                    listener.estimateFee((double) (response.body().get("2").getAsDouble()));
 
                 }
 
@@ -46,12 +46,13 @@ public abstract class GetEstimateFee {
                 }
             });
         }catch(Exception e){
+            e.printStackTrace();
             listener.fail();
         }
     }
 
     public static interface estimateFeeListener{
-        public void estimateFee(long value);
+        public void estimateFee(double value);
         public void fail();
     }
 
