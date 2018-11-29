@@ -8,6 +8,7 @@ import com.google.common.primitives.UnsignedLong;
 
 import org.bitcoinj.core.ECKey;
 
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import cy.agorise.graphenej.UserAccount;
 import cy.agorise.graphenej.models.AccountProperties;
 import cy.agorise.graphenej.models.BlockHeader;
 import cy.agorise.graphenej.models.HistoricalTransfer;
+import cy.agorise.graphenej.objects.Memo;
 import cy.agorise.graphenej.operations.TransferOperationBuilder;
 
 /**
@@ -585,9 +587,16 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 .setTransferAmount(new AssetAmount(UnsignedLong.valueOf(sendRequest.getAmount()), new Asset(idAsset)))
                 .setFee(new AssetAmount(UnsignedLong.valueOf(0), feeAsset));
         if (sendRequest.getMemo() != null) {
-            //builder.setMemo(new Memo(fromUserAccount,toUserAccount,0,sendRequest.getMemo().getBytes()));
-            //TODO memo
-            System.out.println("transaction has memo");
+            try {
+                //TODO change authority for memo
+                Address fromAddress = new Address(fromUserAccount.getActive().getKeyAuthList().get(0).getKey(), "BTS");
+                Address toAddress = new Address(toUserAccount.getActive().getKeyAuthList().get(0).getKey(), "BTS");
+                builder.setMemo(new Memo(fromAddress,toAddress,BigInteger.ZERO,sendRequest.getMemo().getBytes()));
+                //TODO add random nonce
+            }catch ( Exception e){
+                e.printStackTrace();
+                //TODO error
+            }
         }
         ArrayList<BaseOperation> operationList = new ArrayList<>();
         operationList.add(builder.build());
