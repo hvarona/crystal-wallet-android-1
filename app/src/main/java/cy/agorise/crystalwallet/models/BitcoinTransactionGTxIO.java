@@ -14,8 +14,8 @@ import android.arch.persistence.room.ForeignKey;
     primaryKeys = {"bitcoin_transaction_id", "io_index", "is_output"},
     foreignKeys = {
         @ForeignKey(
-            entity = BitcoinTransaction.class,
-            parentColumns = "crypto_coin_transaction_id",
+                entity = CryptoCoinTransaction.class,
+                parentColumns = "id",
             childColumns = "bitcoin_transaction_id",
             onDelete = ForeignKey.CASCADE
         )

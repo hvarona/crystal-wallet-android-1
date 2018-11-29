@@ -309,7 +309,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 btTransaction.setCryptoCoinTransactionId(ccId);
                 long btId = db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction)[0];
                 for (BitcoinTransactionGTxIO gtxio : gtxios) {
-                    gtxio.setBitcoinTransactionId(btId);
+                    gtxio.setBitcoinTransactionId(ccId);
                     db.bitcoinTransactionDao().insertBitcoinTransactionGTxIO(gtxio);
                 }
 
