@@ -782,7 +782,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             etTo.setText(invoice.getTo());
 
             for (int i = 0; i < assetAdapter.getCount(); i++) {
-                if (assetAdapter.getItem(i).getName().equals(invoice.getCurrency())) {
+                if (assetAdapter.getItem(i).getName().equals(invoice.getCurrency().toUpperCase())) {
                     spAsset.setSelection(i);
                     break;
                 }
