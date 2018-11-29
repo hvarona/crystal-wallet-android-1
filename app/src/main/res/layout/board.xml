@@ -53,8 +53,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="16dp"
+                        android:padding="8dp"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/crystal_logo"
+                        android:src="@drawable/crystal_logo_white"
                         android:contentDescription="@string/crystal_logo"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
