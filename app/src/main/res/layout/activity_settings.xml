@@ -79,13 +79,12 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <com.sjaramillo10.animatedtablayout.AnimatedTabLayout
+            <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
-                app:tabBoldText="true"
                 app:tabMode="fixed" />
 
         </RelativeLayout>
