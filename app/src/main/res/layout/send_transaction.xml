@@ -206,6 +206,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvMemoError" />
 
+        <View
+            android:id="@+id/viewCamera"
+            android:background="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:visibility="visible"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toBottomOf="@+id/tvScan"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"/>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabCloseCamera"
             android:layout_width="32dp"
@@ -220,26 +233,12 @@
             android:id="@+id/ivCamera"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
             android:contentDescription="@string/camera_feed_to_scan_qr"
-            android:src="#666"
-            app:layout_constraintDimensionRatio="h,3:4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"
-            app:layout_constraintTop_toTopOf="@+id/fabCloseCamera" />
-
-        <View
-            android:id="@+id/viewCamera"
-            android:background="@color/black"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="visible"
-            android:src="#666"
-            app:layout_constraintTop_toTopOf="@id/ivCamera"
-            app:layout_constraintStart_toStartOf="@id/ivCamera"
-            app:layout_constraintEnd_toEndOf="@id/ivCamera"
-            app:layout_constraintBottom_toBottomOf="@+id/ivCamera"/>
+            app:layout_constraintDimensionRatio="w,3:4"
+            app:layout_constraintTop_toTopOf="@+id/viewCamera"
+            app:layout_constraintBottom_toBottomOf="@id/viewCamera"
+            app:layout_constraintStart_toStartOf="@id/viewCamera"
+            app:layout_constraintEnd_toEndOf="@id/viewCamera" />
 
         <View
             android:id="@+id/viewSend"

@@ -129,9 +129,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     @BindView(R.id.gravatar)
     CircularImageView userImg;
 
-    @BindView(R.id.viewCamera)
-    View viewCamera;
-
     /* Flag to control when the camera is visible and when is hidden */
     private boolean cameraVisible = false;
 
@@ -421,7 +418,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
      * */
     private void showCamera(){
         /* Change visibilities of views */
-        viewCamera.setVisibility(View.GONE);
         mScannerView.setVisibility(View.VISIBLE);
 
         /* Change icon */
@@ -440,7 +436,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
      * */
     private void hideCamera(){
         /* Change visibilities of views */
-        viewCamera.setVisibility(View.VISIBLE);
         mScannerView.setVisibility(View.INVISIBLE);
 
         /* Change icon */
