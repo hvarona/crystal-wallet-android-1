@@ -261,7 +261,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                     //cryptoCurrencyList.add(crypto1);
 
 
-                    CryptoCurrencyAdapter assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
+                    assetAdapter = new CryptoCurrencyAdapter(getContext(), android.R.layout.simple_spinner_item, cryptoCurrencyList);
                     spAsset.setAdapter(assetAdapter);
                 }
             });
