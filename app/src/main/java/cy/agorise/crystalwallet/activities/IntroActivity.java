@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.R;
+import cy.agorise.crystalwallet.application.CrystalSecurityMonitor;
 import cy.agorise.crystalwallet.fragments.ImportAccountOptionsFragment;
 import cy.agorise.crystalwallet.viewmodels.AccountSeedListViewModel;
 
@@ -68,6 +69,9 @@ public class IntroActivity extends CustomActivity {
                         importAccount();
                     }
                 } );
+
+
+        this.getApplication().registerActivityLifecycleCallbacks(CrystalSecurityMonitor.getInstance(this));
 
         //Checks if the user has any seed created
         AccountSeedListViewModel accountSeedListViewModel = ViewModelProviders.of(this).get(AccountSeedListViewModel.class);

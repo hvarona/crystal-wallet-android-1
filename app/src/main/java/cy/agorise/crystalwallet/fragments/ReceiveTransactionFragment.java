@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import butterknife.OnClick;
 import cy.agorise.crystalwallet.enums.CryptoCoin;
@@ -84,6 +86,8 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
     TextView tvAssetError;
     @BindView(R.id.ivQrCode)
     ImageView ivQrCode;
+    @BindView(R.id.pbQrCode)
+    ProgressBar pbQrCode;
     @BindView(R.id.tvCancel)
     TextView tvCancel;
 
@@ -105,6 +109,8 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
     private FloatingActionButton fabReceive;
 
     private AsyncTask qrCodeTask;
+
+    private Double lastAmount = -1.0;
 
     public static ReceiveTransactionFragment newInstance(long cryptoNetAccountId) {
         ReceiveTransactionFragment f = new ReceiveTransactionFragment();
@@ -337,144 +343,147 @@ public class ReceiveTransactionFragment extends DialogFragment implements UIVali
     }
 
     public void createQrCode(){
-        Double amount = 0.0;
+        final Double amount;
         try{
             amount = Double.valueOf(this.etAmount.getText().toString());
+
         } catch(NumberFormatException e){
+            lastAmount = -1.0;
             Log.e("ReceiveFragment","Amount casting error.");
+            return;
         }
 
-        CryptoNetAccount toAccountSelected = (CryptoNetAccount) spTo.getSelectedItem();
-
-        if (this.cryptoNetAccount.getCryptoNet() == CryptoNet.BITSHARES) {
-            /*
-             * this is only for graphene accounts.
-             *
-             **/
-            GrapheneAccount grapheneAccountSelected = new GrapheneAccount(toAccountSelected);
-            grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(toAccountSelected.getId()));
-
-
-            this.invoiceItems.clear();
-            this.invoiceItems.add(
-                    new LineItem("transfer", 1, amount)
-            );
-
-            LineItem items[] = new LineItem[this.invoiceItems.size()];
-            items = this.invoiceItems.toArray(items);
-            this.invoice.setLineItems(items);
-            this.invoice.setTo(grapheneAccountSelected.getName());
-            this.invoice.setCurrency(this.cryptoCurrency.getName());
+        if (!amount.equals(lastAmount)) {
+            pbQrCode.setVisibility(View.VISIBLE);
+            lastAmount = amount;
+            CryptoNetAccount toAccountSelected = (CryptoNetAccount) spTo.getSelectedItem();
 
             if (this.qrCodeTask != null) {
                 this.qrCodeTask.cancel(true);
             }
 
-            this.qrCodeTask = new AsyncTask<Object, Void, Void>() {
+            if (this.cryptoNetAccount.getCryptoNet() == CryptoNet.BITSHARES) {
+                /*
+                 * this is only for graphene accounts.
+                 *
+                 **/
+                GrapheneAccount grapheneAccountSelected = new GrapheneAccount(toAccountSelected);
+                grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(toAccountSelected.getId()));
 
-                @Override
-                protected Void doInBackground(Object... voids) {
-                    try {
-                        final Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
 
-                        if (!this.isCancelled()) {
-                            ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ivQrCode.setImageBitmap(bitmap);
-                                }
-                            });
-                        }
-                    } catch (WriterException e) {
-                        Log.e("ReceiveFragment", "Error creating QrCode");
-                    }
-                    return null;
-                }
-            };
+                this.invoiceItems.clear();
+                this.invoiceItems.add(
+                        new LineItem("transfer", 1, amount)
+                );
 
-            this.qrCodeTask.execute(null, null, null);
-        } else {
-            final CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+                LineItem items[] = new LineItem[this.invoiceItems.size()];
+                items = this.invoiceItems.toArray(items);
+                this.invoice.setLineItems(items);
+                this.invoice.setTo(grapheneAccountSelected.getName());
+                this.invoice.setCurrency(this.cryptoCurrency.getName());
 
-            //final NextBitcoinAccountAddressRequest addressRequest = new NextBitcoinAccountAddressRequest(this.cryptoNetAccount, cryptoCoin, getContext());
+                //if (this.qrCodeTask != null) {
+                //    this.qrCodeTask.cancel(true);
+                //}
 
-            //addressRequest.setListener(new CryptoNetInfoRequestListener() {
-            //    @Override
-            //    public void onCarryOut() {
-            //        if (addressRequest.getStatus() == NextBitcoinAccountAddressRequest.StatusCode.SUCCEEDED){
-                        final CalculateBitcoinUriRequest uriRequest = new CalculateBitcoinUriRequest(cryptoCoin, cryptoNetAccount, getContext(), amount);
+                this.qrCodeTask = new AsyncTask<Object, Void, Void>() {
 
-                        uriRequest.setListener(new CryptoNetInfoRequestListener(){
-                            @Override
-                            public void onCarryOut(){
-                                if (uriRequest.getUri() != null){
-                                    qrCodeTask = new AsyncTask<Object, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Object... voids) {
+                        try {
+                            final Bitmap bitmap = textToImageEncode(Invoice.toQrCode(invoice));
 
-                                        @Override
-                                        protected Void doInBackground(Object... voids) {
-                                            try {
-                                                final Bitmap bitmap = textToImageEncode(uriRequest.getUri());
-
-                                                if (!this.isCancelled()) {
-                                                    ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            ivQrCode.setImageBitmap(bitmap);
-                                                        }
-                                                    });
-                                                }
-                                            } catch (WriterException e) {
-                                                Log.e("ReceiveFragment", "Error creating QrCode");
-                                            }
-                                            return null;
-                                        }
-                                    };
-
-                                    qrCodeTask.execute(null, null, null);
-                                } else {
-                                    Log.e("ReceiveFragment", "Error obtaining the uri");
-                                }
+                            if (!this.isCancelled()) {
+                                ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ivQrCode.setImageBitmap(bitmap);
+                                        pbQrCode.setVisibility(View.GONE);
+                                    }
+                                });
                             }
-                        });
+                        } catch (WriterException e) {
+                            Log.e("ReceiveFragment", "Error creating QrCode");
+                        }
 
+                        return null;
+                    }
+                };
+
+                this.qrCodeTask.execute(null, null, null);
+            } else {
+                final CryptoCoin cryptoCoin = CryptoCoin.getByCryptoNet(this.cryptoNetAccount.getCryptoNet()).get(0);
+
+                final CalculateBitcoinUriRequest uriRequest = new CalculateBitcoinUriRequest(cryptoCoin, cryptoNetAccount, getContext(), amount);
+
+                uriRequest.setListener(new CryptoNetInfoRequestListener() {
+                    @Override
+                    public void onCarryOut() {
+                        if (uriRequest.getUri() != null) {
+                            qrCodeTask = new AsyncTask<Object, Void, Void>() {
+
+                                @Override
+                                protected Void doInBackground(Object... voids) {
+                                    try {
+                                        final Bitmap bitmap = textToImageEncode(uriRequest.getUri());
+
+                                        if (!this.isCancelled()) {
+                                            ReceiveTransactionFragment.this.getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //Double amountNow = -1.0;
+                                                    //try{
+                                                    //    amountNow = Double.valueOf(etAmount.getText().toString());
+                                                    //} catch(NumberFormatException e){
+                                                    //}
+                                                    //if (amountNow >= 0) {
+                                                        if (amount.equals(lastAmount)) {
+                                                            if (!isCancelled()) {
+                                                                ivQrCode.setImageBitmap(bitmap);
+                                                                pbQrCode.setVisibility(View.GONE);
+                                                            }
+                                                        }
+                                                    //}
+                                                }
+                                            });
+                                        }
+                                    } catch (WriterException e) {
+                                        Log.e("ReceiveFragment", "Error creating QrCode");
+                                    }
+
+                                    return null;
+                                }
+                            };
+
+                            qrCodeTask.execute(null, null, null);
+                        } else {
+                            Log.e("ReceiveFragment", "Error obtaining the uri");
+                        }
+                    }
+                });
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
                         CryptoNetInfoRequests.getInstance().addRequest(uriRequest);
-            //        } else {
-            //            Toast.makeText(getContext(),"Error creating address",Toast.LENGTH_SHORT);
-            //        }
-            //    }
-            //});
+                    }
+                });
+                thread.start();
+            }
         }
     }
 
     Bitmap textToImageEncode(String Value) throws WriterException {
-        //TODO: do this in another thread
-
-        BitMatrix bitMatrix;
+        Bitmap bitmap = null;
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
-            bitMatrix = new MultiFormatWriter().encode(
-                    Value,
-                    BarcodeFormat.DATA_MATRIX.QR_CODE,
-                    ivQrCode.getWidth(), ivQrCode.getHeight(), null
-            );
-
-        } catch (IllegalArgumentException Illegalargumentexception) {
-            return null;
-        }
-        int bitMatrixWidth = bitMatrix.getWidth();
-        int bitMatrixHeight = bitMatrix.getHeight();
-        int[] pixels = new int[bitMatrixWidth * bitMatrixHeight];
-
-        for (int y = 0; y < bitMatrixHeight; y++) {
-            int offset = y * bitMatrixWidth;
-
-            for (int x = 0; x < bitMatrixWidth; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ?
-                        getResources().getColor(R.color.QRCodeBlackColor):getResources().getColor(R.color.QRCodeWhiteColor);
-            }
+            BitMatrix bitMatrix = multiFormatWriter.encode(Value, BarcodeFormat.QR_CODE, ivQrCode.getWidth(), ivQrCode.getHeight());
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            bitmap = barcodeEncoder.createBitmap(bitMatrix);
+        } catch (WriterException e) {
+            e.printStackTrace();
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
-        bitmap.setPixels(pixels, 0, ivQrCode.getWidth(), 0, 0, bitMatrixWidth, bitMatrixHeight);
         return bitmap;
     }
 }

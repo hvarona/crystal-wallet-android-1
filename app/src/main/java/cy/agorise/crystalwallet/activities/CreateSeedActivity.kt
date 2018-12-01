@@ -3,20 +3,17 @@ package cy.agorise.crystalwallet.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.TextInputEditText
 import android.text.Editable
-import android.view.View
+import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import butterknife.ButterKnife
-import butterknife.OnClick
-import butterknife.OnTextChanged
 import com.thekhaeng.pushdownanim.PushDownAnim
 import com.vincent.filepicker.ToastUtil
 import cy.agorise.crystalwallet.R
 import cy.agorise.crystalwallet.dialogs.material.*
 import cy.agorise.crystalwallet.requestmanagers.CryptoNetInfoRequests
 import cy.agorise.crystalwallet.requestmanagers.ValidateCreateBitsharesAccountRequest
-import cy.agorise.crystalwallet.requestmanagers.ValidateExistBitsharesAccountRequest
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.interfaces.UIValidatorListener
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.validationFields.BitsharesAccountNameValidation
 import cy.agorise.crystalwallet.viewmodels.validators.customImpl.validationFields.BitsharesAccountNameValidation.OnAccountExist
@@ -42,11 +39,6 @@ class CreateSeedActivity : CustomActivity() {
         setContentView(R.layout.create_seed)
 
         /*
-        * Initialice butterknife MVC
-        * */
-        ButterKnife.bind(this)
-
-        /*
          * Add the controls to the validator
          * */
         this.fieldsValidator.add(tietPin)
@@ -54,10 +46,10 @@ class CreateSeedActivity : CustomActivity() {
         this.fieldsValidator.add(tietAccountName)
 
         /*
-        *   Integration of library with button efects
+        *   Integration of library with button effects
         * */
         PushDownAnim.setPushDownAnimTo(btnCancel)
-                .setOnClickListener { cancel() }
+                .setOnClickListener { finish() }
         PushDownAnim.setPushDownAnimTo(btnCreate)
                 .setOnClickListener { createSeed() }
 
@@ -97,20 +89,14 @@ class CreateSeedActivity : CustomActivity() {
             }
         }
 
-        /*
-        * Create the pin double validation
-        * */
+        //Create the pin double validation
         val pinDoubleConfirmationValidationField = PinDoubleConfirmationValidationField(this, tietPin, tietPinConfirmation, uiValidatorListener)
 
-        /*
-        * Listener for the validation for success or fail
-        * */
+        // Listener for the validation for success or fail
         tietPin?.setUiValidator(pinDoubleConfirmationValidationField) //Validator for the field
         tietPinConfirmation?.setUiValidator(pinDoubleConfirmationValidationField) //Validator for the field
 
-        /*
-        * Account name validator
-        * */
+        // Account name validator
         val bitsharesAccountNameValidation = BitsharesAccountNameValidation(this, tietAccountName, uiValidatorListener)
         val onAccountExist = object : OnAccountExist {
             override fun onAccountExists() {
@@ -124,58 +110,49 @@ class CreateSeedActivity : CustomActivity() {
         tietAccountName?.setUiValidator(bitsharesAccountNameValidation)
 
         /*This button should not be enabled till all the fields be correctly filled*/
-        disableCreate()
+        btnCreate.isEnabled = false
 
-        /*
-        * Set the focus on the fisrt field and show keyboard
-        * */
+        // Set the focus on the first field and show keyboard
         tilPin?.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(tilPin, InputMethodManager.SHOW_IMPLICIT)
+
+        tietPin.afterTextChanged {
+            this.fieldsValidator.validate()
+            validateFieldsToContinue()
+        }
+
+        tietPinConfirmation.afterTextChanged {
+            this.fieldsValidator.validate()
+            validateFieldsToContinue()
+        }
+
+        tietAccountName.afterTextChanged {
+            this.fieldsValidator.validate()
+            validateFieldsToContinue()
+        }
+
+        btnCancel.setOnClickListener { finish() }
+        btnCreate.setOnClickListener { createSeed() }
     }
 
-    @OnTextChanged(value = R.id.tietPin, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    internal fun afterPinChanged(editable: Editable) {
-        this.fieldsValidator.validate()
+    /**
+     * Extension function to easily add a text watcher
+     */
+    fun TextInputEditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object :TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
 
-        /*
-         * Validate continue to create account
-         * */
-        validateFieldsToContinue()
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
 
-
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
     }
 
-    @OnTextChanged(value = R.id.tietPinConfirmation, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    internal fun afterPinConfirmationChanged(editable: Editable) {
-        this.fieldsValidator.validate()
-
-        /*
-         * Validate continue to create account
-         * */
-        validateFieldsToContinue()
-    }
-
-    @OnTextChanged(value = R.id.tietAccountName, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    internal fun afterAccountNameChanged(editable: Editable) {
-        this.fieldsValidator.validate()
-
-        /*
-         * Validate continue to create account
-         * */
-        validateFieldsToContinue()
-    }
-
-    @OnClick(R.id.btnCancel)
-    fun cancel() {
-
-        /*
-        * Exit of the activity
-        * */
-        this.finish()
-    }
-
-    @OnClick(R.id.btnCreate)
     fun createSeed() {
 
         /*
@@ -191,11 +168,10 @@ class CreateSeedActivity : CustomActivity() {
         questionDialog.setOnPositive(object : PositiveResponse{
             override fun onPositive() {
 
-                // Make request to create a bitshare account
+                // Make request to create a bitshares account
                 var accountName:String = tietAccountName?.getText().toString().trim()
                 val request = ValidateCreateBitsharesAccountRequest(accountName, applicationContext)
 
-                //DTVV: Friday 27 July 2018
                 //Makes dialog to tell the user that the account is been created
                 val creatingAccountMaterialDialog = CrystalDialog(globalActivity)
                 creatingAccountMaterialDialog.setText(globalActivity.resources.getString(R.string.window_create_seed_DialogMessage))
@@ -215,7 +191,7 @@ class CreateSeedActivity : CustomActivity() {
                     }
                     else if (request.status == ValidateCreateBitsharesAccountRequest.StatusCode.ACCOUNT_EXIST) {
                         ToastUtil.getInstance(globalActivity).showToast(globalActivity.getString(R.string.Account_already_exists))
-                        disableCreate()
+                        btnCreate.isEnabled = false
                     }
                     else {
                         fieldsValidator.validate()
@@ -224,10 +200,7 @@ class CreateSeedActivity : CustomActivity() {
 
                 (object : Thread() {
                     override fun run() {
-
-                        /*
-                        *
-                        * Run thread*/
+                        /* Run thread*/
                         CryptoNetInfoRequests.getInstance().addRequest(request)
                     }
                 }).start()
@@ -253,40 +226,7 @@ class CreateSeedActivity : CustomActivity() {
             result = true //Validation is correct
         }
 
-
-        /*
-        * If the result is true so the user can continue to the creation of the account
-        * */
-        if (result) {
-
-            enableCreate()
-
-        } else {
-
-            /*
-            * Disaible button create
-            * */
-            disableCreate()
-        }
-    }
-
-    /*
-    * Enable create button
-    * */
-    private fun enableCreate() {
-        runOnUiThread(Runnable {
-            //btnCreate?.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-            btnCreate?.setEnabled(true)
-        })
-    }
-
-    /*
-     * Disable create button
-     * */
-    private fun disableCreate() {
-        runOnUiThread(Runnable {
-            btnCreate?.setEnabled(false)
-            //btnCreate?.setBackground(resources.getDrawable(R.drawable.disable_style))
-        })
+        // If the result is true so the user can continue to the creation of the account
+        btnCreate.isEnabled = result
     }
 }

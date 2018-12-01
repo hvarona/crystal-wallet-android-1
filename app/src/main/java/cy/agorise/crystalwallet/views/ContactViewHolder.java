@@ -3,21 +3,17 @@ package cy.agorise.crystalwallet.views;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.activities.CreateContactActivity;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
 import cy.agorise.crystalwallet.models.Contact;
-import cy.agorise.crystalwallet.util.CircleTransformation;
+import cy.agorise.crystalwallet.util.GlideApp;
 import cy.agorise.crystalwallet.util.MD5Hash;
 
 /**
@@ -33,13 +29,13 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
     private ImageView ivDeleteContact;
     private Context context;
 
-    public ContactViewHolder(View itemView) {
+    ContactViewHolder(View itemView) {
         super(itemView);
         //TODO: use ButterKnife to load this
-        tvName = (TextView) itemView.findViewById(R.id.tvContactName);
-        ivThumbnail = (ImageView) itemView.findViewById(R.id.ivContactThumbnail);
-        tvLastPaid = (TextView) itemView.findViewById(R.id.tvLastPaid);
-        ivDeleteContact = (ImageView) itemView.findViewById(R.id.ivDeleteContact);
+        tvName = itemView.findViewById(R.id.tvContactName);
+        ivThumbnail = itemView.findViewById(R.id.ivContactThumbnail);
+        tvLastPaid = itemView.findViewById(R.id.tvLastPaid);
+        ivDeleteContact = itemView.findViewById(R.id.ivDeleteContact);
         this.context = itemView.getContext();
 
     }
@@ -76,10 +72,9 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
                 String emailHash = MD5Hash.hash(contact.getEmail());
                 String gravatarUrl = "http://www.gravatar.com/avatar/" + emailHash + "?s=204&d=404";
 
-                Picasso.with(this.context)
+                GlideApp.with(context)
                         .load(gravatarUrl)
                         .placeholder(R.drawable.avatar_placeholder)
-                        //.transform(new CircleTransformation())
                         .into(ivThumbnail);
             }
 

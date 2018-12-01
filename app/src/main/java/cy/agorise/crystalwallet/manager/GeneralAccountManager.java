@@ -98,7 +98,19 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 new ChildNumber(1, false));
 
         CryptoCoinBalance balance = new CryptoCoinBalance();
-        balance.setBalance(0);
+        long amount = 0;
+        List<CryptoCoinTransaction> trransactions = db.transactionDao().getByIdAccount(account.getId());
+        for(CryptoCoinTransaction transaction : trransactions){
+            if(transaction.isConfirmed()){
+                if(transaction.getInput()){
+                    amount += transaction.getAmount();
+                }else{
+                    amount -= transaction.getAmount();
+                }
+
+            }
+        }
+        balance.setBalance(amount);
         balance.setCryptoCurrencyId(db.cryptoCurrencyDao().getByName(cryptoCoin.getLabel(),cryptoCoin.name()).getId());
         balance.setAccountId(account.getId());
         db.cryptoCoinBalanceDao().insertCryptoCoinBalance(balance);
@@ -115,7 +127,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
             address.setChange(false);
             address.setAccountId(account.getId());
             address.setIndex(0);
-            String addressString =externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
+            String addressString = externalAddrKey.toAddress(this.cryptoCoin.getParameters()).toString();
             address.setAddress(addressString);
             db.bitcoinAddressDao().insertBitcoinAddresses(address);
             InsightApiGenerator.getTransactionFromAddress(cryptoCoin,addressString,true,
@@ -149,6 +161,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         //if(Arrays.asList(SUPPORTED_COINS).contains(request.getCoin())){
         if(request.getCoin().equals(this.cryptoCoin)){
             if(request instanceof BitcoinSendRequest) {
+                this.send((BitcoinSendRequest) request);
             }else if(request instanceof CreateBitcoinAccountRequest){
                 this.createGeneralAccount((CreateBitcoinAccountRequest) request);
             }else if(request instanceof NextBitcoinAccountAddressRequest){
@@ -228,11 +241,12 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                             ccTransaction.setAccountId(address.getAccountId());
                             ccTransaction.setFrom(addr);
                             ccTransaction.setInput(false);
+                            amount -= (long) (txi.fee * Math.pow(10, cryptoCoin.getPrecision()));
                         }
 
-                        if (ccTransaction.getAccountId() == address.getAccountId()) {
+                        //if (ccTransaction.getAccountId() == address.getAccountId()) {
                             amount -= (long) (vin.value * Math.pow(10, cryptoCoin.getPrecision()));
-                        }
+                        //}
                     }
 
                     if (ccTransaction.getFrom() == null || ccTransaction.getFrom().isEmpty()) {
@@ -267,9 +281,9 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                                 ccTransaction.setTo(addr);
                             }
 
-                            if (ccTransaction.getAccountId() == address.getAccountId()) {
+                            //if (ccTransaction.getAccountId() == address.getAccountId()) {
                                 amount += (long) (vout.value * Math.pow(10, cryptoCoin.getPrecision()));
-                            }
+                            //}
                         } else {
                             //TOOD multiple send address
                             if (ccTransaction.getTo() == null || ccTransaction.getTo().isEmpty()) {
@@ -280,11 +294,11 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 }
 
                 ccTransaction.setAmount(amount);
-                CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
+                CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
                 if (currency == null) {
                     currency = new CryptoCurrency();
                     currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-                    currency.setName(this.cryptoCoin.name());
+                    currency.setName(this.cryptoCoin.getLabel());
                     currency.setPrecision(this.cryptoCoin.getPrecision());
                     long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
                     currency.setId(idCurrency);
@@ -296,7 +310,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                 btTransaction.setCryptoCoinTransactionId(ccId);
                 long btId = db.bitcoinTransactionDao().insertBitcoinTransaction(btTransaction)[0];
                 for (BitcoinTransactionGTxIO gtxio : gtxios) {
-                    gtxio.setBitcoinTransactionId(btId);
+                    gtxio.setBitcoinTransactionId(ccId);
                     db.bitcoinTransactionDao().insertBitcoinTransactionGTxIO(gtxio);
                 }
 
@@ -325,11 +339,11 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
     }
 
     private void updateBalance(CryptoCoinTransaction ccTransaction, long amount, CrystalDatabase db){
-        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.name(), this.cryptoCoin.getCryptoNet().name());
+        CryptoCurrency currency = db.cryptoCurrencyDao().getByNameAndCryptoNet(this.cryptoCoin.getLabel(), this.cryptoCoin.getCryptoNet().name());
         if (currency == null) {
             currency = new CryptoCurrency();
             currency.setCryptoNet(this.cryptoCoin.getCryptoNet());
-            currency.setName(this.cryptoCoin.name());
+            currency.setName(this.cryptoCoin.getLabel());
             currency.setPrecision(this.cryptoCoin.getPrecision());
             long idCurrency = db.cryptoCurrencyDao().insertCryptoCurrency(currency)[0];
             currency.setId(idCurrency);
@@ -361,39 +375,52 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         //TODO check server connection
         //TODO validate to address
 
+        System.out.println("GeneralAccount Manager Send request, asking fee");
         InsightApiGenerator.getEstimateFee(this.cryptoCoin,new ApiRequest(1, new ApiRequestListener() {
             @Override
             public void success(Object answer, int idPetition) {
-                Transaction tx = new Transaction(cryptoCoin.getParameters());
-                long currentAmount = 0;
-                long fee = -1;
-                long feeRate = (Long) answer;
-                fee = 226 * feeRate;
+                System.out.println("GeneralAccount Manager Send request, fee " + answer.toString());
+                try {
+                    Transaction tx = new Transaction(cryptoCoin.getParameters());
+                    long currentAmount = 0;
+                    long fee = -1;
+                    long feeRate = (long) (((double) answer) * Math.pow(10, cryptoCoin.getPrecision()));
+                    fee = 226 * feeRate;
 
-                CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
-                db.bitcoinTransactionDao();
+                    System.out.println("GeneralAccount Manager Send request getting utxos" );
+                    CrystalDatabase db = CrystalDatabase.getAppDatabase(request.getContext());
+                    db.bitcoinTransactionDao();
 
-                List<BitcoinTransactionGTxIO> utxos = getUtxos(request.getSourceAccount().getId(),db);
+                    List<BitcoinTransactionGTxIO> utxos = getUtxos(request.getSourceAccount().getId(), db);
+                    System.out.println("GeneralAccount Manager Send request utxos found " + utxos.size() );
+                    for(BitcoinTransactionGTxIO utxo : utxos){
+                        currentAmount += utxo.getAmount();
+                        if(currentAmount >= request.getAmount() + fee) {
+                            break;
+                        }
+                    }
 
-                if(currentAmount< request.getAmount() + fee){
-                    request.setStatus(BitcoinSendRequest.StatusCode.NO_BALANCE);
-                    return;
-                }
-                AccountSeed seed = db.accountSeedDao().findById(request.getSourceAccount().getSeedId());
-                DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
-                        new ChildNumber(44, true));
-                DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
-                        new ChildNumber(cryptoCoin.getCoinNumber(), true));
-                DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
-                        new ChildNumber(request.getSourceAccount().getAccountIndex(), true));
-                DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
-                        new ChildNumber(0, false));
-                DeterministicKey changeKey = HDKeyDerivation.deriveChildKey(accountKey,
-                        new ChildNumber(1, false));
+                    if (currentAmount < request.getAmount() + fee) {
+                        System.out.println("GeneralAccount Manager Send request no balance" );
+                        request.setStatus(BitcoinSendRequest.StatusCode.NO_BALANCE);
+                        return;
+                    }
 
-                //String to an address
-                Address toAddr = Address.fromBase58(cryptoCoin.getParameters(), request.getToAccount());
-                tx.addOutput(Coin.valueOf(request.getAmount()), toAddr);
+                    AccountSeed seed = db.accountSeedDao().findById(request.getSourceAccount().getSeedId());
+                    DeterministicKey purposeKey = HDKeyDerivation.deriveChildKey((DeterministicKey) seed.getPrivateKey(),
+                            new ChildNumber(44, true));
+                    DeterministicKey coinKey = HDKeyDerivation.deriveChildKey(purposeKey,
+                            new ChildNumber(cryptoCoin.getCoinNumber(), true));
+                    DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinKey,
+                            new ChildNumber(request.getSourceAccount().getAccountIndex(), true));
+                    DeterministicKey externalKey = HDKeyDerivation.deriveChildKey(accountKey,
+                            new ChildNumber(0, false));
+                    DeterministicKey changeKey = HDKeyDerivation.deriveChildKey(accountKey,
+                            new ChildNumber(1, false));
+
+                    //String to an address
+                    Address toAddr = Address.fromBase58(cryptoCoin.getParameters(), request.getToAccount());
+                    tx.addOutput(Coin.valueOf(request.getAmount()), toAddr);
 
                 /*if(request.getMemo()!= null && !request.getMemo().isEmpty()){
                     String memo = request.getMemo();
@@ -408,62 +435,74 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
                     tx.addOutput(Coin.valueOf(0),memoScript);
                 }*/
 
-                //Change address
-                long remain = currentAmount - request.getAmount() - fee;
-                if( remain > 0 ) {
-                    long index = db.bitcoinAddressDao().getLastChangeAddress(request.getSourceAccount().getId());
-                    BitcoinAddress btAddress = db.bitcoinAddressDao().getChangeByIndex(index);
-                    Address changeAddr;
-                    if(btAddress != null && db.bitcoinTransactionDao().getGtxIOByAddress(btAddress.getAddress()).size()<=0){
+                    //Change address
+                    long remain = currentAmount - request.getAmount() - fee;
+                    if (remain > 0) {
+                        long index = db.bitcoinAddressDao().getLastChangeAddress(request.getSourceAccount().getId());
+                        BitcoinAddress btAddress = db.bitcoinAddressDao().getChangeByIndex(index);
+                        Address changeAddr;
+                        if (btAddress != null && db.bitcoinTransactionDao().getGtxIOByAddress(btAddress.getAddress()).size() <= 0) {
                             changeAddr = Address.fromBase58(cryptoCoin.getParameters(), btAddress.getAddress());
 
-                    }else{
-                        if(btAddress == null){
-                            index = 0;
-                        }else{
-                            index++;
+                        } else {
+                            if (btAddress == null) {
+                                index = 0;
+                            } else {
+                                index++;
+                            }
+                            btAddress = new BitcoinAddress();
+                            btAddress.setIndex(index);
+                            btAddress.setAccountId(request.getSourceAccount().getId());
+                            btAddress.setChange(true);
+                            btAddress.setAddress(HDKeyDerivation.deriveChildKey(changeKey, new ChildNumber((int) btAddress.getIndex(), false)).toAddress(cryptoCoin.getParameters()).toString());
+                            db.bitcoinAddressDao().insertBitcoinAddresses(btAddress);
+                            changeAddr = Address.fromBase58(cryptoCoin.getParameters(), btAddress.getAddress());
                         }
-                        btAddress = new BitcoinAddress();
-                        btAddress.setIndex(index);
-                        btAddress.setAccountId(request.getSourceAccount().getId());
-                        btAddress.setChange(true);
-                        btAddress.setAddress(HDKeyDerivation.deriveChildKey(changeKey, new ChildNumber((int) btAddress.getIndex(), false)).toAddress(cryptoCoin.getParameters()).toString());
-                        db.bitcoinAddressDao().insertBitcoinAddresses(btAddress);
-                        changeAddr = Address.fromBase58(cryptoCoin.getParameters(), btAddress.getAddress());
+                        tx.addOutput(Coin.valueOf(remain), changeAddr);
                     }
-                    tx.addOutput(Coin.valueOf(remain), changeAddr);
+
+                    for (BitcoinTransactionGTxIO utxo : utxos) {
+                        Sha256Hash txHash = Sha256Hash.wrap(utxo.getOriginalTxId());
+                        Script script = new Script(Util.hexToBytes(utxo.getScriptHex()));
+                        TransactionOutPoint outPoint = new TransactionOutPoint(cryptoCoin.getParameters(), utxo.getIndex(), txHash);
+                        BitcoinAddress btAddress = db.bitcoinAddressDao().getdadress(utxo.getAddress());
+                        ECKey addrKey;
+
+                        if (btAddress.isChange()) {
+                            addrKey = HDKeyDerivation.deriveChildKey(changeKey, new ChildNumber((int) btAddress.getIndex(), false));
+                        } else {
+                            addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) btAddress.getIndex(), true));
+                        }
+                        tx.addSignedInput(outPoint, script, addrKey, Transaction.SigHash.ALL, true);
+                        currentAmount -= utxo.getAmount();
+                        if(currentAmount<= 0){
+                            break;
+                        }
+                    }
+
+                    System.out.println("GeneralAccount Manager Send request rawtx "  +Util.bytesToHex(tx.bitcoinSerialize()) );
+                    InsightApiGenerator.broadcastTransaction(cryptoCoin, Util.bytesToHex(tx.bitcoinSerialize()), new ApiRequest(1, new ApiRequestListener() {
+                        @Override
+                        public void success(Object answer, int idPetition) {
+                            System.out.println("GeneralAccount MAnager succed send");
+                            request.setStatus(BitcoinSendRequest.StatusCode.SUCCEEDED);
+                        }
+
+                        @Override
+                        public void fail(int idPetition) {
+                            System.out.println("GeneralAccount MAnager succed fail");
+                            request.setStatus(BitcoinSendRequest.StatusCode.PETITION_FAILED);
+                        }
+                    }));
+                }catch(Exception e){
+                    System.out.println("GeneralAccount Manager Send request error ");
+                    e.printStackTrace();
                 }
-
-                for(BitcoinTransactionGTxIO utxo: utxos) {
-                    Sha256Hash txHash = Sha256Hash.wrap(utxo.getOriginalTxId());
-                    Script script = new Script(Util.hexToBytes(utxo.getScriptHex()));
-                    TransactionOutPoint outPoint = new TransactionOutPoint(cryptoCoin.getParameters(), utxo.getIndex(), txHash);
-                    BitcoinAddress btAddress = db.bitcoinAddressDao().getdadress(utxo.getAddress());
-                    ECKey addrKey;
-
-                    if(btAddress.isChange()){
-                        addrKey = HDKeyDerivation.deriveChildKey(changeKey, new ChildNumber((int) btAddress.getIndex(), false));
-                    }else{
-                        addrKey = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber((int) btAddress.getIndex(), true));
-                    }
-                    tx.addSignedInput(outPoint, script, addrKey, Transaction.SigHash.ALL, true);
-                }
-
-                InsightApiGenerator.broadcastTransaction(cryptoCoin,Util.bytesToHex(tx.bitcoinSerialize()),new ApiRequest(1, new ApiRequestListener() {
-                    @Override
-                    public void success(Object answer, int idPetition) {
-                        request.setStatus(BitcoinSendRequest.StatusCode.SUCCEEDED);
-                    }
-
-                    @Override
-                    public void fail(int idPetition) {
-                        request.setStatus(BitcoinSendRequest.StatusCode.PETITION_FAILED);
-                    }
-                }));
             }
 
             @Override
             public void fail(int idPetition) {
+                System.out.println("GeneralAccount Manager Send request fee fail" );
                 request.setStatus(BitcoinSendRequest.StatusCode.NO_FEE);
 
             }
@@ -542,7 +581,7 @@ public class GeneralAccountManager implements CryptoAccountManager, CryptoNetInf
         System.out.println("GeneralAccountMAnager uri calculated : " + uri.toString());
 
         request.setUri(uri.toString());
-        request.validate();
+        //request.validate();
     }
 
     private void parseUri(BitcoinUriParseRequest request){

@@ -75,7 +75,7 @@ public class InsightApiGenerator {
         GetEstimateFee.getEstimateFee(CryptoNetManager.getURL(cryptoCoin.getCryptoNet()),
                 new GetEstimateFee.estimateFeeListener() {
             @Override
-            public void estimateFee(long value) {
+            public void estimateFee(double value) {
                 request.listener.success(value,request.getId());
             }
 

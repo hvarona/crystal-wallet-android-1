@@ -8,6 +8,7 @@ import com.google.common.primitives.UnsignedLong;
 
 import org.bitcoinj.core.ECKey;
 
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import cy.agorise.graphenej.UserAccount;
 import cy.agorise.graphenej.models.AccountProperties;
 import cy.agorise.graphenej.models.BlockHeader;
 import cy.agorise.graphenej.models.HistoricalTransfer;
+import cy.agorise.graphenej.objects.Memo;
 import cy.agorise.graphenej.operations.TransferOperationBuilder;
 
 /**
@@ -90,6 +92,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                             long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(fetch)[0];
                             fetch.setId(idAccount);
                             db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(fetch));
+                            AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                            if(seed.getName() == null || seed.getName().isEmpty()){
+                                seed.setName(grapheneAccount.getName());
+                                db.accountSeedDao().insertAccountSeed(seed);
+                            }
                             subscribeBitsharesAccount(fetch.getId(),fetch.getAccountId(),context);
                             request.success(fetch);
                         }
@@ -130,6 +137,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long[] idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount);
                         grapheneAccount.setId(idAccount[0]);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -149,6 +161,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
                         grapheneAccount.setId(idAccount);
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -162,6 +179,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 long idAccount = db.cryptoNetAccountDao().insertCryptoNetAccount(grapheneAccount)[0];
                 grapheneAccount.setId(idAccount);
                 db.grapheneAccountInfoDao().insertGrapheneAccountInfo(new GrapheneAccountInfo(grapheneAccount));
+                AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                if(seed.getName() == null || seed.getName().isEmpty()){
+                    seed.setName(grapheneAccount.getName());
+                    db.accountSeedDao().insertAccountSeed(seed);
+                }
                 subscribeBitsharesAccount(grapheneAccount.getId(), grapheneAccount.getAccountId(), context);
             }
         }
@@ -182,6 +204,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                         info.setAccountId(fetch.getAccountId());
                         grapheneAccount.setAccountId(fetch.getAccountId());
                         db.grapheneAccountInfoDao().insertGrapheneAccountInfo(info);
+                        AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                        if(seed.getName() == null || seed.getName().isEmpty()){
+                            seed.setName(grapheneAccount.getName());
+                            db.accountSeedDao().insertAccountSeed(seed);
+                        }
                         subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
                     }
 
@@ -212,6 +239,11 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                     }
                 });
             }else{
+                AccountSeed seed = db.accountSeedDao().findById(grapheneAccount.getSeedId());
+                if(seed.getName() == null || seed.getName().isEmpty()){
+                    seed.setName(grapheneAccount.getName());
+                    db.accountSeedDao().insertAccountSeed(seed);
+                }
                 subscribeBitsharesAccount(grapheneAccount.getId(),grapheneAccount.getAccountId(),context);
             }
         }
@@ -555,9 +587,16 @@ public class BitsharesAccountManager implements CryptoAccountManager, CryptoNetI
                 .setTransferAmount(new AssetAmount(UnsignedLong.valueOf(sendRequest.getAmount()), new Asset(idAsset)))
                 .setFee(new AssetAmount(UnsignedLong.valueOf(0), feeAsset));
         if (sendRequest.getMemo() != null) {
-            //builder.setMemo(new Memo(fromUserAccount,toUserAccount,0,sendRequest.getMemo().getBytes()));
-            //TODO memo
-            System.out.println("transaction has memo");
+            try {
+                //TODO change authority for memo
+                Address fromAddress = new Address(fromUserAccount.getActive().getKeyAuthList().get(0).getKey(), "BTS");
+                Address toAddress = new Address(toUserAccount.getActive().getKeyAuthList().get(0).getKey(), "BTS");
+                builder.setMemo(new Memo(fromAddress,toAddress,BigInteger.ZERO,sendRequest.getMemo().getBytes()));
+                //TODO add random nonce
+            }catch ( Exception e){
+                e.printStackTrace();
+                //TODO error
+            }
         }
         ArrayList<BaseOperation> operationList = new ArrayList<>();
         operationList.add(builder.build());

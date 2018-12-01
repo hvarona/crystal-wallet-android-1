@@ -97,8 +97,8 @@ class InsightApiServiceGenerator {
                 return chain.proceed(request);
             }
         });
-        sClientBuilder.readTimeout(5, TimeUnit.MINUTES);
-        sClientBuilder.connectTimeout(5, TimeUnit.MINUTES);
+        sClientBuilder.readTimeout(30, TimeUnit.SECONDS);
+        sClientBuilder.connectTimeout(30, TimeUnit.SECONDS);
         OkHttpClient client = sClientBuilder.build();
         Retrofit retrofit = sBuilder.client(client).build();
         return retrofit.create(serviceClass);

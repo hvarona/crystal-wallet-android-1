@@ -65,9 +65,14 @@ public class BroadcastTransaction extends Thread implements Callback<Txi> {
      */
     @Override
     public void run() {
-        InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
-        Call<Txi> broadcastTransaction = service.broadcastTransaction(this.mPath,this.mRawTx);
-        broadcastTransaction.enqueue(this);
+        try {
+
+            InsightApiService service = this.mServiceGenerator.getService(InsightApiService.class);
+            Call<Txi> broadcastTransaction = service.broadcastTransaction(this.mPath, this.mRawTx);
+            broadcastTransaction.enqueue(this);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public interface BroadCastTransactionListener{

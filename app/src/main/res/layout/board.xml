@@ -53,8 +53,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="16dp"
+                        android:padding="8dp"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/crystal_logo"
+                        android:src="@drawable/crystal_logo_white"
                         android:contentDescription="@string/crystal_logo"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -95,7 +96,7 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <com.sjaramillo10.animatedtablayout.AnimatedTabLayout
+            <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_gravity="bottom"
                 android:background="@color/transparent"
@@ -123,21 +124,25 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabReceive"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"
         android:layout_marginBottom="-125dp"
         android:layout_marginStart="-125dp"
+        app:fabCustomSize="250dp"
+        app:maxImageSize="200dp"
         app:backgroundTint="@color/white"
         app:srcCompat="@drawable/receive_icon" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabSend"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="-125dp"
         android:layout_marginEnd="-125dp"
+        app:fabCustomSize="250dp"
+        app:maxImageSize="200dp"
         app:backgroundTint="@color/white"
         app:srcCompat="@drawable/send_icon" />
 

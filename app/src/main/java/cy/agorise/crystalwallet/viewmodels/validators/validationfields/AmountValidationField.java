@@ -5,6 +5,8 @@ import android.widget.Spinner;
 
 import cy.agorise.crystalwallet.R;
 import cy.agorise.crystalwallet.dao.CrystalDatabase;
+import cy.agorise.crystalwallet.enums.CryptoCoin;
+import cy.agorise.crystalwallet.enums.CryptoNet;
 import cy.agorise.crystalwallet.models.CryptoCoinBalance;
 import cy.agorise.crystalwallet.models.CryptoCurrency;
 import cy.agorise.crystalwallet.models.CryptoNetAccount;
@@ -29,7 +31,12 @@ public class AmountValidationField extends ValidationField {
     public void validate(){
         try {
             final float newAmountValue = Float.parseFloat(amountField.getText().toString());
-            final CryptoCurrency cryptoCurrency = (CryptoCurrency)assetSpinner.getSelectedItem();
+            final CryptoCurrency cryptoCurrency;
+            if(this.account.getCryptoNet() == CryptoNet.BITSHARES) {
+                cryptoCurrency = (CryptoCurrency) assetSpinner.getSelectedItem();
+            }else{
+                cryptoCurrency = CrystalDatabase.getAppDatabase(amountField.getContext()).cryptoCurrencyDao().getByNameAndCryptoNet(CryptoCoin.getByCryptoNet(this.account.getCryptoNet()).get(0).getLabel(),this.account.getCryptoNet().name());
+            }
 
             /*
             * Validation for the money
@@ -66,6 +73,8 @@ public class AmountValidationField extends ValidationField {
             setLastValue("");
             setMessageForValue("",validator.getContext().getResources().getString(R.string.please_enter_valid_amount));
             setValidForValue("", false);
+        } catch (Exception e ){
+            e.printStackTrace();
         }
     }
 }
