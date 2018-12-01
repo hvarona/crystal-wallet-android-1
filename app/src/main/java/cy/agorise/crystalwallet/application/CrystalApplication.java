@@ -52,8 +52,8 @@ public class CrystalApplication extends Application {
 
 
     public static final String BITCOIN_SERVER_URLS[] ={
+            "https://testnet.blockexplorer.com/",
             "https://test-insight.bitpay.com",
-            //"https://testnet.blockexplorer.com/",
             //"https://insight.bitpay.com/"
 
     };

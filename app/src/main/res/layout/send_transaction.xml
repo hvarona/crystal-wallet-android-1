@@ -18,6 +18,13 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5"/>
 
+        <android.support.constraint.Guideline
+            android:id="@+id/cameraVerticalGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.65"/>
+
         <View
             android:id="@+id/topView"
             android:layout_width="match_parent"
@@ -217,7 +224,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toBottomOf="@+id/tvScan"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"/>
+            app:layout_constraintEnd_toStartOf="@id/cameraVerticalGuideline"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabCloseCamera"
@@ -225,7 +232,7 @@
             android:layout_height="wrap_content"
             app:backgroundTint="@color/send_strong_orange"
             app:fabCustomSize="32dp"
-            app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
+            app:layout_constraintStart_toEndOf="@id/cameraVerticalGuideline"
             app:layout_constraintTop_toBottomOf="@+id/tvScan"
             app:srcCompat="@drawable/ok" />
 
@@ -247,7 +254,8 @@
             android:layout_marginEnd="0dp"
             android:background="@drawable/send_transaction_send_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/ivCamera" />
+            app:layout_constraintTop_toTopOf="@id/viewCamera"
+            app:layout_constraintBottom_toBottomOf="@id/viewCamera"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btnSend"
