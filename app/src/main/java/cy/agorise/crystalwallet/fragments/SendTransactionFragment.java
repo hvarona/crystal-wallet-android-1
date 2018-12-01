@@ -502,6 +502,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                                 throwable.printStackTrace();
                             }
                         } else {
+                            crystalDialog.dismiss();
                             Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                         }
                     }
@@ -534,6 +535,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                                 throwable.printStackTrace();
                             }
                         } else {
+                            crystalDialog.dismiss();
                             Toast.makeText(getContext(), getContext().getString(R.string.unable_to_send_amount), Toast.LENGTH_LONG);
                         }
                     }

@@ -89,7 +89,7 @@ public class BitcoinSendRequest extends CryptoNetInfoRequest {
 
     public void setStatus(StatusCode code){
         this.status = code;
-        this._fireOnCarryOutEvent();
+        this.validate();
     }
 
     public StatusCode getStatus() {
