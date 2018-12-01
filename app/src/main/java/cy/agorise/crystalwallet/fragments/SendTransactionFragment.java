@@ -28,8 +28,6 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -139,9 +137,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     private FloatingActionButton fabSend;
     private AlertDialog.Builder builder;
 
-    /*
-        Dialog for loading
-    */
+    /* Dialog for loading */
     private CrystalDialog crystalDialog;
 
     public static SendTransactionFragment newInstance(long cryptoNetAccountId) {
@@ -168,7 +164,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
         //AlertDialog.Builder
         builder = new AlertDialog.Builder(getActivity(), R.style.dialog_theme_full);
-        //builder.setTitle("Send");
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.send_transaction, null);
@@ -176,11 +171,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
         this.cryptoNetAccountId  = getArguments().getLong("CRYPTO_NET_ACCOUNT_ID",-1);
 
-        final Activity activity = getActivity();
-
-        /*
-         *   Add style to the spinner android
-         * */
+        /* Add style to the spinner android */
         spFrom.setBackground(getContext().getDrawable(R.drawable.square_color));
 
         if (this.cryptoNetAccountId != -1) {
@@ -191,36 +182,10 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
             List<CryptoNetAccount> cryptoNetAccounts = cryptoNetAccountListViewModel.getCryptoNetAccountList();
             CryptoNetAccountAdapter fromSpinnerAdapter = new CryptoNetAccountAdapter(this.getContext(), android.R.layout.simple_spinner_item, cryptoNetAccounts);
 
-            /*
-             *   If only one account block the control
-             * */
-            //if(cryptoNetAccounts.size()==1){
-            //    spFrom.setEnabled(false);
-            //}
-
             spFrom.setAdapter(fromSpinnerAdapter);
             spFrom.setSelection(0);
 
             setAccountUI();
-            /*
-             * Custom material spinner implementation
-             * */
-            //spFrom.setItems(cryptoNetAccounts);
-            //spFrom.setSelectedIndex(0);
-            //spFrom.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<CryptoNetAccount>() {
-            //    @Override
-             //   public void onItemSelected(MaterialSpinner view, int position, long id, CryptoNetAccount item) {
-            //        sendTransactionValidator.validate();
-            //    }
-            //});
-            //spFrom.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
-
-            //    @Override public void onNothingSelected(MaterialSpinner spinner) {
-
-            //    }
-            //});
-
-            // etFrom.setText(this.grapheneAccount.getName());
         }
 
         loadUserImage();
@@ -337,12 +302,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
     public void onResume() {
         super.onResume();
         mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
 
-        // Force dialog fragment to use the full width of the screen
-        Window dialogWindow = getDialog().getWindow();
-        assert dialogWindow != null;
-        dialogWindow.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         loadUserImage();
     }
 
@@ -511,10 +471,7 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
 
             if (fromAccountSelected.getCryptoNet() == CryptoNet.BITSHARES) {
-                /*
-                 * this is only for graphene accounts.
-                 *
-                 **/
+                /* This is only for graphene accounts. */
                 GrapheneAccount grapheneAccountSelected = new GrapheneAccount(fromAccountSelected);
                 grapheneAccountSelected.loadInfo(db.grapheneAccountInfoDao().getByAccountId(fromAccountSelected.getId()));
 
@@ -583,16 +540,12 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
                 });
             }
 
-            /*
-             * If exists mode scurity show it and valide events in case of success or fail
-             * */
+            /* If exists mode security show it and validate events in case of success or fail */
             CrystalSecurityMonitor.getInstance(this.getActivity()).callPasswordRequest(this.getActivity(), new OnResponse() {
                 @Override
                 public void onSuccess() {
 
-                    /*
-                     * Show loading dialog
-                     * */
+                    /* Show loading dialog */
                     crystalDialog = new CrystalDialog((Activity) getContext());
                     crystalDialog.setText("Sending");
                     crystalDialog.progress();
@@ -623,10 +576,6 @@ public class SendTransactionFragment extends DialogFragment implements UIValidat
 
     // Camera Permissions
     private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static String[] PERMISSIONS_CAMERA = {
-            Manifest.permission.CAMERA
-    };
-
 
     @Override
     public void onValidationSucceeded(final ValidationField field) {
