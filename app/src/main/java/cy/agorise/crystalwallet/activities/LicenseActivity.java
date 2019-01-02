@@ -70,12 +70,7 @@ public class LicenseActivity extends AppCompatActivity {
             finish();
         }
         else{
-
-            /*
-            * Load the licence only if it is necesarry
-            * */
-            String html = getString(R.string.licence_html);
-            wvEULA.loadData(html, "text/html", "UTF-8");
+            wvEULA.loadUrl("file:///android_asset/crystal_eula.html");
         }
     }
 
